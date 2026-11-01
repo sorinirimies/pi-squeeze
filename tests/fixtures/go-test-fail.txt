@@ -1,0 +1,6 @@
+--- FAIL: TestB (0.00s)
+    --- FAIL: TestB/sub (0.00s)
+        a_test.go:4: bad 3
+FAIL
+FAIL	gt	0.301s
+FAIL

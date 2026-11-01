@@ -9,6 +9,12 @@
 import { describe, expect, it } from "bun:test";
 import { compact } from "../extensions/core/compact.ts";
 import { parse, tokenize } from "../extensions/core/command.ts";
+import { compactAudit } from "../extensions/core/audit.ts";
+import { compactGradle } from "../extensions/core/gradle.ts";
+import { compactRustc } from "../extensions/core/rustc.ts";
+import { compactBunTest, compactGoTest } from "../extensions/core/runners.ts";
+import { compactTree } from "../extensions/core/tree.ts";
+import { compactTsc } from "../extensions/core/tsc.ts";
 import { compactBlame } from "../extensions/core/blame.ts";
 import { compactDust } from "../extensions/core/dust.ts";
 import { compactGeneric } from "../extensions/core/generic.ts";
@@ -87,6 +93,24 @@ describe("fuzz", () => {
 		compactBlame(d);
 		compactDust(d);
 		compactGeneric(d);
+		compactAudit(d);
+		compactGradle(`> Task :x\n${d}\nBUILD FAILED in 1s`);
+		compactRustc(d);
+		compactRustc(`error: x\n --> a.rs:1:1\n${d}`);
+		compactBunTest(`${d}\nRan 1 tests across 1 files.`);
+		compactGoTest(`ok  \tp\t1s\n${d}`);
+		compactTree(`root\n├── a\n${d}`);
+		compactTsc(d);
+	});
+
+	fuzz("tsc keeps every error message; gradle keeps every failed task", (r) => {
+		const msgs = Array.from({ length: 1 + Math.floor(r() * 20) }, (_, i) => `message ${i} ${text(r, 6).replace(/[\u0000-\u001f\u007f-\u009f\u2028\u2029]/g, " ").trim()}`);
+		const raw = msgs.map((m, i) => `f${i % 3}.ts(${i + 1},1): error TS${1000 + i}: ${m}`).join("\n");
+		const out = compactTsc(raw, { lineChars: 10000, perGroup: 1000, total: 5000 })!.text;
+		for (const m of msgs) expect(out).toContain(m);
+		const failed = Array.from({ length: 1 + Math.floor(r() * 5) }, (_, i) => `> Task :m${i}:compile FAILED`);
+		const g = compactGradle([...failed, ...Array.from({ length: 5 }, (_, i) => `> Task :ok${i} UP-TO-DATE`), "BUILD FAILED in 1s"].join("\n"))!.text;
+		for (const f of failed) expect(g).toContain(f);
 	});
 
 	fuzz("generic clean-up never loses a distinct line", (r) => {

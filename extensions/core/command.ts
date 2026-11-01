@@ -64,7 +64,8 @@ export function stripCd(command: string): string {
 
 /** The single simple command a line runs, or undefined when it is anything more. */
 export function parse(command: string): Invocation | undefined {
-	const line = stripCd(command).trim();
+	// `2>&1` only merges the streams, which is how pi shows them anyway.
+	const line = stripCd(command).replace(/\s+2>&1\s*$/, "").trim();
 	if (!line || hasOperator(line)) return undefined;
 	const words = tokenize(line);
 	if (!words) return undefined;

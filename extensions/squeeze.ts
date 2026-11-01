@@ -7,7 +7,7 @@
  */
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { completions, parseCommand } from "./command/parse.ts";
-import { compact, compactsFailures, KINDS } from "./core/compact.ts";
+import { compact, KINDS } from "./core/compact.ts";
 import { type Config, DEFAULT_CONFIG, optionsOf, readConfig, saveConfig } from "./core/config.ts";
 import { rewrite } from "./core/rtk.ts";
 import { saveFull } from "./core/save.ts";
@@ -48,14 +48,13 @@ export default function (pi: ExtensionAPI) {
 		if (!config.enabled || event.toolName !== "bash") return;
 		const command = (event.input as { command?: unknown }).command;
 		if (typeof command !== "string") return;
-		if (event.isError && !compactsFailures(command)) return;
 		// pi already truncated this one: its text is not the tool's own format any more.
 		if ((event.details as { truncation?: unknown } | undefined)?.truncation) return;
 		const blocks = event.content;
 		if (blocks.length !== 1 || blocks[0]!.type !== "text") return;
 		const original = blocks[0]!.text;
 
-		const r = compact(command, original, optionsOf(config));
+		const r = compact(command, original, { ...optionsOf(config), failed: event.isError });
 		if (!r) return;
 		record(stats, r);
 		showStatus(ctx);

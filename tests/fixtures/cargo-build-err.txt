@@ -1,0 +1,35 @@
+   Compiling warn v0.1.0 (/private/tmp/s/warn)
+warning: unused import: `std::collections::HashMap`
+ --> src/lib.rs:1:5
+  |
+1 | use std::collections::HashMap;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+error[E0308]: mismatched types
+ --> src/lib.rs:8:39
+  |
+8 | pub fn broken() -> i32 { let q: i32 = "x"; undefined_fn(q) }
+  |                                 ---   ^^^ expected `i32`, found `&str`
+  |                                 |
+  |                                 expected due to this
+
+error[E0425]: cannot find function `undefined_fn` in this scope
+ --> src/lib.rs:8:44
+  |
+8 | pub fn broken() -> i32 { let q: i32 = "x"; undefined_fn(q) }
+  |                                            ^^^^^^^^^^^^ not found in this scope
+
+warning: unused variable: `unused`
+ --> src/lib.rs:2:31
+  |
+2 | pub fn a(x: i32) -> i32 { let unused = 5; if x == 1 { return 1; } else { return 2; } }
+  |                               ^^^^^^ help: if this is intentional, prefix it with an underscore: `_unused`
+  |
+  = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+Some errors have detailed explanations: E0308, E0425.
+For more information about an error, try `rustc --explain E0308`.
+warning: `warn` (lib) generated 2 warnings
+error: could not compile `warn` (lib) due to 2 previous errors; 2 warnings emitted

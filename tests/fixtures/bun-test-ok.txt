@@ -1,0 +1,70 @@
+bun test v1.3.14 (0d9b296a)
+
+b.test.ts:
+(pass) math > adds 0 [0.04ms]
+(pass) math > adds 1
+(pass) math > adds 2
+(pass) math > adds 3
+(pass) math > adds 4
+(pass) math > adds 5
+(pass) math > adds 6
+(pass) math > adds 7
+(pass) math > adds 8
+(pass) math > adds 9
+(pass) math > adds 10
+(pass) math > adds 11
+(pass) math > adds 12
+(pass) math > adds 13
+(pass) math > adds 14
+(pass) math > adds 15
+(pass) math > adds 16
+(pass) math > adds 17
+(pass) math > adds 18
+(pass) math > adds 19
+(pass) math > adds 20
+(pass) math > adds 21
+(pass) math > adds 22
+(pass) math > adds 23
+(pass) math > adds 24
+(pass) math > adds 25
+(pass) math > adds 26
+(pass) math > adds 27
+(pass) math > adds 28
+(pass) math > adds 29
+
+a.test.ts:
+(pass) math > adds 0
+(pass) math > adds 1
+(pass) math > adds 2
+(pass) math > adds 3 [0.02ms]
+(pass) math > adds 4
+(pass) math > adds 5
+(pass) math > adds 6
+(pass) math > adds 7
+(pass) math > adds 8
+(pass) math > adds 9
+(pass) math > adds 10
+(pass) math > adds 11
+(pass) math > adds 12
+(pass) math > adds 13
+(pass) math > adds 14
+(pass) math > adds 15
+(pass) math > adds 16
+(pass) math > adds 17
+(pass) math > adds 18
+(pass) math > adds 19
+(pass) math > adds 20
+(pass) math > adds 21
+(pass) math > adds 22
+(pass) math > adds 23
+(pass) math > adds 24
+(pass) math > adds 25
+(pass) math > adds 26
+(pass) math > adds 27
+(pass) math > adds 28
+(pass) math > adds 29
+
+ 60 pass
+ 0 fail
+ 60 expect() calls
+Ran 60 tests across 2 files. [8.00ms]

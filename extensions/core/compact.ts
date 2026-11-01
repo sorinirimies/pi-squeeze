@@ -1,18 +1,24 @@
 /** Chooses the compactor for a bash command and applies the safety rules. */
 import { hasFlag, parse } from "./command.ts";
 import { DEFAULT_LIMITS, type Limits, type Squeezed } from "./elide.ts";
+import { compactAudit } from "./audit.ts";
 import { compactBlame } from "./blame.ts";
 import { compactDiff } from "./diff.ts";
 import { compactDust } from "./dust.ts";
+import { compactGradle } from "./gradle.ts";
 import { compactGeneric, isContent } from "./generic.ts";
 import { compactLog, compactShow } from "./gitlog.ts";
 import { compactStatus } from "./gitstatus.ts";
 import { compactLsd } from "./lsd.ts";
 import { compactPaths } from "./paths.ts";
 import { compactRg } from "./rg.ts";
+import { compactRustc } from "./rustc.ts";
+import { compactBunTest, compactGoTest } from "./runners.ts";
 import { compactTests } from "./tests.ts";
+import { compactTree } from "./tree.ts";
+import { compactTsc } from "./tsc.ts";
 
-export const KINDS = ["search", "paths", "listing", "diff", "tests", "git", "generic"] as const;
+export const KINDS = ["search", "paths", "listing", "diff", "tests", "git", "build", "tree", "generic"] as const;
 export type Kind = (typeof KINDS)[number];
 
 export type Result = { text: string; kind: Kind; truncated: boolean; before: number; after: number };
@@ -25,6 +31,8 @@ export type Options = {
 	maxRatio?: number;
 	/** Compactors that may run; a missing entry means on. */
 	kinds?: Partial<Record<Kind, boolean>>;
+	/** The command failed: only test and build output is worth compacting then (the errors are the point). */
+	failed?: boolean;
 };
 
 const SEARCH = new Set(["rg", "grep", "egrep", "ugrep"]);
@@ -50,6 +58,37 @@ const NOT_PLAIN_DIFF = {
 function plainFind(args: string[]): boolean {
 	return !args.some((a) => ["-exec", "-execdir", "-ls", "-print0", "-printf", "-fprint", "-delete", "-ok"].includes(a));
 }
+
+function pickCargo(args: string[]): ReturnType<typeof pick> {
+	const [sub, ...rest] = args;
+	if (hasFlag(rest, ["--format", "--message-format", "--prefix", "--charset", "--timings"])) return undefined;
+	switch (sub) {
+		case "test":
+			return { kind: "tests", run: compactTests };
+		case "build":
+		case "check":
+		case "clippy":
+		case "doc":
+		case "bench":
+			return { kind: "build", run: compactRustc };
+		case "audit":
+			return { kind: "build", run: compactAudit };
+		case "tree":
+			return { kind: "tree", run: compactTree };
+		default:
+			return undefined;
+	}
+}
+
+/** Output with a strong marker of its own is recognised whatever command produced it (`just check`, `npm run build`, pipes). */
+const SNIFFERS: { kind: Kind; run: (out: string, l: Limits) => Squeezed | undefined }[] = [
+	{ kind: "tests", run: compactBunTest },
+	{ kind: "tests", run: compactGoTest },
+	{ kind: "build", run: compactGradle },
+	{ kind: "build", run: compactTsc },
+	{ kind: "build", run: compactRustc },
+	{ kind: "build", run: compactAudit },
+];
 
 function pickGit(args: string[]): ReturnType<typeof pick> {
 	const [sub, ...rest] = args;
@@ -87,10 +126,12 @@ function pick(command: string): { kind: Kind; run: (out: string, l: Limits) => S
 		return { kind: "paths", run: compactPaths };
 	}
 	if (program === "git") return pickGit(args);
-	if (program === "cargo" && args[0] === "test") {
-		if (hasFlag(args, ["--format", "--message-format"])) return undefined;
-		return { kind: "tests", run: compactTests };
-	}
+	if (program === "cargo") return pickCargo(args);
+	if (program === "tsc" || ((program === "npx" || program === "bunx") && args[0] === "tsc")) return { kind: "build", run: compactTsc };
+	if (program === "gradle" || program === "gradlew") return { kind: "build", run: compactGradle };
+	if (program === "go" && args[0] === "test") return hasFlag(args, ["-json", "--json"]) ? undefined : { kind: "tests", run: compactGoTest };
+	if (program === "bun" && args[0] === "test") return { kind: "tests", run: compactBunTest };
+	if (program === "tree" || ((program === "eza" || program === "exa" || program === "lsd") && hasFlag(args, ["--tree"], ["T"]))) return hasFlag(args, ["-J", "--json", "-H", "--html"]) ? undefined : { kind: "tree", run: compactTree };
 	if (program === "dust") return hasFlag(args, ["--output-json"], ["j"]) ? undefined : { kind: "listing", run: compactDust };
 	if (LISTING.has(program)) {
 		if (!hasFlag(args, ["--long"], ["l"])) return undefined;
@@ -102,22 +143,27 @@ function pick(command: string): { kind: Kind; run: (out: string, l: Limits) => S
 /** True when a native compactor takes care of `command`'s output (whatever the switches say). */
 export const handles = (command: string): boolean => pick(command) !== undefined;
 
-/** A failed run is still worth compacting for these: a failing test run is the long output. */
-export const compactsFailures = (command: string): boolean => pick(command)?.kind === "tests";
-
 /** Compacts the output of `command`, or returns undefined to leave it exactly as it is. */
 export function compact(command: string, output: string, opts: Options = {}): Result | undefined {
-	const { limits = DEFAULT_LIMITS, minChars = 400, maxRatio = 0.9, kinds = {} } = opts;
+	const { limits = DEFAULT_LIMITS, minChars = 400, maxRatio = 0.9, kinds = {}, failed = false } = opts;
 	if (output.length < minChars) return undefined;
 	const small = (sq: Squeezed | undefined): sq is Squeezed => sq !== undefined && sq.text.length <= output.length * maxRatio;
+	const allowed = (kind: Kind) => kinds[kind] !== false && (!failed || kind === "tests" || kind === "build");
+	const done = (sq: Squeezed, kind: Kind): Result => ({ text: sq.text, kind, truncated: sq.truncated, before: output.length, after: sq.text.length });
 
 	const chosen = pick(command);
-	if (chosen && kinds[chosen.kind] !== false) {
+	if (chosen && allowed(chosen.kind)) {
 		const sq = chosen.run(output, limits);
-		if (small(sq)) return { text: sq.text, kind: chosen.kind, truncated: sq.truncated, before: output.length, after: sq.text.length };
+		if (small(sq)) return done(sq, chosen.kind);
+	}
+	if (isContent(command)) return undefined;
+	for (const s of SNIFFERS) {
+		if (!allowed(s.kind)) continue;
+		const sq = s.run(output, limits);
+		if (small(sq)) return done(sq, s.kind);
 	}
 	// Nothing specific fits: still drop colour codes, progress frames and repeated lines.
-	if (kinds.generic === false || isContent(command)) return undefined;
+	if (failed || kinds.generic === false) return undefined;
 	const sq = compactGeneric(output);
-	return small(sq) ? { text: sq.text, kind: "generic", truncated: false, before: output.length, after: sq.text.length } : undefined;
+	return small(sq) ? done(sq, "generic") : undefined;
 }

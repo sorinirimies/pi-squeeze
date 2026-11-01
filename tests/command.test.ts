@@ -43,7 +43,7 @@ describe("parseCommand", () => {
 
 describe("completions", () => {
 	test("completes the top level by prefix, every item has a label", () => {
-		expect(completions("")!.map((i) => i.label)).toEqual(["status", "on", "off", "search", "paths", "listing", "diff", "tests", "git", "generic", "rtk", "min"]);
+		expect(completions("")!.map((i) => i.label)).toEqual(["status", "on", "off", "search", "paths", "listing", "diff", "tests", "git", "build", "tree", "generic", "rtk", "min"]);
 		expect(completions("o")!.map((i) => i.label)).toEqual(["on", "off"]);
 		expect(completions("  SE")!.map((i) => i.label)).toEqual(["search"]);
 		for (const i of completions("")!) expect(typeof i.label).toBe("string");

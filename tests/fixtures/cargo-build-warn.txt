@@ -1,0 +1,26 @@
+warning: unused import: `std::collections::HashMap`
+ --> src/lib.rs:1:5
+  |
+1 | use std::collections::HashMap;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `unused`
+ --> src/lib.rs:2:31
+  |
+2 | pub fn a(x: i32) -> i32 { let unused = 5; if x == 1 { return 1; } else { return 2; } }
+  |                               ^^^^^^ help: if this is intentional, prefix it with an underscore: `_unused`
+  |
+  = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `dead` is never used
+ --> src/lib.rs:6:4
+  |
+6 | fn dead() {}
+  |    ^^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `warn` (lib) generated 3 warnings (run `cargo fix --lib -p warn` to apply 2 suggestions)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.00s

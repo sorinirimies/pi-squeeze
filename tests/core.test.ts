@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { hasFlag, hasOperator, parse, stripCd, tokenize } from "../extensions/core/command.ts";
-import { compact, compactsFailures, handles } from "../extensions/core/compact.ts";
+import { compact, handles } from "../extensions/core/compact.ts";
 import { capLines, cutLine } from "../extensions/core/elide.ts";
 import { compactLsd } from "../extensions/core/lsd.ts";
 import { compactPaths } from "../extensions/core/paths.ts";
@@ -243,9 +243,10 @@ describe("compact router: diff and tests", () => {
 		expect(handles("git diff")).toBe(true);
 		expect(handles("cargo test")).toBe(true);
 		expect(handles("git stash list")).toBe(false);
-		expect(compactsFailures("cargo test")).toBe(true);
-		expect(compactsFailures("git diff")).toBe(false);
-		expect(compactsFailures("rg x")).toBe(false);
+		const cargo = readFileSync(join(import.meta.dir, "fixtures", "cargo-test-ok.txt"), "utf8");
+		expect(compact("cargo test", cargo, { failed: true })!.kind).toBe("tests");
+		expect(compact("git diff", diff, { failed: true })).toBeUndefined();
+		expect(compact("bun install", `\u001b[31m${"same\n".repeat(200)}`, { failed: true })).toBeUndefined();
 	});
 });
 

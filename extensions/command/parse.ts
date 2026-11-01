@@ -60,6 +60,8 @@ const TOP_LEVEL: CompletionItem[] = [
 	{ value: "diff ", label: "diff", description: "git diff with trimmed context (on or off)" },
 	{ value: "tests ", label: "tests", description: "cargo test without build noise and passing tests (on or off)" },
 	{ value: "git ", label: "git", description: "git status, log, show and blame, shorter (on or off)" },
+	{ value: "build ", label: "build", description: "cargo build/clippy/audit, tsc and gradle, errors kept and warnings grouped (on or off)" },
+	{ value: "tree ", label: "tree", description: "cargo tree, tree and eza --tree cut below a depth (on or off)" },
 	{ value: "generic ", label: "generic", description: "ANSI codes, progress frames and repeated lines in any output (on or off)" },
 	{ value: "rtk ", label: "rtk", description: "Rewrite git, cargo, docker… through rtk, when installed (on or off)" },
 	{ value: "min ", label: "min", description: "Smallest output to compact, in characters" },

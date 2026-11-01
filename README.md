@@ -34,8 +34,17 @@ It only touches output it fully understands, and otherwise passes it through unc
 | `git show` | that commit line, then the compacted diff |
 | `git blame` | one header per run of lines from the same commit |
 | `dust` | size, tree and share; the bar chart goes |
+| `cargo build` / `check` / `clippy` / `doc` | errors keep their whole block; warnings become one line each, grouped by lint (`clippy::needless_return (2)`); `Compiling`/`Finished` lines go |
+| `cargo audit` | one line per advisory (id, crate, version, kind, title, fix) |
+| `cargo tree`, `tree`, `eza --tree` | cut below 3 levels, `… [+15 lines deeper]` under each cut |
+| `tsc` | errors grouped by file (`a.ts (8)`, `1:7 TS2322 …`) |
+| `gradle`, `./gradlew` | task lines counted (`11 tasks (5 executed, 4 no-source, 2 up-to-date)`); failures, compiler errors, test failures and the `BUILD` line stay; daemon and `--scan` hints go; Kotlin `w:`/`e:` paths lose their shared directory |
+| `bun test`, `go test` | passing tests counted, not listed; failures and totals stay |
 | anything else | colour codes dropped, progress bars (`\r`) keep their last frame, 4+ identical lines become `line  [×N]`, 3+ blank lines become one. Never for `cat`, `head`, `jq`, `curl`… (content commands) |
 | `git`, `cargo`, `docker`… | rewritten through [rtk](https://github.com/rtk-ai/rtk) when it is installed (switch: `/squeeze rtk off`) |
+
+Output with a marker of its own (a `tsc` error list, a gradle build, a `bun test` run, rustc diagnostics) is recognised whatever ran it: `just check`, `npm run build`, `make test`, `… 2>&1`.
+A **failed** command is compacted too, but only for test and build output, where the errors are the point.
 
 Safety rules:
 
@@ -51,7 +60,7 @@ Safety rules:
 |---|---|
 | `/squeeze` or `/squeeze status` | the settings and the tokens saved so far |
 | `/squeeze [on\|off]` | switch everything |
-| `/squeeze [search\|paths\|listing\|diff\|tests\|git\|generic] [on\|off]` | switch one compactor |
+| `/squeeze [search\|paths\|listing\|diff\|tests\|git\|build\|tree\|generic] [on\|off]` | switch one compactor |
 | `/squeeze rtk [on\|off]` | rewrite git, cargo, docker… through [rtk](https://github.com/rtk-ai/rtk), when installed |
 | `/squeeze min <chars>` | smallest output worth compacting (default 400) |
 
