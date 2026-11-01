@@ -3,6 +3,8 @@
 [![npm](https://img.shields.io/npm/v/pi-squeeze.svg)](https://www.npmjs.com/package/pi-squeeze)
 [![CI](https://github.com/sorinirimies/pi-squeeze/actions/workflows/ci.yml/badge.svg)](https://github.com/sorinirimies/pi-squeeze/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Audit](https://github.com/sorinirimies/pi-squeeze/actions/workflows/security.yml/badge.svg)](https://github.com/sorinirimies/pi-squeeze/actions/workflows/security.yml)
+[![Fuzz](https://github.com/sorinirimies/pi-squeeze/actions/workflows/fuzz.yml/badge.svg)](https://github.com/sorinirimies/pi-squeeze/actions/workflows/fuzz.yml)
 
 Squeezes tool output and steers commands to fast CLI tools, so the agent's context stays small: uses rtk when installed, native compactors otherwise.
 
