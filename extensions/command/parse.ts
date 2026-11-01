@@ -1,5 +1,5 @@
 /** `/squeeze ...`: parsing and argument completion. Pure: the handler in squeeze.ts acts on the result. */
-import type { Kind } from "../core/compact.ts";
+import { KINDS, type Kind } from "../core/compact.ts";
 
 export type Command =
 	| { kind: "status" }
@@ -10,9 +10,8 @@ export type Command =
 	| { kind: "min"; chars: number }
 	| { kind: "invalid"; message: string };
 
-export const KINDS: Kind[] = ["search", "paths", "listing"];
 
-export const USAGE = "Usage: /squeeze [status] · on · off · search|paths|listing|rtk <on|off> · min <chars>";
+export const USAGE = "Usage: /squeeze [status] · on · off · search|paths|listing|diff|tests|rtk <on|off> · min <chars>";
 
 export function parseCommand(args: string | undefined): Command {
 	const [cmd, p1] = (args ?? "").trim().toLowerCase().split(/\s+/).filter(Boolean);
@@ -35,7 +34,7 @@ export function parseCommand(args: string | undefined): Command {
 		case "rtk":
 			return p1 === "on" || p1 === "off" ? { kind: "rtk", on: p1 === "on" } : { kind: "invalid", message: "Usage: /squeeze rtk <on|off>" };
 		default:
-			if ((KINDS as string[]).includes(cmd)) {
+			if ((KINDS as readonly string[]).includes(cmd)) {
 				return p1 === "on" || p1 === "off"
 					? { kind: "compactor", compactor: cmd as Kind, on: p1 === "on" }
 					: { kind: "invalid", message: `Usage: /squeeze ${cmd} <on|off>` };
@@ -58,6 +57,8 @@ const TOP_LEVEL: CompletionItem[] = [
 	{ value: "search ", label: "search", description: "rg / grep results grouped by file (on or off)" },
 	{ value: "paths ", label: "paths", description: "fd / find results grouped by directory (on or off)" },
 	{ value: "listing ", label: "listing", description: "lsd / eza -l listings (on or off)" },
+	{ value: "diff ", label: "diff", description: "git diff with trimmed context (on or off)" },
+	{ value: "tests ", label: "tests", description: "cargo test without build noise and passing tests (on or off)" },
 	{ value: "rtk ", label: "rtk", description: "Rewrite git, cargo, docker… through rtk, when installed (on or off)" },
 	{ value: "min ", label: "min", description: "Smallest output to compact, in characters" },
 ];

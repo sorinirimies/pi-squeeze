@@ -1,0 +1,1052 @@
+diff --git a/extensions/command/parse.ts b/extensions/command/parse.ts
+new file mode 100644
+index 0000000..05e6f60
+--- /dev/null
++++ b/extensions/command/parse.ts
+@@ -0,0 +1,77 @@
++/** `/squeeze ...`: parsing and argument completion. Pure: the handler in squeeze.ts acts on the result. */
++import type { Kind } from "../core/compact.ts";
++
++export type Command =
++	| { kind: "status" }
++	| { kind: "on" }
++	| { kind: "off" }
++	| { kind: "compactor"; compactor: Kind; on: boolean }
++	| { kind: "rtk"; on: boolean }
++	| { kind: "min"; chars: number }
++	| { kind: "invalid"; message: string };
++
++export const KINDS: Kind[] = ["search", "paths", "listing"];
++
++export const USAGE = "Usage: /squeeze [status] · on · off · search|paths|listing|rtk <on|off> · min <chars>";
++
++export function parseCommand(args: string | undefined): Command {
++	const [cmd, p1] = (args ?? "").trim().toLowerCase().split(/\s+/).filter(Boolean);
++	switch (cmd) {
++		case undefined:
++		case "status":
++			return { kind: "status" };
++		case "on":
++		case "enable":
++			return { kind: "on" };
++		case "off":
++		case "disable":
++			return { kind: "off" };
++		case "min": {
++			const n = Number(p1);
++			return Number.isInteger(n) && n >= 100 && n <= 1_000_000
++				? { kind: "min", chars: n }
++				: { kind: "invalid", message: "Usage: /squeeze min <chars> (100 to 1000000)" };
++		}
++		case "rtk":
++			return p1 === "on" || p1 === "off" ? { kind: "rtk", on: p1 === "on" } : { kind: "invalid", message: "Usage: /squeeze rtk <on|off>" };
++		default:
++			if ((KINDS as string[]).includes(cmd)) {
++				return p1 === "on" || p1 === "off"
++					? { kind: "compactor", compactor: cmd as Kind, on: p1 === "on" }
++					: { kind: "invalid", message: `Usage: /squeeze ${cmd} <on|off>` };
++			}
++			return { kind: "invalid", message: `Unknown option "${cmd}". ${USAGE}` };
++	}
++}
++
++export interface CompletionItem {
++	value: string;
++	/** Required by pi: it calls `label.endsWith(...)` when applying a completion. */
++	label: string;
++	description?: string;
++}
++
++const TOP_LEVEL: CompletionItem[] = [
++	{ value: "status", label: "status", description: "Show the settings and the savings" },
++	{ value: "on", label: "on", description: "Turn pi-squeeze on" },
++	{ value: "off", label: "off", description: "Turn it off (nothing is compacted)" },
++	{ value: "search ", label: "search", description: "rg / grep results grouped by file (on or off)" },
++	{ value: "paths ", label: "paths", description: "fd / find results grouped by directory (on or off)" },
++	{ value: "listing ", label: "listing", description: "lsd / eza -l listings (on or off)" },
++	{ value: "rtk ", label: "rtk", description: "Rewrite git, cargo, docker… through rtk, when installed (on or off)" },
++	{ value: "min ", label: "min", description: "Smallest output to compact, in characters" },
++];
++
++/** `prefix` is the whole argument text typed so far (pi replaces it with `value`). */
++export function completions(prefix: string): CompletionItem[] | null {
++	const text = (prefix ?? "").toLowerCase().replace(/^\s+/, "");
++	const kind = [...KINDS, "rtk"].find((k) => text.startsWith(`${k} `));
++	const pool: CompletionItem[] = kind
++		? [
++				{ value: `${kind} on`, label: "on", description: kind === "rtk" ? "Rewrite commands through rtk" : `Compact ${kind} output` },
++				{ value: `${kind} off`, label: "off", description: kind === "rtk" ? "Run commands as written" : `Leave ${kind} output alone` },
++			]
++		: TOP_LEVEL;
++	const out = pool.filter((i) => i.value.startsWith(text));
++	return out.length > 0 ? out : null;
++}
+diff --git a/extensions/core/command.ts b/extensions/core/command.ts
+new file mode 100644
+index 0000000..403fc2e
+--- /dev/null
++++ b/extensions/core/command.ts
+@@ -0,0 +1,85 @@
++/**
++ * Reads a bash command line just far enough to know which program ran and with which
++ * arguments. Anything that reshapes the output (pipes, redirects, chains, substitution)
++ * makes it return undefined: the output is then not in the program's own format and
++ * must pass through untouched.
++ */
++
++export type Invocation = { program: string; args: string[] };
++
++const OPERATOR = /[|;&<>`]|\$\(/;
++
++/** Split on whitespace, honouring single/double quotes and backslash escapes. */
++export function tokenize(line: string): string[] | undefined {
++	const out: string[] = [];
++	let cur = "";
++	let has = false;
++	let quote: "'" | '"' | undefined;
++	for (let i = 0; i < line.length; i++) {
++		const c = line[i]!;
++		if (quote) {
++			if (c === quote) quote = undefined;
++			else if (c === "\\" && quote === '"' && i + 1 < line.length) cur += line[++i];
++			else cur += c;
++		} else if (c === "'" || c === '"') {
++			quote = c;
++			has = true;
++		} else if (c === "\\" && i + 1 < line.length) {
++			cur += line[++i];
++			has = true;
++		} else if (/\s/.test(c)) {
++			if (has || cur) out.push(cur);
++			cur = "";
++			has = false;
++		} else {
++			cur += c;
++			has = true;
++		}
++	}
++	if (quote) return undefined;
++	if (has || cur) out.push(cur);
++	return out;
++}
++
++/** True when `text` contains a shell operator outside quotes. */
++export function hasOperator(text: string): boolean {
++	let quote: "'" | '"' | undefined;
++	for (let i = 0; i < text.length; i++) {
++		const c = text[i]!;
++		if (quote) {
++			if (c === quote) quote = undefined;
++			else if (c === "\\" && quote === '"') i++;
++			else if (quote === '"' && (c === "`" || (c === "$" && text[i + 1] === "("))) return true;
++		} else if (c === "'" || c === '"') quote = c;
++		else if (c === "\\") i++;
++		else if (OPERATOR.test(c === "$" ? text.slice(i, i + 2) : c)) return true;
++	}
++	return false;
++}
++
++/** Drop a leading `cd <dir> &&`, which only sets the working directory. */
++export function stripCd(command: string): string {
++	return command.replace(/^\s*cd\s+(?:"[^"]*"|'[^']*'|[^\s;&|]+)\s*&&\s*/, "");
++}
++
++/** The single simple command a line runs, or undefined when it is anything more. */
++export function parse(command: string): Invocation | undefined {
++	const line = stripCd(command).trim();
++	if (!line || hasOperator(line)) return undefined;
++	const words = tokenize(line);
++	if (!words) return undefined;
++	while (words.length && /^[A-Za-z_][A-Za-z0-9_]*=/.test(words[0]!)) words.shift();
++	const first = words.shift();
++	if (!first) return undefined;
++	return { program: first.split("/").pop()!, args: words };
++}
++
++/** Does a short or long flag appear in `args` (also inside combined short flags like -rn)? */
++export function hasFlag(args: string[], long: string[], short: string[] = []): boolean {
++	for (const a of args) {
++		if (a === "--") return false;
++		if (long.includes(a) || long.some((l) => a.startsWith(`${l}=`))) return true;
++		if (/^-[A-Za-z]+$/.test(a) && short.some((s) => a.includes(s))) return true;
++	}
++	return false;
++}
+diff --git a/extensions/core/compact.ts b/extensions/core/compact.ts
+new file mode 100644
+index 0000000..f020bb2
+--- /dev/null
++++ b/extensions/core/compact.ts
+@@ -0,0 +1,66 @@
++/** Chooses the compactor for a bash command and applies the safety rules. */
++import { hasFlag, parse } from "./command.ts";
++import { DEFAULT_LIMITS, type Limits, type Squeezed } from "./elide.ts";
++import { compactLsd } from "./lsd.ts";
++import { compactPaths } from "./paths.ts";
++import { compactRg } from "./rg.ts";
++
++export type Kind = "search" | "paths" | "listing";
++
++export type Result = { text: string; kind: Kind; truncated: boolean; before: number; after: number };
++
++export type Options = {
++	limits?: Limits;
++	/** Output shorter than this is never touched. */
++	minChars?: number;
++	/** The result must be at most this share of the original, or the original is kept. */
++	maxRatio?: number;
++	/** Compactors that may run; a missing entry means on. */
++	kinds?: Partial<Record<Kind, boolean>>;
++};
++
++const SEARCH = new Set(["rg", "grep", "egrep", "ugrep"]);
++const PATHS = new Set(["fd", "fdfind", "find"]);
++const LISTING = new Set(["lsd", "eza", "exa"]);
++
++/** Flags after which the output is no longer plain `path:line:text` / one path per line. */
++const NOT_PLAIN_SEARCH = { long: ["--json", "--count", "--files-with-matches", "--files-without-match", "--files", "--heading", "--stats", "--vimgrep", "--only-matching", "--null", "--passthru"], short: ["c", "l", "L", "o", "z"] };
++const NOT_PLAIN_PATHS = { long: ["--exec", "--exec-batch", "--list-details", "--print0", "--format"], short: ["x", "X", "l", "0"] };
++
++function plainFind(args: string[]): boolean {
++	return !args.some((a) => ["-exec", "-execdir", "-ls", "-print0", "-printf", "-fprint", "-delete", "-ok"].includes(a));
++}
++
++function pick(command: string): { kind: Kind; run: (out: string, l: Limits) => Squeezed | undefined } | undefined {
++	const inv = parse(command);
++	if (!inv) return undefined;
++	const { program, args } = inv;
++	if (SEARCH.has(program)) {
++		if (hasFlag(args, NOT_PLAIN_SEARCH.long, NOT_PLAIN_SEARCH.short)) return undefined;
++		return { kind: "search", run: compactRg };
++	}
++	if (PATHS.has(program)) {
++		if (program === "find" ? !plainFind(args) : hasFlag(args, NOT_PLAIN_PATHS.long, NOT_PLAIN_PATHS.short)) return undefined;
++		return { kind: "paths", run: compactPaths };
++	}
++	if (LISTING.has(program)) {
++		if (!hasFlag(args, ["--long"], ["l"])) return undefined;
++		return { kind: "listing", run: compactLsd };
++	}
++	return undefined;
++}
++
++/** True when a native compactor takes care of `command`'s output (whatever the switches say). */
++export const handles = (command: string): boolean => pick(command) !== undefined;
++
++/** Compacts the output of `command`, or returns undefined to leave it exactly as it is. */
++export function compact(command: string, output: string, opts: Options = {}): Result | undefined {
++	const { limits = DEFAULT_LIMITS, minChars = 400, maxRatio = 0.9, kinds = {} } = opts;
++	if (output.length < minChars) return undefined;
++	const chosen = pick(command);
++	if (!chosen || kinds[chosen.kind] === false) return undefined;
++	const sq = chosen.run(output, limits);
++	if (!sq) return undefined;
++	if (sq.text.length > output.length * maxRatio) return undefined;
++	return { text: sq.text, kind: chosen.kind, truncated: sq.truncated, before: output.length, after: sq.text.length };
++}
+diff --git a/extensions/core/config.ts b/extensions/core/config.ts
+new file mode 100644
+index 0000000..e24e0e8
+--- /dev/null
++++ b/extensions/core/config.ts
+@@ -0,0 +1,109 @@
++/**
++ * The persisted settings: <agent dir>/squeeze.json.
++ *
++ * A hand-edited file can hold anything, so `sanitizeConfig` keeps valid values and defaults the
++ * rest. A missing file is not a problem (defaults); a broken one is reported, never thrown.
++ */
++import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
++import { homedir } from "node:os";
++import { join } from "node:path";
++import type { Kind } from "./compact.ts";
++
++export interface Config {
++	/** Master switch: when false nothing is compacted. */
++	enabled: boolean;
++	/** Show the savings in the status line. */
++	showStatus: boolean;
++	/** Which compactors run. */
++	kinds: Record<Kind, boolean>;
++	/** Rewrite commands to their `rtk` form (git, cargo, docker, …) when the rtk binary is installed. */
++	rtk: boolean;
++	/** Output shorter than this many characters is never touched. */
++	minChars: number;
++	/** Longest line kept whole in search results. */
++	lineChars: number;
++	/** Match lines kept per file. */
++	perGroup: number;
++	/** Lines in a whole compacted result. */
++	total: number;
++}
++
++export const DEFAULT_CONFIG: Config = {
++	enabled: true,
++	showStatus: true,
++	rtk: true,
++	kinds: { search: true, paths: true, listing: true },
++	minChars: 400,
++	lineChars: 240,
++	perGroup: 15,
++	total: 250,
++};
++
++export const clampInt = (v: unknown, min: number, max: number, fallback: number): number =>
++	typeof v === "number" && Number.isFinite(v) ? Math.min(max, Math.max(min, Math.round(v))) : fallback;
++
++const bool = (v: unknown, fallback: boolean): boolean => (typeof v === "boolean" ? v : fallback);
++
++export function sanitizeConfig(raw: unknown): Config {
++	const r = (typeof raw === "object" && raw !== null && !Array.isArray(raw) ? raw : {}) as Record<string, unknown>;
++	const k = (typeof r.kinds === "object" && r.kinds !== null ? r.kinds : {}) as Record<string, unknown>;
++	const d = DEFAULT_CONFIG;
++	return {
++		enabled: bool(r.enabled, d.enabled),
++		showStatus: bool(r.showStatus, d.showStatus),
++		rtk: bool(r.rtk, d.rtk),
++		kinds: { search: bool(k.search, d.kinds.search), paths: bool(k.paths, d.kinds.paths), listing: bool(k.listing, d.kinds.listing) },
++		minChars: clampInt(r.minChars, 100, 1_000_000, d.minChars),
++		lineChars: clampInt(r.lineChars, 40, 4000, d.lineChars),
++		perGroup: clampInt(r.perGroup, 1, 500, d.perGroup),
++		total: clampInt(r.total, 20, 5000, d.total),
++	};
++}
++
++/** Where pi keeps its config: PI_CODING_AGENT_DIR, then $XDG_CONFIG_HOME/pi/agent, then ~/.pi/agent. */
++export function resolveAgentDir(env: Record<string, string | undefined>, home: string): string {
++	if (env.PI_CODING_AGENT_DIR) return env.PI_CODING_AGENT_DIR;
++	if (env.XDG_CONFIG_HOME) return join(env.XDG_CONFIG_HOME, "pi", "agent");
++	return join(home, ".pi", "agent");
++}
++
++export const configPath = (env: Record<string, string | undefined> = process.env, home = homedir()): string =>
++	join(resolveAgentDir(env, home), "squeeze.json");
++
++/** The config, plus a `problem` when the file exists but cannot be used. */
++export async function readConfig(path = configPath()): Promise<{ config: Config; problem?: string }> {
++	let raw: string;
++	try {
++		raw = await readFile(path, "utf8");
++	} catch (e) {
++		const code = (e as { code?: string } | null)?.code;
++		return code === "ENOENT" ? { config: sanitizeConfig({}) } : { config: sanitizeConfig({}), problem: `cannot read ${path} (${code ?? "error"})` };
++	}
++	try {
++		return { config: sanitizeConfig(JSON.parse(raw)) };
++	} catch {
++		return { config: sanitizeConfig({}), problem: `${path} is not valid JSON` };
++	}
++}
++
++export async function loadConfig(path = configPath()): Promise<Config> {
++	return (await readConfig(path)).config;
++}
++
++/** Atomic: written to a temp file and renamed, so a crash or a second pi session never leaves half a file. */
++export async function saveConfig(config: Config, path = configPath()): Promise<void> {
++	await mkdir(join(path, ".."), { recursive: true });
++	const tmp = `${path}.${process.pid}.${Date.now()}.tmp`;
++	try {
++		await writeFile(tmp, `${JSON.stringify(config, null, 2)}\n`, "utf8");
++		await rename(tmp, path);
++	} catch (e) {
++		await Promise.allSettled([rm(tmp, { force: true })]); // the original error matters more
++		throw e;
++	}
++}
++
++/** The compaction options this config stands for. */
++export function optionsOf(c: Config) {
++	return { limits: { lineChars: c.lineChars, perGroup: c.perGroup, total: c.total }, minChars: c.minChars, kinds: c.kinds };
++}
+diff --git a/extensions/core/elide.ts b/extensions/core/elide.ts
+new file mode 100644
+index 0000000..e40560e
+--- /dev/null
++++ b/extensions/core/elide.ts
+@@ -0,0 +1,31 @@
++/** Shared limits and truncation helpers: every cut leaves a visible marker behind. */
++
++export type Limits = {
++	/** Longest line kept whole; longer ones are cut with a note. */
++	lineChars: number;
++	/** Lines kept per file or group. */
++	perGroup: number;
++	/** Lines in the whole result. */
++	total: number;
++};
++
++export const DEFAULT_LIMITS: Limits = { lineChars: 240, perGroup: 15, total: 250 };
++
++export type Squeezed = {
++	text: string;
++	/** True when content was left out (not merely reformatted): the full output is worth saving. */
++	truncated: boolean;
++};
++
++export function cutLine(line: string, max: number): string {
++	if (line.length <= max) return line;
++	return `${line.slice(0, max)}… [+${line.length - max} chars]`;
++}
++
++/** Caps `lines` at `total`, replacing the rest with a one-line marker. */
++export function capLines(lines: string[], total: number): Squeezed {
++	if (lines.length <= total) return { text: lines.join("\n"), truncated: false };
++	const kept = lines.slice(0, total);
++	kept.push(`… [+${lines.length - total} more lines]`);
++	return { text: kept.join("\n"), truncated: true };
++}
+diff --git a/extensions/core/lsd.ts b/extensions/core/lsd.ts
+new file mode 100644
+index 0000000..f184644
+--- /dev/null
++++ b/extensions/core/lsd.ts
+@@ -0,0 +1,29 @@
++/**
++ * `lsd -l` / `eza -l` style listings reduced to what a model uses: type, size, modified
++ * time (no year or seconds) and name. Owner, group and permission bits are dropped.
++ *
++ *   d  Oct 24 16:40  command
++ *   -  6.0KB  Oct 24 16:40  tokenburn.ts
++ *
++ * Strict: a single line that does not parse makes it return undefined.
++ */
++import { capLines, DEFAULT_LIMITS, type Limits, type Squeezed } from "./elide.ts";
++
++const ROW = /^([dl.\-bcps])[rwxsStT\-.+@]{9}\S*\s+\S+\s+\S+\s+([\d.,]+ ?[A-Za-z]*)\s+(\w{3}) (\w{3})\s+(\d+) (\d\d:\d\d):\d\d \d{4}\s+(.+)$/;
++
++export function compactLsd(output: string, limits: Limits = DEFAULT_LIMITS): Squeezed | undefined {
++	const lines = output.split("\n");
++	while (lines.length && lines.at(-1) === "") lines.pop();
++	if (lines.length < 3) return undefined;
++	const out: string[] = [];
++	for (const l of lines) {
++		const m = ROW.exec(l);
++		if (!m) return undefined;
++		const [, kind, size, , month, day, time, name] = m;
++		if (name === "." || name === "..") continue;
++		const type = kind === "d" ? "d" : kind === "l" ? "l" : "-";
++		const meta = type === "d" ? "" : `${size!.replace(/\s+/g, "")}  `;
++		out.push(`${type}  ${meta}${month} ${day} ${time}  ${name}`);
++	}
++	return capLines(out, limits.total);
++}
+diff --git a/extensions/core/paths.ts b/extensions/core/paths.ts
+new file mode 100644
+index 0000000..560a1ee
+--- /dev/null
++++ b/extensions/core/paths.ts
+@@ -0,0 +1,50 @@
++/**
++ * `fd` / `find` output (one path per line) grouped by directory:
++ *
++ *   src/core/
++ *     a.ts b.ts c.ts
++ *
++ * Names with spaces are quoted. A directory with a single entry keeps its full path.
++ */
++import { capLines, DEFAULT_LIMITS, type Limits, type Squeezed } from "./elide.ts";
++
++function split(path: string): [string, string] {
++	const dir = path.endsWith("/");
++	const body = dir ? path.slice(0, -1) : path;
++	const i = body.lastIndexOf("/");
++	if (i < 0) return ["", path];
++	return [body.slice(0, i + 1), body.slice(i + 1) + (dir ? "/" : "")];
++}
++
++export function compactPaths(output: string, limits: Limits = DEFAULT_LIMITS): Squeezed | undefined {
++	const lines = output.split("\n");
++	while (lines.length && lines.at(-1) === "") lines.pop();
++	if (lines.length < 2 || lines.some((l) => l === "" || l.includes("\t"))) return undefined;
++
++	const groups = new Map<string, string[]>();
++	for (const l of lines) {
++		const [dir, name] = split(l);
++		const g = groups.get(dir);
++		if (g) g.push(name);
++		else groups.set(dir, [name]);
++	}
++	const out: string[] = [];
++	for (const [dir, names] of groups) {
++		if (names.length === 1) {
++			out.push(`${dir}${names[0]}`);
++			continue;
++		}
++		out.push(dir || "./");
++		const quoted = names.map((n) => (/\s/.test(n) ? JSON.stringify(n) : n));
++		let row = "  ";
++		for (const n of quoted) {
++			if (row.length + n.length > 100 && row.trim()) {
++				out.push(row.trimEnd());
++				row = "  ";
++			}
++			row += `${n} `;
++		}
++		if (row.trim()) out.push(row.trimEnd());
++	}
++	return capLines(out, limits.total);
++}
+diff --git a/extensions/core/rg.ts b/extensions/core/rg.ts
+new file mode 100644
+index 0000000..e6c0803
+--- /dev/null
++++ b/extensions/core/rg.ts
+@@ -0,0 +1,89 @@
++/**
++ * `rg -n` / `grep -n` output (`path:line:text`, context lines `path-line-text`) grouped by
++ * file, so each path is written once instead of on every match:
++ *
++ *   src/a.ts (3)
++ *     12: const x = 1;
++ *     13- context
++ *
++ * Strict: when any line is not in that format (`--heading`, `-c`, `-l`, `--json`, no
++ * line numbers) it returns undefined and the output passes through unchanged.
++ */
++import { cutLine, DEFAULT_LIMITS, type Limits, type Squeezed } from "./elide.ts";
++
++type Row = { path: string; line: number; sep: ":" | "-"; text: string };
++
++const MATCH = /^(.+?):(\d+):(.*)$/;
++
++export function parseRows(output: string): Row[] | undefined {
++	const lines = output.split("\n");
++	while (lines.length && lines.at(-1) === "") lines.pop();
++	if (!lines.length) return undefined;
++	const rows: Row[] = [];
++	const files = new Set<string>();
++	const pending: { index: number; raw: string }[] = [];
++	for (const raw of lines) {
++		if (raw === "--") continue;
++		const m = MATCH.exec(raw);
++		if (m) {
++			if (m[1]!.includes(":")) return undefined; // `12:foo:3:bar` is single-file output, not a path
++			files.add(m[1]!);
++			rows.push({ path: m[1]!, line: Number(m[2]), sep: ":", text: m[3]! });
++		} else {
++			pending.push({ index: rows.length, raw });
++			rows.push(undefined as unknown as Row);
++		}
++	}
++	if (!files.size) return undefined;
++	// Context lines (`path-line-text`) only count for files that also had a real match.
++	for (const { index, raw } of pending) {
++		let row: Row | undefined;
++		for (const path of files) {
++			if (!raw.startsWith(`${path}-`)) continue;
++			const m = /^(\d+)-(.*)$/.exec(raw.slice(path.length + 1));
++			if (m) {
++				row = { path, line: Number(m[1]), sep: "-", text: m[2]! };
++				break;
++			}
++		}
++		if (!row) return undefined;
++		rows[index] = row;
++	}
++	return rows;
++}
++
++export function compactRg(output: string, limits: Limits = DEFAULT_LIMITS): Squeezed | undefined {
++	const rows = parseRows(output);
++	if (!rows) return undefined;
++	const groups = new Map<string, Row[]>();
++	for (const r of rows) {
++		const g = groups.get(r.path);
++		if (g) g.push(r);
++		else groups.set(r.path, [r]);
++	}
++	const matchCount = rows.filter((r) => r.sep === ":").length;
++	const out: string[] = [`${matchCount} matches in ${groups.size} files`];
++	let truncated = false;
++	let hiddenFiles = 0;
++	for (const [path, list] of groups) {
++		if (out.length >= limits.total) {
++			hiddenFiles++;
++			truncated = true;
++			continue;
++		}
++		const matches = list.filter((r) => r.sep === ":").length;
++		out.push(`${path} (${matches})`);
++		let shown = 0;
++		for (const r of list) {
++			if (shown >= limits.perGroup) break;
++			out.push(`  ${r.line}${r.sep} ${cutLine(r.text.trim(), limits.lineChars)}`);
++			shown++;
++		}
++		if (list.length > shown) {
++			out.push(`  … [+${list.length - shown} more in this file]`);
++			truncated = true;
++		}
++	}
++	if (hiddenFiles) out.push(`… [+${hiddenFiles} more files]`);
++	return { text: out.join("\n"), truncated };
++}
+diff --git a/extensions/core/rtk.ts b/extensions/core/rtk.ts
+new file mode 100644
+index 0000000..cbb883d
+--- /dev/null
++++ b/extensions/core/rtk.ts
+@@ -0,0 +1,50 @@
++/**
++ * The optional rtk layer: commands that have no native compactor here (git, cargo, docker, …) are
++ * rewritten to their `rtk` form, which prints a compact output itself.
++ *
++ * `rtk rewrite <command>` is the single source of truth for what rtk can take over. Exit 0 and 3
++ * mean "rewritten" (3: the host should ask for approval, pi has no such step); 1 means no rewrite
++ * and 2 a deny. Never rewritten: what a native compactor handles (its output format is ours to
++ * parse) and file reads (`rtk read` may drop lines, and a read must stay exact).
++ */
++import { spawnSync } from "node:child_process";
++import { handles } from "./compact.ts";
++
++export type Run = (command: string) => { status: number | null; stdout: string; missing?: boolean };
++
++const spawnRun: Run = (command) => {
++	const r = spawnSync("rtk", ["rewrite", command], { encoding: "utf8", timeout: 2000 });
++	return { status: r.status, stdout: r.stdout ?? "", missing: (r.error as NodeJS.ErrnoException | undefined)?.code === "ENOENT" };
++};
++
++let run: Run = spawnRun;
++/** For tests: replace the process runner (no argument restores it). */
++export const useRunner = (r: Run = spawnRun): void => {
++	run = r;
++};
++
++const cache = new Map<string, string | undefined>();
++const CACHE_MAX = 500;
++let missing = false;
++
++/** The command to run instead of `command`, or undefined to run it as written. */
++export function rewrite(command: string): string | undefined {
++	if (missing || command.trim() === "" || handles(command)) return undefined;
++	if (cache.has(command)) return cache.get(command);
++	const r = run(command);
++	if (r.missing) {
++		missing = true;
++		return undefined;
++	}
++	const out = r.stdout.trim();
++	const rewritten = (r.status === 0 || r.status === 3) && out !== "" && out !== command && !/^rtk read\b/.test(out) ? out : undefined;
++	if (cache.size >= CACHE_MAX) cache.clear();
++	cache.set(command, rewritten);
++	return rewritten;
++}
++
++/** For tests: forget what was learned (the cache and a missing binary). */
++export function resetRtk(): void {
++	cache.clear();
++	missing = false;
++}
+diff --git a/extensions/core/save.ts b/extensions/core/save.ts
+new file mode 100644
+index 0000000..25cfd59
+--- /dev/null
++++ b/extensions/core/save.ts
+@@ -0,0 +1,11 @@
++import { mkdirSync, writeFileSync } from "node:fs";
++import { tmpdir } from "node:os";
++import { join } from "node:path";
++
++/** Writes the untouched output to a temp file so a truncated result can be recovered. */
++export function saveFull(text: string, dir = join(tmpdir(), "pi-squeeze")): string {
++	mkdirSync(dir, { recursive: true });
++	const path = join(dir, `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}.txt`);
++	writeFileSync(path, text);
++	return path;
++}
+diff --git a/extensions/core/stats.ts b/extensions/core/stats.ts
+new file mode 100644
+index 0000000..cf15476
+--- /dev/null
++++ b/extensions/core/stats.ts
+@@ -0,0 +1,31 @@
++import type { Kind, Result } from "./compact.ts";
++
++export type Stats = { calls: number; before: number; after: number; byKind: Record<Kind, { calls: number; saved: number }> };
++
++export function emptyStats(): Stats {
++	return { calls: 0, before: 0, after: 0, byKind: { search: { calls: 0, saved: 0 }, paths: { calls: 0, saved: 0 }, listing: { calls: 0, saved: 0 } } };
++}
++
++export function record(stats: Stats, r: Result): void {
++	stats.calls++;
++	stats.before += r.before;
++	stats.after += r.after;
++	stats.byKind[r.kind].calls++;
++	stats.byKind[r.kind].saved += r.before - r.after;
++}
++
++/** Characters saved so far. */
++export const saved = (s: Stats): number => s.before - s.after;
++
++/** Rough token estimate: 4 characters per token. */
++export const tokens = (chars: number): number => Math.round(chars / 4);
++
++export function summary(stats: Stats): string {
++	if (!stats.calls) return "squeeze: nothing compacted yet in this session";
++	const pct = Math.round((saved(stats) / stats.before) * 100);
++	const kinds = (Object.entries(stats.byKind) as [Kind, { calls: number; saved: number }][])
++		.filter(([, v]) => v.calls)
++		.map(([k, v]) => `${k} ${v.calls}× (~${tokens(v.saved)} tokens)`)
++		.join(", ");
++	return `squeeze: ${stats.calls} outputs compacted, ~${tokens(saved(stats))} tokens saved (${pct}%): ${kinds}`;
++}
+diff --git a/extensions/squeeze.ts b/extensions/squeeze.ts
+index ae5b80f..a9ee59f 100644
+--- a/extensions/squeeze.ts
++++ b/extensions/squeeze.ts
+@@ -1,22 +1,110 @@
+ /**
+- * pi-squeeze: Squeezes tool output and steers commands to fast CLI tools, so the agent's context stays small: uses rtk when installed, native compactors otherwise.
++ * pi-squeeze: Squeezes tool output so the agent's context stays small.
+  *
+- * Keep the pure logic in exported functions (tested directly in tests/core.test.ts);
+- * the default export only wires them to pi's hooks and stays thin.
++ * Pure logic lives in core/ and command/ (tested directly); this file only wires it to pi.
++ * Output is only ever replaced when the result is clearly smaller, and a truncated result
++ * says where the full output was saved. Settings persist in <agent dir>/squeeze.json.
+  */
+ import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
++import { completions, parseCommand } from "./command/parse.ts";
++import { compact } from "./core/compact.ts";
++import { type Config, DEFAULT_CONFIG, optionsOf, readConfig, saveConfig } from "./core/config.ts";
++import { rewrite } from "./core/rtk.ts";
++import { saveFull } from "./core/save.ts";
++import { emptyStats, record, saved, summary, tokens } from "./core/stats.ts";
+ 
+-/** The sample feature: a greeting. Replace it with the real logic. */
+-export function greet(name: string): string {
+-	const trimmed = name.trim();
+-	return trimmed ? `Hello, ${trimmed}!` : "Hello!";
+-}
++type StatusUi = { ui: { setStatus(key: string, text: string): void } };
++
++export const settingsText = (c: Config): string =>
++	`${c.enabled ? "on" : "off"} · rtk ${c.rtk ? "on" : "off"} · search ${c.kinds.search ? "on" : "off"} · paths ${c.kinds.paths ? "on" : "off"} · listing ${c.kinds.listing ? "on" : "off"} · min ${c.minChars} chars`;
+ 
+ export default function (pi: ExtensionAPI) {
++	let config: Config = { ...DEFAULT_CONFIG, kinds: { ...DEFAULT_CONFIG.kinds } };
++	const stats = emptyStats();
++	if (process.env.PI_SQUEEZE === "off") config.enabled = false;
++
++	const showStatus = (ctx: StatusUi) => {
++		const n = tokens(saved(stats));
++		ctx.ui.setStatus("squeeze", config.enabled && config.showStatus && n > 0 ? `squeeze: ~${n >= 1000 ? `${(n / 1000).toFixed(1)}k` : n} tokens saved` : "");
++	};
++
++	pi.on("session_start", async (_event, ctx) => {
++		const { config: loaded, problem } = await readConfig();
++		config = loaded;
++		if (process.env.PI_SQUEEZE === "off") config.enabled = false;
++		if (problem) ctx.ui.notify(`squeeze: ${problem}; using the defaults`, "warning");
++		showStatus(ctx);
++	});
++
++	pi.on("tool_call", async (event) => {
++		if (!config.enabled || !config.rtk || event.toolName !== "bash") return;
++		const input = event.input as { command?: unknown };
++		if (typeof input.command !== "string") return;
++		const rewritten = rewrite(input.command);
++		if (rewritten) input.command = rewritten;
++	});
++
++	pi.on("tool_result", async (event, ctx) => {
++		if (!config.enabled || event.toolName !== "bash" || event.isError) return;
++		const command = (event.input as { command?: unknown }).command;
++		if (typeof command !== "string") return;
++		// pi already truncated this one: its text is not the tool's own format any more.
++		if ((event.details as { truncation?: unknown } | undefined)?.truncation) return;
++		const blocks = event.content;
++		if (blocks.length !== 1 || blocks[0]!.type !== "text") return;
++		const original = blocks[0]!.text;
++
++		const r = compact(command, original, optionsOf(config));
++		if (!r) return;
++		record(stats, r);
++		showStatus(ctx);
++		const text = r.truncated ? `${r.text}\n[squeeze: output shortened; full output: ${saveFull(original)}]` : r.text;
++		return { content: [{ type: "text", text }] };
++	});
++
+ 	pi.registerCommand("squeeze", {
+-		description: "Say hello (sample command)",
++		description: "pi-squeeze: status, on, off, search|paths|listing|rtk on|off, min <chars>",
++		getArgumentCompletions: (prefix: string) => completions(prefix),
+ 		handler: async (args, ctx) => {
+-			ctx.ui.notify(greet(args), "info");
++			const cmd = parseCommand(args);
++			// The setting applies to this session either way; a failed save only means it is not remembered.
++			const persist = async () => {
++				try {
++					await saveConfig(config);
++				} catch (error) {
++					ctx.ui.notify(`squeeze: could not save the setting (${(error as Error)?.message ?? String(error)}); it applies to this session only`, "warning");
++				}
++				showStatus(ctx);
++			};
++			switch (cmd.kind) {
++				case "status":
++					ctx.ui.notify(`squeeze ${settingsText(config)}\n${summary(stats)}`, "info");
++					return;
++				case "on":
++				case "off":
++					config.enabled = cmd.kind === "on";
++					await persist();
++					ctx.ui.notify(`squeeze ${cmd.kind}`, "info");
++					return;
++				case "rtk":
++					config.rtk = cmd.on;
++					await persist();
++					ctx.ui.notify(`squeeze: rtk ${cmd.on ? "on" : "off"}`, "info");
++					return;
++				case "compactor":
++					config.kinds[cmd.compactor] = cmd.on;
++					await persist();
++					ctx.ui.notify(`squeeze: ${cmd.compactor} ${cmd.on ? "on" : "off"}`, "info");
++					return;
++				case "min":
++					config.minChars = cmd.chars;
++					await persist();
++					ctx.ui.notify(`squeeze: output under ${cmd.chars} characters is left alone`, "info");
++					return;
++				case "invalid":
++					ctx.ui.notify(cmd.message, "warning");
++					return;
++			}
+ 		},
+ 	});
+ }
+diff --git a/tests/extension.test.ts b/tests/extension.test.ts
+index 5052857..c4aa911 100644
+--- a/tests/extension.test.ts
++++ b/tests/extension.test.ts
+@@ -1,22 +1,214 @@
+ import { describe, expect, test } from "bun:test";
+-import ext from "../extensions/squeeze.ts";
++import { readFileSync, rmSync } from "node:fs";
++import { join } from "node:path";
++import { configPath } from "../extensions/core/config.ts";
++import { resetRtk, useRunner } from "../extensions/core/rtk.ts";
++import { fakeCtx, load } from "./helpers.ts";
+ 
+-type Command = { description: string; handler: (args: string, ctx: any) => Promise<void> };
+-
+-function load() {
+-	const commands: Record<string, Command> = {};
+-	ext({ registerCommand: (name: string, c: Command) => (commands[name] = c) } as any);
+-	return commands;
+-}
++const raw = readFileSync(join(import.meta.dir, "fixtures", "rg-flat.txt"), "utf8");
++const result = (command: unknown, text = raw, extra: object = {}) => ({ toolName: "bash", isError: false, input: { command }, content: [{ type: "text", text }], details: undefined, ...extra });
+ 
+ describe("extension", () => {
+-	test("registers the /squeeze command", () => {
+-		expect(Object.keys(load())).toEqual(["squeeze"]);
++	test("registers the hooks and the command", () => {
++		const { hooks, commands } = load();
++		expect(Object.keys(hooks)).toEqual(["session_start", "tool_call", "tool_result"]);
++		expect(Object.keys(commands)).toEqual(["squeeze"]);
++		expect(commands.squeeze!.getArgumentCompletions("of")!.map((c) => c.value)).toEqual(["off"]);
++	});
++
++	test("replaces a bash rg result with the compact one and shows the savings", async () => {
++		const { hooks } = load();
++		const ctx = fakeCtx();
++		const out = await hooks.tool_result!(result("rg -n import extensions"), ctx);
++		expect(out.content[0].text.length).toBeLessThan(raw.length);
++		expect(ctx.status.squeeze).toMatch(/^squeeze: ~\d+ tokens saved$/);
++	});
++
++	test("the status line switches to k above a thousand tokens", async () => {
++		const { hooks } = load();
++		const ctx = fakeCtx();
++		const big = Array.from({ length: 400 }, (_, i) => `src/dir${i % 9}/file${i}.ts:${i}:${"const value = something();".repeat(8)}`).join("\n");
++		await hooks.tool_result!(result("rg -n x", big), ctx);
++		expect(ctx.status.squeeze).toMatch(/^squeeze: ~\d+\.\dk tokens saved$/);
++	});
++
++	test("leaves everything else alone", async () => {
++		const { hooks } = load();
++		const h = (r: object) => hooks.tool_result!(r, fakeCtx());
++		expect(await h(result("rg -n import extensions", raw, { toolName: "read" }))).toBeUndefined();
++		expect(await h(result("rg -n import extensions", raw, { isError: true }))).toBeUndefined();
++		expect(await h(result(42))).toBeUndefined();
++		expect(await h(result("rg -n import extensions", raw, { details: { truncation: {} } }))).toBeUndefined();
++		expect(await h(result("rg -n import extensions", raw, { content: [{ type: "image" }] }))).toBeUndefined();
++		expect(await h(result("rg -n import extensions", raw, { content: [] }))).toBeUndefined();
++		expect(await h(result("cat x"))).toBeUndefined();
+ 	});
+ 
+-	test("the command notifies with the greeting", async () => {
+-		const seen: [string, string][] = [];
+-		await load().squeeze.handler("pi", { ui: { notify: (m: string, l: string) => seen.push([m, l]) } });
+-		expect(seen).toEqual([["Hello, pi!", "info"]]);
++	test("a truncated result says where the full output is", async () => {
++		const { hooks } = load();
++		const big = Array.from({ length: 600 }, (_, i) => `src/f${i}.ts:1:${"x".repeat(40)}`).join("\n");
++		const out = await hooks.tool_result!(result("rg -n x", big), fakeCtx());
++		const path = /full output: (.+?)\]$/.exec(out.content[0].text)![1]!;
++		expect(readFileSync(path, "utf8")).toBe(big);
++	});
++
++	test("on, off and the per-compactor switches persist and take effect", async () => {
++		rmSync(configPath(), { force: true });
++		const { hooks, commands } = load();
++		const ctx = fakeCtx();
++		const cmd = commands.squeeze!;
++		await hooks.session_start!({}, ctx);
++
++		await cmd.handler("off", ctx);
++		expect(JSON.parse(readFileSync(configPath(), "utf8")).enabled).toBe(false);
++		expect(await hooks.tool_result!(result("rg -n import extensions"), ctx)).toBeUndefined();
++		await cmd.handler("on", ctx);
++		await cmd.handler("search off", ctx);
++		expect(await hooks.tool_result!(result("rg -n import extensions"), ctx)).toBeUndefined();
++		await cmd.handler("search on", ctx);
++		await cmd.handler("min 100000", ctx);
++		expect(await hooks.tool_result!(result("rg -n import extensions"), ctx)).toBeUndefined();
++		expect(JSON.parse(readFileSync(configPath(), "utf8")).minChars).toBe(100000);
++
++		const fresh = fakeCtx();
++		const again = load();
++		await again.hooks.session_start!({}, fresh);
++		expect(await again.hooks.tool_result!(result("rg -n import extensions"), fresh)).toBeUndefined();
++		rmSync(configPath(), { force: true });
++	});
++
++	test("status reports the settings and the savings; invalid input warns", async () => {
++		rmSync(configPath(), { force: true });
++		const { hooks, commands } = load();
++		const ctx = fakeCtx();
++		await hooks.tool_result!(result("rg -n import extensions"), ctx);
++		await commands.squeeze!.handler("", ctx);
++		await commands.squeeze!.handler("bogus", ctx);
++		expect(ctx.notes[0]![0]).toMatch(/^squeeze on · rtk on · search on · paths on · listing on · min 400 chars\nsqueeze: 1 outputs compacted/);
++		expect(ctx.notes[1]![1]).toBe("warning");
++	});
++
++	test("session_start reports a broken file and PI_SQUEEZE=off wins over the file", async () => {
++		await Bun.write(configPath(), "{ nope");
++		const { hooks } = load();
++		const ctx = fakeCtx();
++		await hooks.session_start!({}, ctx);
++		expect(ctx.notes[0]![0]).toContain("is not valid JSON");
++		rmSync(configPath(), { force: true });
++
++		process.env.PI_SQUEEZE = "off";
++		try {
++			const off = load();
++			await off.hooks.session_start!({}, fakeCtx());
++			expect(await off.hooks.tool_result!(result("rg -n import extensions"), fakeCtx())).toBeUndefined();
++		} finally {
++			delete process.env.PI_SQUEEZE;
++		}
++	});
++
++	test("a save that fails is reported and the setting still applies", async () => {
++		const { commands } = load();
++		const ctx = fakeCtx();
++		const dir = process.env.PI_CODING_AGENT_DIR!;
++		rmSync(dir, { recursive: true, force: true });
++		await Bun.write(dir, "a file where the directory should be");
++		await commands.squeeze!.handler("paths off", ctx);
++		expect(ctx.notes[0]![0]).toContain("could not save the setting");
++		rmSync(dir, { force: true });
++	});
++
++	describe("rtk layer", () => {
++		const call = (command: unknown, toolName = "bash") => ({ toolName, input: { command } });
++		const fake = (status: number | null, stdout: string) => {
++			const seen: string[] = [];
++			useRunner((c) => (seen.push(c), { status, stdout }));
++			resetRtk();
++			return seen;
++		};
++
++		test("rewrites a command through rtk and remembers the answer", async () => {
++			const seen = fake(0, "rtk git status\n");
++			const { hooks } = load();
++			const ev = call("git status");
++			await hooks.tool_call!(ev, fakeCtx());
++			expect(ev.input.command).toBe("rtk git status");
++			await hooks.tool_call!(call("git status"), fakeCtx());
++			expect(seen).toEqual(["git status"]);
++			useRunner();
++		});
++
++		test("leaves the command alone when rtk has no rewrite, denies, or returns the same", async () => {
++			const { hooks } = load();
++			for (const [status, out] of [[1, ""], [2, ""], [0, "git log"], [0, ""], [null, "rtk x"]] as const) {
++				fake(status, out);
++				const ev = call("git log");
++				await hooks.tool_call!(ev, fakeCtx());
++				expect(ev.input.command).toBe("git log");
++			}
++			useRunner();
++		});
++
++		test("exit 3 (ask) still rewrites; a file read never does", async () => {
++			const { hooks } = load();
++			fake(3, "rtk cargo test");
++			const a = call("cargo test");
++			await hooks.tool_call!(a, fakeCtx());
++			expect(a.input.command).toBe("rtk cargo test");
++			fake(0, "rtk read foo.ts");
++			const b = call("cat foo.ts");
++			await hooks.tool_call!(b, fakeCtx());
++			expect(b.input.command).toBe("cat foo.ts");
++			useRunner();
++		});
++
++		test("never rewrites what a native compactor handles, other tools, or odd input", async () => {
++			const seen = fake(0, "rtk whatever");
++			const { hooks } = load();
++			const a = call("rg -n x src");
++			await hooks.tool_call!(a, fakeCtx());
++			await hooks.tool_call!(call("git status", "read"), fakeCtx());
++			await hooks.tool_call!(call(42), fakeCtx());
++			await hooks.tool_call!(call("   "), fakeCtx());
++			expect(a.input.command).toBe("rg -n x src");
++			expect(seen).toEqual([]);
++			useRunner();
++		});
++
++		test("a missing rtk binary is noticed once and then ignored", async () => {
++			let calls = 0;
++			useRunner(() => (calls++, { status: null, stdout: "", missing: true }));
++			resetRtk();
++			const { hooks } = load();
++			await hooks.tool_call!(call("git status"), fakeCtx());
++			await hooks.tool_call!(call("git diff"), fakeCtx());
++			expect(calls).toBe(1);
++			useRunner();
++			resetRtk();
++		});
++
++		test("the cache is bounded", async () => {
++			fake(0, "rtk x");
++			const { hooks } = load();
++			for (let i = 0; i < 520; i++) await hooks.tool_call!(call(`git log -${i + 1}`), fakeCtx());
++			useRunner();
++			resetRtk();
++		});
++
++		test("rtk off and squeeze off both skip the rewrite; the real runner works", async () => {
++			const seen = fake(0, "rtk git status");
++			const { commands, hooks } = load();
++			await commands.squeeze!.handler("rtk off", fakeCtx());
++			await hooks.tool_call!(call("git status"), fakeCtx());
++			await commands.squeeze!.handler("rtk on", fakeCtx());
++			await commands.squeeze!.handler("off", fakeCtx());
++			await hooks.tool_call!(call("git status"), fakeCtx());
++			expect(seen).toEqual([]);
++			await commands.squeeze!.handler("on", fakeCtx());
++			useRunner();
++			resetRtk();
++			const ev = call("git status");
++			await hooks.tool_call!(ev, fakeCtx()); // the real process: rewritten if rtk is installed, else untouched
++			expect(["git status", "rtk git status"]).toContain(ev.input.command as string);
++		});
+ 	});
+ });

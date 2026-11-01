@@ -7,7 +7,7 @@
  */
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { completions, parseCommand } from "./command/parse.ts";
-import { compact } from "./core/compact.ts";
+import { compact, compactsFailures } from "./core/compact.ts";
 import { type Config, DEFAULT_CONFIG, optionsOf, readConfig, saveConfig } from "./core/config.ts";
 import { rewrite } from "./core/rtk.ts";
 import { saveFull } from "./core/save.ts";
@@ -16,7 +16,7 @@ import { emptyStats, record, saved, summary, tokens } from "./core/stats.ts";
 type StatusUi = { ui: { setStatus(key: string, text: string): void } };
 
 export const settingsText = (c: Config): string =>
-	`${c.enabled ? "on" : "off"} · rtk ${c.rtk ? "on" : "off"} · search ${c.kinds.search ? "on" : "off"} · paths ${c.kinds.paths ? "on" : "off"} · listing ${c.kinds.listing ? "on" : "off"} · min ${c.minChars} chars`;
+	`${c.enabled ? "on" : "off"} · rtk ${c.rtk ? "on" : "off"} · search ${c.kinds.search ? "on" : "off"} · paths ${c.kinds.paths ? "on" : "off"} · listing ${c.kinds.listing ? "on" : "off"} · diff ${c.kinds.diff ? "on" : "off"} · tests ${c.kinds.tests ? "on" : "off"} · min ${c.minChars} chars`;
 
 export default function (pi: ExtensionAPI) {
 	let config: Config = { ...DEFAULT_CONFIG, kinds: { ...DEFAULT_CONFIG.kinds } };
@@ -45,9 +45,10 @@ export default function (pi: ExtensionAPI) {
 	});
 
 	pi.on("tool_result", async (event, ctx) => {
-		if (!config.enabled || event.toolName !== "bash" || event.isError) return;
+		if (!config.enabled || event.toolName !== "bash") return;
 		const command = (event.input as { command?: unknown }).command;
 		if (typeof command !== "string") return;
+		if (event.isError && !compactsFailures(command)) return;
 		// pi already truncated this one: its text is not the tool's own format any more.
 		if ((event.details as { truncation?: unknown } | undefined)?.truncation) return;
 		const blocks = event.content;
@@ -63,7 +64,7 @@ export default function (pi: ExtensionAPI) {
 	});
 
 	pi.registerCommand("squeeze", {
-		description: "pi-squeeze: status, on, off, search|paths|listing|rtk on|off, min <chars>",
+		description: "pi-squeeze: status, on, off, search|paths|listing|diff|tests|rtk on|off, min <chars>",
 		getArgumentCompletions: (prefix: string) => completions(prefix),
 		handler: async (args, ctx) => {
 			const cmd = parseCommand(args);

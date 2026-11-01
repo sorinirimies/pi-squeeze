@@ -1,0 +1,344 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.27
+   Compiling libc v0.2.191
+   Compiling cfg-if v1.0.5
+   Compiling unicode-segmentation v1.13.3
+   Compiling rustversion v1.0.23
+   Compiling equivalent v1.0.3
+   Compiling bitflags v2.13.2
+   Compiling strsim v0.11.1
+   Compiling ident_case v1.0.1
+   Compiling foldhash v0.2.0
+   Compiling allocator-api2 v0.2.21
+   Compiling thiserror v2.0.21
+   Compiling either v1.19.0
+   Compiling heck v0.5.0
+   Compiling signal-hook v0.3.18
+   Compiling static_assertions v1.1.0
+   Compiling itertools v0.14.0
+   Compiling hashbrown v0.17.1
+   Compiling itoa v1.0.18
+   Compiling unicode-width v0.2.3
+   Compiling ryu v1.0.23
+   Compiling parking_lot_core v0.9.12
+   Compiling convert_case v0.10.0
+   Compiling critical-section v1.2.0
+   Compiling once_cell v1.21.4
+   Compiling rustix v1.1.6
+   Compiling indoc v2.0.8
+   Compiling scopeguard v1.2.0
+   Compiling log v0.4.35
+   Compiling smallvec v1.16.4
+   Compiling lock_api v0.4.14
+   Compiling litrs v1.0.1
+   Compiling time-core v0.1.9
+   Compiling lru v0.18.5
+   Compiling deranged v0.5.9
+   Compiling powerfmt v0.2.1
+   Compiling num-conv v0.2.2
+   Compiling tracing-core v0.1.36
+   Compiling line-clipping v0.3.8
+   Compiling lazy_static v1.5.1
+   Compiling sharded-slab v0.1.7
+   Compiling document-features v0.2.12
+   Compiling thread_local v1.1.10
+   Compiling autocfg v1.5.1
+   Compiling unicode-truncate v2.0.1
+   Compiling pin-project-lite v0.2.17
+   Compiling tracing-subscriber v0.3.23
+   Compiling tracing v0.1.44
+   Compiling adler2 v2.0.1
+   Compiling color-spantrace v0.3.0
+   Compiling gimli v0.34.0
+   Compiling eyre v0.6.14
+   Compiling memchr v2.8.3
+   Compiling miniz_oxide v0.9.1
+   Compiling indenter v0.3.4
+   Compiling owo-colors v4.4.0
+   Compiling object v0.40.0
+   Compiling syn v3.0.9
+   Compiling syn v2.0.119
+   Compiling tracing-error v0.2.1
+   Compiling rustc-demangle v0.1.28
+   Compiling castaway v0.2.4
+   Compiling addr2line v0.27.1
+   Compiling strum_macros v0.28.0
+   Compiling derive_more-impl v2.1.1
+   Compiling derive_more v2.1.1
+   Compiling darling_core v0.24.1
+   Compiling strum v0.28.0
+   Compiling thiserror-impl v2.0.21
+   Compiling errno v0.3.14
+   Compiling mio v1.2.4
+   Compiling num_threads v0.1.8
+   Compiling time v0.3.55
+   Compiling signal-hook-registry v1.4.8
+   Compiling parking_lot v0.12.5
+   Compiling signal-hook-mio v0.2.5
+   Compiling backtrace v0.3.77
+   Compiling darling_macro v0.24.1
+   Compiling compact_str v0.9.1
+   Compiling color-eyre v0.6.5
+   Compiling darling v0.24.1
+   Compiling crossterm v0.29.0
+   Compiling kasuari v0.4.13
+   Compiling ratatui-core v0.1.2
+   Compiling instability v0.3.14
+   Compiling ratatui-widgets v0.3.2
+   Compiling ratatui-crossterm v0.1.2
+   Compiling ratatui-macros v0.7.2
+   Compiling ratatui v0.30.2
+   Compiling tui-nuances v0.1.10
+   Compiling tui-spinner v0.5.1 (/Users/EBEMXC4/Projects/tui-spinner)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.37s
+     Running unittests src/lib.rs (target/debug/deps/tui_spinner-c83b66df6b8a7f3a)
+
+running 134 tests
+test bar_spinner::tests::arc_width_zero_uses_auto ... ok
+test bar_spinner::tests::arc_width_larger_than_bar_is_clamped ... ok
+test bar_spinner::tests::all_non_braille_styles_have_char_pairs ... ok
+test bar_spinner::tests::bar_style_builder ... ok
+test bar_spinner::tests::bounce_still_reverses ... ok
+test bar_spinner::tests::arc_edges_use_fade_bytes ... ok
+test bar_spinner::tests::bar_style_block_produces_non_braille_chars ... ok
+test bar_spinner::tests::build_lines_height_matches ... ok
+test bar_spinner::tests::arc_width_override_respected ... ok
+test bar_spinner::tests::arc_char_changes_centre_byte ... ok
+test bar_spinner::tests::build_lines_width_matches ... ok
+test bar_spinner::tests::builder_chain ... ok
+test bar_spinner::tests::char_size_auto_width_is_none ... ok
+test bar_spinner::tests::char_size_clamps_minimum ... ok
+test bar_spinner::tests::char_size_fixed_width ... ok
+test bar_spinner::tests::cw_starts_at_left_ccw_at_right ... ok
+test bar_spinner::tests::cw_and_ccw_differ_at_same_tick ... ok
+test bar_spinner::tests::dim_columns_use_dim_byte ... ok
+test bar_spinner::tests::different_ticks_produce_different_output ... ok
+test bar_spinner::tests::engine_anchor_stays_in_bounds ... ok
+test bar_spinner::tests::engine_bounces_direction ... ok
+test bar_spinner::tests::engine_walk_does_not_panic ... ok
+test bar_spinner::tests::engine_builds_without_panic ... ok
+test bar_spinner::tests::loop_motion_wraps_at_left_edge_ccw ... ok
+test bar_spinner::tests::loop_motion_wraps_at_right_edge ... ok
+test bar_spinner::tests::motion_builder ... ok
+test bar_spinner::tests::loop_all_columns_lit_over_full_cycle ... ok
+test bar_spinner::tests::non_braille_style_chars_match_declaration ... ok
+test bar_spinner::tests::preset_solid_has_full_track_and_zero_fade ... ok
+test bar_spinner::tests::preset_zed_defaults ... ok
+test bar_spinner::tests::ticks_per_step_slows_animation ... ok
+test bar_spinner::tests::to_lines_matches_build_lines ... ok
+test bar_spinner::tests::track_and_fade_width_builder ... ok
+test bar_spinner::tests::vertical_loop_does_not_panic ... ok
+test bar_spinner::tests::vertical_orientation_builder ... ok
+test bar_spinner::tests::vertical_renders_correct_col_count ... ok
+test bar_spinner::tests::vertical_renders_correct_row_count ... ok
+test bar_spinner::tests::widget_zero_area_no_panic ... ok
+test bar_spinner::tests::widget_renders_without_panic ... ok
+test bar_spinner::tests::widget_fixed_width_renders_without_panic ... ok
+test bar_spinner::tests::with_colors_sets_both ... ok
+test circle_spinner::tests::builder_chain_fields ... ok
+test circle_spinner::tests::char_size_is_correct ... ok
+test circle_spinner::tests::char_size_radius_8 ... ok
+test circle_spinner::tests::circle_perimeter_is_square_bounding_box ... ok
+test circle_spinner::tests::circle_perimeter_larger_radius_more_points ... ok
+test circle_spinner::tests::circle_perimeter_has_points ... ok
+test circle_spinner::tests::circle_perimeter_zero_returns_single_dot ... ok
+test circle_spinner::tests::circle_perimeter_sorted_clockwise ... ok
+test circle_spinner::tests::converts_into_text ... ok
+test circle_spinner::tests::engine_advances_after_walk ... ok
+test circle_spinner::tests::sort_clockwise_four_cardinals ... ok
+test circle_spinner::tests::cw_and_ccw_differ ... ok
+test circle_spinner::tests::different_ticks_produce_different_output ... ok
+test circle_spinner::tests::engine_walk_does_not_panic ... ok
+test circle_spinner::tests::widget_zero_area_no_panic ... ok
+test flux_spinner::tests::all_presets_non_empty ... ok
+test flux_spinner::tests::builder_chain ... ok
+test flux_spinner::tests::ccw_is_reverse_of_cw ... ok
+test circle_spinner::tests::ring_has_visible_content ... ok
+test flux_spinner::tests::ccw_wraps_after_eight_steps ... ok
+test circle_spinner::tests::engine_wraps_after_full_revolution ... ok
+test flux_spinner::tests::char_size_clamps_to_one ... ok
+test circle_spinner::tests::to_lines_matches_build_lines ... ok
+test flux_spinner::tests::cw_and_ccw_agree_at_tick_zero ... ok
+test flux_spinner::tests::cw_wraps_after_eight_steps ... ok
+test circle_spinner::tests::engine_builds_for_various_radii ... ok
+test flux_spinner::tests::phase_step_eight_wraps_to_same ... ok
+test flux_spinner::tests::braille_preset_has_eight_frames ... ok
+test flux_spinner::tests::all_presets_have_distinct_chars_within_set ... ok
+test circle_spinner::tests::ticks_per_step_slows_animation ... ok
+test flux_spinner::tests::ccw_wave_differs_from_cw_wave ... ok
+test flux_spinner::tests::char_size_returns_width_height ... ok
+test flux_spinner::tests::custom_frames_respected ... ok
+test flux_spinner::tests::converts_into_text_and_cell ... ok
+test flux_spinner::tests::cw_advances_each_tick ... ok
+test flux_spinner::tests::cw_and_ccw_differ_at_same_tick ... ok
+test flux_spinner::tests::frames_builder_changes_output ... ok
+test flux_spinner::tests::output_chars_come_from_frame_set ... ok
+test flux_spinner::tests::output_dimensions_match_width_height ... ok
+test flux_spinner::tests::phase_step_one_cells_differ ... ok
+test flux_spinner::tests::phase_step_zero_all_cells_same ... ok
+test flux_spinner::tests::ticks_per_step_slows_animation ... ok
+test flux_spinner::tests::to_text_has_expected_row_count ... ok
+test flux_spinner::tests::to_lines_matches_build_lines ... ok
+test flux_spinner::tests::widget_zero_area_no_panic ... ok
+test linear_spinner::tests::converts_into_text ... ok
+test linear_spinner::tests::flow_forwards_is_default ... ok
+test flux_spinner::tests::widget_renders_without_panic ... ok
+test flux_spinner::tests::widget_single_char_renders ... ok
+test linear_spinner::tests::flow_default_trait ... ok
+test linear_spinner::tests::horizontal_lit_clamped_to_total_at_render ... ok
+test linear_spinner::tests::horizontal_second_step_advances ... ok
+test linear_spinner::tests::all_styles_return_non_empty_symbols ... ok
+test linear_spinner::tests::horizontal_backwards_second_step_reverses ... ok
+test linear_spinner::tests::horizontal_first_step_lights_first_two ... ok
+test linear_spinner::tests::horizontal_single_dot_no_panic ... ok
+test linear_spinner::tests::horizontal_backwards_first_step_lights_last_two ... ok
+test linear_spinner::tests::horizontal_window_wraps ... ok
+test linear_spinner::tests::horizontal_backwards_third_step ... ok
+test linear_spinner::tests::linear_style_arrow_changes_with_direction ... ok
+test linear_spinner::tests::render_horizontal_does_not_panic_on_zero_area ... ok
+test linear_spinner::tests::render_vertical_does_not_panic_on_small_area ... ok
+test linear_spinner::tests::render_vertical_does_not_panic_on_zero_area ... ok
+test linear_spinner::tests::to_lines_horizontal_is_single_row ... ok
+test linear_spinner::tests::to_lines_vertical_matches_total_slots ... ok
+test linear_spinner::tests::vertical_backwards_bounce_sequence_1_dot ... ok
+test linear_spinner::tests::vertical_backwards_bounce_sequence_3_dots ... ok
+test linear_spinner::tests::vertical_bounce_sequence_1_dot ... ok
+test linear_spinner::tests::vertical_bounce_sequence_3_dots ... ok
+test linear_spinner::tests::vertical_lines_bottom_aligned ... ok
+test linear_spinner::tests::vertical_lines_short_area_no_panic ... ok
+test linear_spinner::tests::vertical_ticks_per_step_one_faster ... ok
+test rect_spinner::tests::converts_into_text ... ok
+test rect_spinner::tests::filled_vs_empty_differ ... ok
+test square_spinner::tests::builder_chain ... ok
+test rect_spinner::tests::cw_and_ccw_differ ... ok
+test rect_spinner::tests::widget_renders ... ok
+test rect_spinner::tests::different_ticks_produce_different_output ... ok
+test rect_spinner::tests::to_lines_matches_render_lines ... ok
+test square_spinner::tests::char_size_is_correct ... ok
+test square_spinner::tests::converts_into_text ... ok
+test square_spinner::tests::filled_vs_empty_differ ... ok
+test square_spinner::tests::widget_renders_without_panic ... ok
+test rect_spinner::tests::square_engine_builds ... ok
+test square_spinner::tests::cw_and_ccw_differ ... ok
+test square_spinner::tests::zero_area_no_panic ... ok
+test square_spinner::tests::different_ticks_differ ... ok
+test square_spinner::tests::to_lines_matches_build_lines ... ok
+test square_spinner::tests::builds_all_sizes ... ok
+test theme_tests::mapping_all_widgets ... ok
+test rect_spinner::tests::square_engine_walk_does_not_panic ... ok
+test square_spinner::tests::walk_does_not_panic ... ok
+test circle_spinner::tests::widget_renders_without_panic ... ok
+
+test result: ok. 134 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/fuzz_regressions.rs (target/debug/deps/fuzz_regressions-fe9456dfc349ca17)
+
+running 7 tests
+test linear_huge_slots_no_capacity_overflow ... ok
+test square_huge_tick_is_fast_and_periodic ... ok
+test circle_tick_wraps_perimeter ... ok
+test rect_huge_tick_is_fast ... ok
+test circle_huge_radius_no_overflow ... ok
+test flux_huge_dimensions_no_capacity_overflow ... ok
+test bar_huge_tick_and_width_are_bounded ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+     Running tests/theme_test.rs (target/debug/deps/theme_test-e5607e88725ae27e)
+
+running 6 tests
+test provider_works ... ok
+test explicit_style_wins ... ok
+test no_theme_is_unchanged ... ok
+test theme_maps_roles ... ok
+test explicit_colors_win_in_any_order ... ok
+test every_theme_renders_every_widget ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+   Doc-tests tui_spinner
+
+running 79 tests
+test src/bar_spinner.rs - bar_spinner::BarSpinner (line 708) - compile ... ok
+test src/bar_spinner.rs - bar_spinner::BarSpinner<'a>::bar_style (line 1083) ... ok
+test src/bar_spinner.rs - bar_spinner::BarSpinner<'a>::fade_width (line 1037) ... ok
+test src/bar_spinner.rs - bar_spinner::BarSpinner<'a>::block (line 1179) ... ok
+test src/bar_spinner.rs - bar_spinner::BarSpinner<'a>::arc_color (line 957) ... ok
+test src/bar_spinner.rs - bar_spinner::BarOrientation (line 255) ... ok
+test src/bar_spinner.rs - bar_spinner::BarSpinner<'a>::claude (line 790) ... ok
+test src/bar_spinner.rs - bar_spinner::BarSpinner<'a>::char_size (line 1212) ... ok
+test src/bar_spinner.rs - bar_spinner::BarSpinner<'a>::minimal (line 804) ... ok
+test src/bar_spinner.rs - bar_spinner::BarSpinner<'a>::dim_color (line 977) ... ok
+test src/bar_spinner.rs - bar_spinner::BarMotion (line 216) ... ok
+test src/bar_spinner.rs - bar_spinner::BarSpinner<'a>::arc_width (line 910) ... ok
+test src/bar_spinner.rs - bar_spinner::BarSpinner<'a>::motion (line 1104) ... ok
+test src/bar_spinner.rs - bar_spinner::BarSpinner<'a>::arc_char (line 1063) ... ok
+test src/bar_spinner.rs - bar_spinner::BarSpinner<'a>::height (line 895) ... ok
+test src/circle_spinner.rs - circle_spinner::CircleSpinner (line 341) - compile ... ok
+test src/bar_spinner.rs - bar_spinner::BarSpinner<'a>::new (line 839) ... ok
+test src/bar_spinner.rs - bar_spinner::BarSpinner<'a>::orientation (line 1135) ... ok
+test src/bar_spinner.rs - bar_spinner::BarSpinner<'a>::solid (line 819) ... ok
+test src/bar_spinner.rs - bar_spinner::BarSpinner<'a>::spin (line 927) ... ok
+test src/bar_spinner.rs - bar_spinner::BarSpinner<'a>::thickness (line 1158) ... ok
+test src/bar_spinner.rs - bar_spinner::BarSpinner<'a>::ticks_per_step (line 942) ... ok
+test src/flux_spinner.rs - flux_spinner (line 29) - compile ... ok
+test src/bar_spinner.rs - bar_spinner::BarSpinner<'a>::to_lines (line 1239) ... ok
+test src/bar_spinner.rs - bar_spinner::BarSpinner<'a>::track (line 1018) ... ok
+test src/bar_spinner.rs - bar_spinner::BarSpinner<'a>::width (line 876) ... ok
+test src/bar_spinner.rs - bar_spinner::BarSpinner<'a>::with_colors (line 999) ... ok
+test src/bar_spinner.rs - bar_spinner::BarSpinner<'a>::zed (line 776) ... ok
+test src/bar_spinner.rs - bar_spinner::BarStyle (line 128) ... ok
+test src/bar_spinner.rs - bar_spinner::BarTrack (line 66) ... ok
+test src/circle_spinner.rs - circle_spinner::CircleSpinner<'a>::arc_color (line 452) ... ok
+test src/circle_spinner.rs - circle_spinner::CircleSpinner<'a>::char_size (line 508) ... ok
+test src/circle_spinner.rs - circle_spinner::CircleSpinner<'a>::dim_color (line 469) ... ok
+test src/circle_spinner.rs - circle_spinner::CircleSpinner<'a>::new (line 381) ... ok
+test src/circle_spinner.rs - circle_spinner::CircleSpinner<'a>::radius (line 407) ... ok
+test src/circle_spinner.rs - circle_spinner::CircleSpinner<'a>::spin (line 430) ... ok
+test src/flux_spinner.rs - flux_spinner::FluxFrames (line 91) ... ok
+test src/lib.rs - (line 19) - compile ... ok
+test src/lib.rs - (line 77) - compile ... ok
+test src/lib.rs - (line 89) - compile ... ok
+test src/flux_spinner.rs - flux_spinner::FluxSpinner (line 251) ... ok
+test src/flux_spinner.rs - flux_spinner::FluxSpinner (line 274) ... ok
+test src/linear_spinner.rs - linear_spinner::LinearSpinner (line 212) - compile ... ok
+test src/flux_spinner.rs - flux_spinner::FluxSpinner (line 293) ... ok
+test src/flux_spinner.rs - flux_spinner::FluxSpinner<'a>::block (line 490) ... ok
+test src/flux_spinner.rs - flux_spinner::FluxSpinner<'a>::char_size (line 521) ... ok
+test src/flux_spinner.rs - flux_spinner::FluxSpinner<'a>::color (line 412) ... ok
+test src/flux_spinner.rs - flux_spinner::FluxSpinner<'a>::frames (line 473) ... ok
+test src/flux_spinner.rs - flux_spinner::FluxSpinner<'a>::height (line 379) ... ok
+test src/flux_spinner.rs - flux_spinner::FluxSpinner<'a>::new (line 337) ... ok
+test src/flux_spinner.rs - flux_spinner::FluxSpinner<'a>::phase_step (line 453) ... ok
+test src/flux_spinner.rs - flux_spinner::FluxSpinner<'a>::spin (line 396) ... ok
+test src/flux_spinner.rs - flux_spinner::FluxSpinner<'a>::ticks_per_step (line 429) ... ok
+test src/flux_spinner.rs - flux_spinner::FluxSpinner<'a>::width (line 364) ... ok
+test src/linear_spinner.rs - linear_spinner::Direction (line 30) ... ok
+test src/square_spinner.rs - square_spinner (line 8) - compile ... ok
+test src/square_spinner.rs - square_spinner::SquareSpinner (line 388) - compile ... ok
+test src/linear_spinner.rs - linear_spinner::Flow (line 65) ... ok
+test src/linear_spinner.rs - linear_spinner::LinearSpinner<'a>::active_color (line 397) ... ok
+test src/linear_spinner.rs - linear_spinner::LinearSpinner<'a>::block (line 431) ... ok
+test src/linear_spinner.rs - linear_spinner::LinearSpinner<'a>::direction (line 293) ... ok
+test src/linear_spinner.rs - linear_spinner::LinearSpinner<'a>::flow (line 311) ... ok
+test src/linear_spinner.rs - linear_spinner::LinearSpinner<'a>::inactive_color (line 414) ... ok
+test src/linear_spinner.rs - linear_spinner::LinearSpinner<'a>::linear_style (line 327) ... ok
+test src/linear_spinner.rs - linear_spinner::LinearSpinner<'a>::lit_slots (line 364) ... ok
+test src/linear_spinner.rs - linear_spinner::LinearSpinner<'a>::new (line 263) ... ok
+test src/linear_spinner.rs - linear_spinner::LinearSpinner<'a>::ticks_per_step (line 382) ... ok
+test src/linear_spinner.rs - linear_spinner::LinearSpinner<'a>::total_slots (line 345) ... ok
+test src/linear_spinner.rs - linear_spinner::LinearStyle (line 93) ... ok
+test src/linear_spinner.rs - linear_spinner::LinearStyle::columns_per_slot (line 151) ... ok
+test src/square_spinner.rs - square_spinner::SquareSpinner<'a>::arc_color (line 494) ... ok
+test src/square_spinner.rs - square_spinner::SquareSpinner<'a>::block (line 545) ... ok
+test src/square_spinner.rs - square_spinner::SquareSpinner<'a>::centre (line 479) ... ok
+test src/square_spinner.rs - square_spinner::SquareSpinner<'a>::char_size (line 576) ... ok
+test src/square_spinner.rs - square_spinner::SquareSpinner<'a>::dim_color (line 513) ... ok
+test src/square_spinner.rs - square_spinner::SquareSpinner<'a>::new (line 421) ... ok
+test src/square_spinner.rs - square_spinner::SquareSpinner<'a>::size (line 449) ... ok
+test src/square_spinner.rs - square_spinner::SquareSpinner<'a>::spin (line 464) ... ok
+test src/square_spinner.rs - square_spinner::SquareSpinner<'a>::ticks_per_step (line 530) ... ok
+
+test result: ok. 79 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 16.48s
+

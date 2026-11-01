@@ -44,6 +44,15 @@ describe("extension", () => {
 		expect(await h(result("cat x"))).toBeUndefined();
 	});
 
+	test("a failed test run is compacted, any other failed command is left alone", async () => {
+		const { hooks } = load();
+		const cargo = readFileSync(join(import.meta.dir, "fixtures", "cargo-test-ok.txt"), "utf8");
+		const out = await hooks.tool_result!(result("cargo test", `${cargo}\n\nCommand exited with code 101`, { isError: true }), fakeCtx());
+		expect(out.content[0].text).toContain("cargo test: 226 passed");
+		expect(out.content[0].text).toContain("Command exited with code 101");
+		expect(await hooks.tool_result!(result("rg -n import extensions", raw, { isError: true }), fakeCtx())).toBeUndefined();
+	});
+
 	test("a truncated result says where the full output is", async () => {
 		const { hooks } = load();
 		const big = Array.from({ length: 600 }, (_, i) => `src/f${i}.ts:1:${"x".repeat(40)}`).join("\n");
@@ -84,7 +93,7 @@ describe("extension", () => {
 		await hooks.tool_result!(result("rg -n import extensions"), ctx);
 		await commands.squeeze!.handler("", ctx);
 		await commands.squeeze!.handler("bogus", ctx);
-		expect(ctx.notes[0]![0]).toMatch(/^squeeze on · rtk on · search on · paths on · listing on · min 400 chars\nsqueeze: 1 outputs compacted/);
+		expect(ctx.notes[0]![0]).toMatch(/^squeeze on · rtk on · search on · paths on · listing on · diff on · tests on · min 400 chars\nsqueeze: 1 outputs compacted/);
 		expect(ctx.notes[1]![1]).toBe("warning");
 	});
 
@@ -150,10 +159,10 @@ describe("extension", () => {
 
 		test("exit 3 (ask) still rewrites; a file read never does", async () => {
 			const { hooks } = load();
-			fake(3, "rtk cargo test");
-			const a = call("cargo test");
+			fake(3, "rtk cargo build");
+			const a = call("cargo build");
 			await hooks.tool_call!(a, fakeCtx());
-			expect(a.input.command).toBe("rtk cargo test");
+			expect(a.input.command).toBe("rtk cargo build");
 			fake(0, "rtk read foo.ts");
 			const b = call("cat foo.ts");
 			await hooks.tool_call!(b, fakeCtx());

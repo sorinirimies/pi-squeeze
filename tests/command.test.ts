@@ -19,6 +19,8 @@ describe("parseCommand", () => {
 		expect(parseCommand("search off")).toEqual({ kind: "compactor", compactor: "search", on: false });
 		expect(parseCommand("paths on")).toEqual({ kind: "compactor", compactor: "paths", on: true });
 		expect(parseCommand("listing off")).toEqual({ kind: "compactor", compactor: "listing", on: false });
+		expect(parseCommand("diff off")).toEqual({ kind: "compactor", compactor: "diff", on: false });
+		expect(parseCommand("tests on")).toEqual({ kind: "compactor", compactor: "tests", on: true });
 		for (const bad of ["search", "search maybe"]) expect(parseCommand(bad).kind).toBe("invalid");
 	});
 
@@ -41,7 +43,7 @@ describe("parseCommand", () => {
 
 describe("completions", () => {
 	test("completes the top level by prefix, every item has a label", () => {
-		expect(completions("")!.map((i) => i.label)).toEqual(["status", "on", "off", "search", "paths", "listing", "rtk", "min"]);
+		expect(completions("")!.map((i) => i.label)).toEqual(["status", "on", "off", "search", "paths", "listing", "diff", "tests", "rtk", "min"]);
 		expect(completions("o")!.map((i) => i.label)).toEqual(["on", "off"]);
 		expect(completions("  SE")!.map((i) => i.label)).toEqual(["search"]);
 		for (const i of completions("")!) expect(typeof i.label).toBe("string");

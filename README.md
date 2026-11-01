@@ -26,6 +26,9 @@ It only touches output it fully understands, and otherwise passes it through unc
 | `rg -n` / `grep -n` | totals line, then matches grouped by file (path written once, indent trimmed, long lines and busy files cut) |
 | `fd`, `find` | paths grouped by directory |
 | `lsd -l`, `eza -l` | type, size, short date and name (owner, group and permissions dropped) |
+| `git diff` | one header line per file (`path (new, +12 −0)`), `index`/mode/`---`/`+++` lines dropped, every changed line kept, context trimmed to 1 line, long files cut |
+| `cargo test` | totals line, then only warnings, failures, panics and result lines (build progress and passing tests dropped); also when the run failed |
+| `git`, `cargo`, `docker`… | rewritten through [rtk](https://github.com/rtk-ai/rtk) when it is installed (see `/squeeze rtk`) |
 
 Safety rules:
 
@@ -41,7 +44,7 @@ Safety rules:
 |---|---|
 | `/squeeze` or `/squeeze status` | the settings and the tokens saved so far |
 | `/squeeze [on\|off]` | switch everything |
-| `/squeeze [search\|paths\|listing] [on\|off]` | switch one compactor |
+| `/squeeze [search\|paths\|listing\|diff\|tests] [on\|off]` | switch one compactor |
 | `/squeeze rtk [on\|off]` | rewrite git, cargo, docker… through [rtk](https://github.com/rtk-ai/rtk), when installed |
 | `/squeeze min <chars>` | smallest output worth compacting (default 400) |
 

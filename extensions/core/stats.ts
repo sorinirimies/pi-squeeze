@@ -1,9 +1,9 @@
-import type { Kind, Result } from "./compact.ts";
+import { KINDS, type Kind, type Result } from "./compact.ts";
 
 export type Stats = { calls: number; before: number; after: number; byKind: Record<Kind, { calls: number; saved: number }> };
 
 export function emptyStats(): Stats {
-	return { calls: 0, before: 0, after: 0, byKind: { search: { calls: 0, saved: 0 }, paths: { calls: 0, saved: 0 }, listing: { calls: 0, saved: 0 } } };
+	return { calls: 0, before: 0, after: 0, byKind: Object.fromEntries(KINDS.map((k) => [k, { calls: 0, saved: 0 }])) as Stats["byKind"] };
 }
 
 export function record(stats: Stats, r: Result): void {

@@ -9,6 +9,8 @@
 import { describe, expect, it } from "bun:test";
 import { compact } from "../extensions/core/compact.ts";
 import { parse, tokenize } from "../extensions/core/command.ts";
+import { compactDiff } from "../extensions/core/diff.ts";
+import { compactTests } from "../extensions/core/tests.ts";
 import { compactLsd } from "../extensions/core/lsd.ts";
 import { compactPaths } from "../extensions/core/paths.ts";
 import { compactRg } from "../extensions/core/rg.ts";
@@ -71,6 +73,30 @@ describe("fuzz", () => {
 		compactRg(d);
 		compactPaths(d);
 		compactLsd(d);
+		compactDiff(d);
+		compactDiff(`diff --git a/x b/x\n${d}`);
+		compactTests(d);
+	});
+
+	fuzz("a compacted diff keeps every changed line of every hunk", (r) => {
+		const files = Array.from({ length: 1 + Math.floor(r() * 4) }, (_, f) => {
+			const body = Array.from({ length: 1 + Math.floor(r() * 12) }, () => pick(r, [" ctx", "+add", "-del"]).replace(/$/, text(r, 6).replace(/\n/g, " ")));
+			const old = body.filter((l) => l[0] !== "+").length;
+			const neu = body.filter((l) => l[0] !== "-").length;
+			return { path: `f${f}.ts`, body, text: [`diff --git a/f${f}.ts b/f${f}.ts`, "index 1..2 100644", `--- a/f${f}.ts`, `+++ b/f${f}.ts`, `@@ -1,${old} +1,${neu} @@`, ...body].join("\n") };
+		});
+		const out = compactDiff(files.map((f) => f.text).join("\n"));
+		expect(out).toBeDefined();
+		const kept = out!.text.split("\n");
+		for (const f of files) for (const l of f.body) if (l[0] !== " ") expect(kept).toContain(l);
+	});
+
+	fuzz("a compacted test run keeps every failing test and every result line", (r) => {
+		const names = Array.from({ length: 1 + Math.floor(r() * 30) }, (_, i) => ({ n: `t::case_${i}`, ok: r() < 0.7 }));
+		const raw = ["   Compiling x v0.1.0", `running ${names.length} tests`, ...names.map((t) => `test ${t.n} ... ${t.ok ? "ok" : "FAILED"}`), `test result: ${names.every((t) => t.ok) ? "ok" : "FAILED"}. 1 passed; 1 failed; 0 ignored; 0 measured`].join("\n");
+		const out = compactTests(raw)!.text.split("\n");
+		for (const t of names) if (!t.ok) expect(out).toContain(`test ${t.n} ... FAILED`);
+		expect(out.some((l) => l.startsWith("test result:"))).toBe(true);
 	});
 
 	fuzz("a compacted search keeps every match's text and loses no file", (r) => {

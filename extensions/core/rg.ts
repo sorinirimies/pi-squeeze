@@ -62,7 +62,7 @@ export function compactRg(output: string, limits: Limits = DEFAULT_LIMITS): Sque
 		else groups.set(r.path, [r]);
 	}
 	const matchCount = rows.filter((r) => r.sep === ":").length;
-	const out: string[] = [`${matchCount} matches in ${groups.size} files`];
+	const out: string[] = [`${matchCount} matches in ${groups.size} file${groups.size === 1 ? "" : "s"}`];
 	let truncated = false;
 	let hiddenFiles = 0;
 	for (const [path, list] of groups) {

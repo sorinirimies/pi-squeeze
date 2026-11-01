@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { hasFlag, hasOperator, parse, stripCd, tokenize } from "../extensions/core/command.ts";
-import { compact } from "../extensions/core/compact.ts";
+import { compact, compactsFailures, handles } from "../extensions/core/compact.ts";
 import { capLines, cutLine } from "../extensions/core/elide.ts";
 import { compactLsd } from "../extensions/core/lsd.ts";
 import { compactPaths } from "../extensions/core/paths.ts";
@@ -102,7 +102,7 @@ describe("rg", () => {
 		expect(r.truncated).toBe(true);
 		expect(r.text).toContain("… [+250 chars]");
 		expect(r.text).toContain("… [+25 more in this file]");
-		expect(r.text.startsWith("30 matches in 1 files")).toBe(true);
+		expect(r.text.startsWith("30 matches in 1 file")).toBe(true);
 	});
 
 	test("files beyond the total cap are counted, not silently dropped", () => {
@@ -217,6 +217,35 @@ describe("compact router", () => {
 		expect(compact("lsd -la", ls)!.kind).toBe("listing");
 		expect(compact("lsd --long", ls)!.kind).toBe("listing");
 		expect(compact("lsd", ls)).toBeUndefined();
+	});
+});
+
+describe("compact router: diff and tests", () => {
+	const diff = readFileSync(join(import.meta.dir, "fixtures", "git-diff.txt"), "utf8");
+	const cargo = readFileSync(join(import.meta.dir, "fixtures", "cargo-test-ok.txt"), "utf8");
+
+	test("git diff and cargo test are compacted, switchable by kind", () => {
+		expect(compact("git diff HEAD~3", diff)!.kind).toBe("diff");
+		expect(compact("cd /tmp/x && cargo test --lib", cargo)!.kind).toBe("tests");
+		expect(compact("git diff", diff, { kinds: { diff: false } })).toBeUndefined();
+		expect(compact("cargo test", cargo, { kinds: { tests: false } })).toBeUndefined();
+	});
+
+	test("a diff in another format passes through", () => {
+		for (const flags of ["--stat", "--name-only", "--color=always", "--check", "-s", "--word-diff"]) expect(compact(`git diff ${flags}`, diff)).toBeUndefined();
+		expect(compact("git log -p", diff)).toBeUndefined();
+		expect(compact("git status", diff)).toBeUndefined();
+		expect(compact("cargo test --message-format json", cargo)).toBeUndefined();
+		expect(compact("cargo build", cargo)).toBeUndefined();
+	});
+
+	test("handles() says whether a native compactor owns the command; only test runs are compacted when they fail", () => {
+		expect(handles("git diff")).toBe(true);
+		expect(handles("cargo test")).toBe(true);
+		expect(handles("git status")).toBe(false);
+		expect(compactsFailures("cargo test")).toBe(true);
+		expect(compactsFailures("git diff")).toBe(false);
+		expect(compactsFailures("rg x")).toBe(false);
 	});
 });
 
