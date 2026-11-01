@@ -14,9 +14,26 @@ A [pi](https://github.com/earendil-works/pi-coding-agent) extension.
 pi install npm:pi-squeeze
 ```
 
-## Use
+## What it does
 
-`/squeeze <name>` says hello (sample command: replace it).
+After a `bash` command, pi-squeeze replaces its output with a shorter form with the same facts.
+It only touches output it fully understands, and otherwise passes it through unchanged:
+
+| Command | Becomes |
+|---|---|
+| `rg -n` / `grep -n` | totals line, then matches grouped by file (path written once, indent trimmed, long lines and busy files cut) |
+| `fd`, `find` | paths grouped by directory |
+| `lsd -l`, `eza -l` | type, size, short date and name (owner, group and permissions dropped) |
+
+Safety rules:
+
+* Pipes, redirects, chains and `--json`/`-c`/`-l`/`-x` style flags are never touched: the output is no longer the tool's own format.
+* A line that does not parse makes the whole output pass through.
+* The result must be clearly smaller (under 90%) and the output at least 400 characters.
+* Every cut leaves a marker (`… [+12 more in this file]`), and the full original goes to a temp file whose path is in the output.
+* `read`, `edit` and `write` are never changed.
+
+`/squeeze` shows the savings, `/squeeze off` and `/squeeze on` switch it. `PI_SQUEEZE=off` disables it at start.
 
 ## Development
 

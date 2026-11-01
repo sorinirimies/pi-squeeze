@@ -1,0 +1,8 @@
+extensions/command/host.ts-7-export interface Host {
+extensions/command/host.ts:8:	ctx: ExtensionContext;
+extensions/command/host.ts-9-	/** Live settings: handlers mutate this, then call `persist()`. */
+--
+extensions/command/handlers.ts-18-	...reportCommands,
+extensions/command/handlers.ts:19:	async invalid(cmd, { ctx }) {
+extensions/command/handlers.ts:20:		ctx.ui.notify(cmd.message, "warning");
+extensions/command/handlers.ts-21-	},

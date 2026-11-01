@@ -7,7 +7,11 @@
 //
 // One property per parser or pure function: assert what must ALWAYS hold, not one example.
 import { describe, expect, it } from "bun:test";
-import { greet } from "../extensions/squeeze.ts";
+import { compact } from "../extensions/core/compact.ts";
+import { parse, tokenize } from "../extensions/core/command.ts";
+import { compactLsd } from "../extensions/core/lsd.ts";
+import { compactPaths } from "../extensions/core/paths.ts";
+import { compactRg } from "../extensions/core/rg.ts";
 
 const ITERS = Number(process.env.FUZZ_ITERS ?? 400);
 const SEED = Number(process.env.FUZZ_SEED ?? Math.floor(Math.random() * 2 ** 31));
@@ -46,10 +50,55 @@ function fuzz(name: string, fn: (r: () => number) => void, iters = ITERS) {
 	});
 }
 
+const pick = <T,>(r: () => number, xs: T[]): T => xs[Math.floor(r() * xs.length)]!;
+
+/** A line that sometimes looks like rg output and sometimes like noise. */
+function line(r: () => number): string {
+	switch (Math.floor(r() * 5)) {
+		case 0: return `${pick(r, ["a.ts", "src/b.ts", "x y/c.ts"])}:${Math.floor(r() * 99)}:${text(r)}`;
+		case 1: return `${pick(r, ["a.ts", "src/b.ts"])}-${Math.floor(r() * 99)}-${text(r)}`;
+		case 2: return "--";
+		case 3: return `${pick(r, ["src/", "a/b/", ""])}${text(r, 8)}`;
+		default: return text(r);
+	}
+}
+
+const doc = (r: () => number) => Array.from({ length: Math.floor(r() * 60) }, () => line(r)).join("\n");
+
 describe("fuzz", () => {
-	fuzz("greet never throws and always greets", (r) => {
-		const out = greet(text(r));
-		expect(out.startsWith("Hello")).toBe(true);
-		expect(out.endsWith("!")).toBe(true);
+	fuzz("compactors never throw, whatever the input", (r) => {
+		const d = doc(r);
+		compactRg(d);
+		compactPaths(d);
+		compactLsd(d);
+	});
+
+	fuzz("a compacted search keeps every match's text and loses no file", (r) => {
+		const d = Array.from({ length: 1 + Math.floor(r() * 40) }, () => `${pick(r, ["a.ts", "b/c.ts", "d.ts"])}:${1 + Math.floor(r() * 99)}:${text(r, 20).replace(/\n/g, " ")}`).join("\n");
+		const out = compactRg(d, { lineChars: 1000, perGroup: 1000, total: 1000 });
+		if (!out) return;
+		expect(out.truncated).toBe(false);
+		for (const l of d.split("\n")) {
+			const m = /^(.+?):(\d+):(.*)$/.exec(l)!;
+			expect(out.text).toContain(`${m[2]}: ${m[3]!.trim()}`);
+			expect(out.text).toContain(`${m[1]} (`);
+		}
+	});
+
+	fuzz("compact output never exceeds the cap by more than the marker", (r) => {
+		const out = compactPaths(Array.from({ length: 5 + Math.floor(r() * 80) }, (_, i) => `d${i % 7}/f${i}.ts`).join("\n"), { lineChars: 10, perGroup: 5, total: 12 });
+		expect(out!.text.split("\n").length).toBeLessThanOrEqual(13);
+	});
+
+	fuzz("compact() only ever returns something smaller", (r) => {
+		const d = doc(r);
+		const res = compact(pick(r, ["rg -n x", "fd .", "lsd -l", "grep -rn x", "cat f", "rg x | wc -l"]), d, { minChars: 0 });
+		if (res) expect(res.text.length).toBeLessThanOrEqual(d.length);
+	});
+
+	fuzz("tokenize and parse never throw", (r) => {
+		const s = text(r, 40);
+		tokenize(s);
+		parse(s);
 	});
 });
