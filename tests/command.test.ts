@@ -22,6 +22,12 @@ describe("parseCommand", () => {
 		for (const bad of ["search", "search maybe"]) expect(parseCommand(bad).kind).toBe("invalid");
 	});
 
+	test("rtk switches on and off", () => {
+		expect(parseCommand("rtk off")).toEqual({ kind: "rtk", on: false });
+		expect(parseCommand("rtk on")).toEqual({ kind: "rtk", on: true });
+		expect(parseCommand("rtk").kind).toBe("invalid");
+	});
+
 	test("min takes an integer 100..1000000", () => {
 		expect(parseCommand("min 800")).toEqual({ kind: "min", chars: 800 });
 		for (const bad of ["min", "min 5", "min 2000000", "min x", "min 150.5"]) expect(parseCommand(bad).kind).toBe("invalid");
@@ -35,7 +41,7 @@ describe("parseCommand", () => {
 
 describe("completions", () => {
 	test("completes the top level by prefix, every item has a label", () => {
-		expect(completions("")!.map((i) => i.label)).toEqual(["status", "on", "off", "search", "paths", "listing", "min"]);
+		expect(completions("")!.map((i) => i.label)).toEqual(["status", "on", "off", "search", "paths", "listing", "rtk", "min"]);
 		expect(completions("o")!.map((i) => i.label)).toEqual(["on", "off"]);
 		expect(completions("  SE")!.map((i) => i.label)).toEqual(["search"]);
 		for (const i of completions("")!) expect(typeof i.label).toBe("string");
@@ -44,6 +50,10 @@ describe("completions", () => {
 	test("after a compactor name it offers on and off", () => {
 		expect(completions("paths ")!.map((i) => i.value)).toEqual(["paths on", "paths off"]);
 		expect(completions("paths of")!.map((i) => i.value)).toEqual(["paths off"]);
+	});
+
+	test("rtk completes on and off", () => {
+		expect(completions("rtk ")!.map((i) => i.value)).toEqual(["rtk on", "rtk off"]);
 	});
 
 	test("nothing matches, nothing is offered", () => {

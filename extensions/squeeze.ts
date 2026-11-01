@@ -9,13 +9,14 @@ import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { completions, parseCommand } from "./command/parse.ts";
 import { compact } from "./core/compact.ts";
 import { type Config, DEFAULT_CONFIG, optionsOf, readConfig, saveConfig } from "./core/config.ts";
+import { rewrite } from "./core/rtk.ts";
 import { saveFull } from "./core/save.ts";
 import { emptyStats, record, saved, summary, tokens } from "./core/stats.ts";
 
 type StatusUi = { ui: { setStatus(key: string, text: string): void } };
 
 export const settingsText = (c: Config): string =>
-	`${c.enabled ? "on" : "off"} · search ${c.kinds.search ? "on" : "off"} · paths ${c.kinds.paths ? "on" : "off"} · listing ${c.kinds.listing ? "on" : "off"} · min ${c.minChars} chars`;
+	`${c.enabled ? "on" : "off"} · rtk ${c.rtk ? "on" : "off"} · search ${c.kinds.search ? "on" : "off"} · paths ${c.kinds.paths ? "on" : "off"} · listing ${c.kinds.listing ? "on" : "off"} · min ${c.minChars} chars`;
 
 export default function (pi: ExtensionAPI) {
 	let config: Config = { ...DEFAULT_CONFIG, kinds: { ...DEFAULT_CONFIG.kinds } };
@@ -33,6 +34,14 @@ export default function (pi: ExtensionAPI) {
 		if (process.env.PI_SQUEEZE === "off") config.enabled = false;
 		if (problem) ctx.ui.notify(`squeeze: ${problem}; using the defaults`, "warning");
 		showStatus(ctx);
+	});
+
+	pi.on("tool_call", async (event) => {
+		if (!config.enabled || !config.rtk || event.toolName !== "bash") return;
+		const input = event.input as { command?: unknown };
+		if (typeof input.command !== "string") return;
+		const rewritten = rewrite(input.command);
+		if (rewritten) input.command = rewritten;
 	});
 
 	pi.on("tool_result", async (event, ctx) => {
@@ -54,7 +63,7 @@ export default function (pi: ExtensionAPI) {
 	});
 
 	pi.registerCommand("squeeze", {
-		description: "pi-squeeze: status, on, off, search|paths|listing on|off, min <chars>",
+		description: "pi-squeeze: status, on, off, search|paths|listing|rtk on|off, min <chars>",
 		getArgumentCompletions: (prefix: string) => completions(prefix),
 		handler: async (args, ctx) => {
 			const cmd = parseCommand(args);
@@ -76,6 +85,11 @@ export default function (pi: ExtensionAPI) {
 					config.enabled = cmd.kind === "on";
 					await persist();
 					ctx.ui.notify(`squeeze ${cmd.kind}`, "info");
+					return;
+				case "rtk":
+					config.rtk = cmd.on;
+					await persist();
+					ctx.ui.notify(`squeeze: rtk ${cmd.on ? "on" : "off"}`, "info");
 					return;
 				case "compactor":
 					config.kinds[cmd.compactor] = cmd.on;

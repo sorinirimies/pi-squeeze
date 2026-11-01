@@ -16,6 +16,8 @@ export interface Config {
 	showStatus: boolean;
 	/** Which compactors run. */
 	kinds: Record<Kind, boolean>;
+	/** Rewrite commands to their `rtk` form (git, cargo, docker, …) when the rtk binary is installed. */
+	rtk: boolean;
 	/** Output shorter than this many characters is never touched. */
 	minChars: number;
 	/** Longest line kept whole in search results. */
@@ -29,6 +31,7 @@ export interface Config {
 export const DEFAULT_CONFIG: Config = {
 	enabled: true,
 	showStatus: true,
+	rtk: true,
 	kinds: { search: true, paths: true, listing: true },
 	minChars: 400,
 	lineChars: 240,
@@ -48,6 +51,7 @@ export function sanitizeConfig(raw: unknown): Config {
 	return {
 		enabled: bool(r.enabled, d.enabled),
 		showStatus: bool(r.showStatus, d.showStatus),
+		rtk: bool(r.rtk, d.rtk),
 		kinds: { search: bool(k.search, d.kinds.search), paths: bool(k.paths, d.kinds.paths), listing: bool(k.listing, d.kinds.listing) },
 		minChars: clampInt(r.minChars, 100, 1_000_000, d.minChars),
 		lineChars: clampInt(r.lineChars, 40, 4000, d.lineChars),

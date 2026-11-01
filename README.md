@@ -42,6 +42,7 @@ Safety rules:
 | `/squeeze` or `/squeeze status` | the settings and the tokens saved so far |
 | `/squeeze [on\|off]` | switch everything |
 | `/squeeze [search\|paths\|listing] [on\|off]` | switch one compactor |
+| `/squeeze rtk [on\|off]` | rewrite git, cargo, docker… through [rtk](https://github.com/rtk-ai/rtk), when installed |
 | `/squeeze min <chars>` | smallest output worth compacting (default 400) |
 
 Settings are remembered in `<pi agent dir>/squeeze.json` (`PI_CODING_AGENT_DIR`, else `~/.pi/agent`); it also holds

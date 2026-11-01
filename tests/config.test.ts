@@ -11,9 +11,10 @@ describe("sanitizeConfig", () => {
 	});
 
 	test("keeps valid values, defaults and clamps the rest", () => {
-		expect(sanitizeConfig({ enabled: false, showStatus: false, kinds: { paths: false }, minChars: 5, lineChars: 99999, perGroup: 0, total: 7 })).toEqual({
+		expect(sanitizeConfig({ enabled: false, showStatus: false, rtk: "x", kinds: { paths: false }, minChars: 5, lineChars: 99999, perGroup: 0, total: 7 })).toEqual({
 			enabled: false,
 			showStatus: false,
+			rtk: true,
 			kinds: { search: true, paths: false, listing: true },
 			minChars: 100,
 			lineChars: 4000,

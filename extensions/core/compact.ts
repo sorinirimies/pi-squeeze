@@ -50,6 +50,9 @@ function pick(command: string): { kind: Kind; run: (out: string, l: Limits) => S
 	return undefined;
 }
 
+/** True when a native compactor takes care of `command`'s output (whatever the switches say). */
+export const handles = (command: string): boolean => pick(command) !== undefined;
+
 /** Compacts the output of `command`, or returns undefined to leave it exactly as it is. */
 export function compact(command: string, output: string, opts: Options = {}): Result | undefined {
 	const { limits = DEFAULT_LIMITS, minChars = 400, maxRatio = 0.9, kinds = {} } = opts;

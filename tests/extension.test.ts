@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { configPath } from "../extensions/core/config.ts";
+import { resetRtk, useRunner } from "../extensions/core/rtk.ts";
 import { fakeCtx, load } from "./helpers.ts";
 
 const raw = readFileSync(join(import.meta.dir, "fixtures", "rg-flat.txt"), "utf8");
@@ -10,7 +11,7 @@ const result = (command: unknown, text = raw, extra: object = {}) => ({ toolName
 describe("extension", () => {
 	test("registers the hooks and the command", () => {
 		const { hooks, commands } = load();
-		expect(Object.keys(hooks)).toEqual(["session_start", "tool_result"]);
+		expect(Object.keys(hooks)).toEqual(["session_start", "tool_call", "tool_result"]);
 		expect(Object.keys(commands)).toEqual(["squeeze"]);
 		expect(commands.squeeze!.getArgumentCompletions("of")!.map((c) => c.value)).toEqual(["off"]);
 	});
@@ -83,7 +84,7 @@ describe("extension", () => {
 		await hooks.tool_result!(result("rg -n import extensions"), ctx);
 		await commands.squeeze!.handler("", ctx);
 		await commands.squeeze!.handler("bogus", ctx);
-		expect(ctx.notes[0]![0]).toMatch(/^squeeze on · search on · paths on · listing on · min 400 chars\nsqueeze: 1 outputs compacted/);
+		expect(ctx.notes[0]![0]).toMatch(/^squeeze on · rtk on · search on · paths on · listing on · min 400 chars\nsqueeze: 1 outputs compacted/);
 		expect(ctx.notes[1]![1]).toBe("warning");
 	});
 
@@ -114,5 +115,100 @@ describe("extension", () => {
 		await commands.squeeze!.handler("paths off", ctx);
 		expect(ctx.notes[0]![0]).toContain("could not save the setting");
 		rmSync(dir, { force: true });
+	});
+
+	describe("rtk layer", () => {
+		const call = (command: unknown, toolName = "bash") => ({ toolName, input: { command } });
+		const fake = (status: number | null, stdout: string) => {
+			const seen: string[] = [];
+			useRunner((c) => (seen.push(c), { status, stdout }));
+			resetRtk();
+			return seen;
+		};
+
+		test("rewrites a command through rtk and remembers the answer", async () => {
+			const seen = fake(0, "rtk git status\n");
+			const { hooks } = load();
+			const ev = call("git status");
+			await hooks.tool_call!(ev, fakeCtx());
+			expect(ev.input.command).toBe("rtk git status");
+			await hooks.tool_call!(call("git status"), fakeCtx());
+			expect(seen).toEqual(["git status"]);
+			useRunner();
+		});
+
+		test("leaves the command alone when rtk has no rewrite, denies, or returns the same", async () => {
+			const { hooks } = load();
+			for (const [status, out] of [[1, ""], [2, ""], [0, "git log"], [0, ""], [null, "rtk x"]] as const) {
+				fake(status, out);
+				const ev = call("git log");
+				await hooks.tool_call!(ev, fakeCtx());
+				expect(ev.input.command).toBe("git log");
+			}
+			useRunner();
+		});
+
+		test("exit 3 (ask) still rewrites; a file read never does", async () => {
+			const { hooks } = load();
+			fake(3, "rtk cargo test");
+			const a = call("cargo test");
+			await hooks.tool_call!(a, fakeCtx());
+			expect(a.input.command).toBe("rtk cargo test");
+			fake(0, "rtk read foo.ts");
+			const b = call("cat foo.ts");
+			await hooks.tool_call!(b, fakeCtx());
+			expect(b.input.command).toBe("cat foo.ts");
+			useRunner();
+		});
+
+		test("never rewrites what a native compactor handles, other tools, or odd input", async () => {
+			const seen = fake(0, "rtk whatever");
+			const { hooks } = load();
+			const a = call("rg -n x src");
+			await hooks.tool_call!(a, fakeCtx());
+			await hooks.tool_call!(call("git status", "read"), fakeCtx());
+			await hooks.tool_call!(call(42), fakeCtx());
+			await hooks.tool_call!(call("   "), fakeCtx());
+			expect(a.input.command).toBe("rg -n x src");
+			expect(seen).toEqual([]);
+			useRunner();
+		});
+
+		test("a missing rtk binary is noticed once and then ignored", async () => {
+			let calls = 0;
+			useRunner(() => (calls++, { status: null, stdout: "", missing: true }));
+			resetRtk();
+			const { hooks } = load();
+			await hooks.tool_call!(call("git status"), fakeCtx());
+			await hooks.tool_call!(call("git diff"), fakeCtx());
+			expect(calls).toBe(1);
+			useRunner();
+			resetRtk();
+		});
+
+		test("the cache is bounded", async () => {
+			fake(0, "rtk x");
+			const { hooks } = load();
+			for (let i = 0; i < 520; i++) await hooks.tool_call!(call(`git log -${i + 1}`), fakeCtx());
+			useRunner();
+			resetRtk();
+		});
+
+		test("rtk off and squeeze off both skip the rewrite; the real runner works", async () => {
+			const seen = fake(0, "rtk git status");
+			const { commands, hooks } = load();
+			await commands.squeeze!.handler("rtk off", fakeCtx());
+			await hooks.tool_call!(call("git status"), fakeCtx());
+			await commands.squeeze!.handler("rtk on", fakeCtx());
+			await commands.squeeze!.handler("off", fakeCtx());
+			await hooks.tool_call!(call("git status"), fakeCtx());
+			expect(seen).toEqual([]);
+			await commands.squeeze!.handler("on", fakeCtx());
+			useRunner();
+			resetRtk();
+			const ev = call("git status");
+			await hooks.tool_call!(ev, fakeCtx()); // the real process: rewritten if rtk is installed, else untouched
+			expect(["git status", "rtk git status"]).toContain(ev.input.command as string);
+		});
 	});
 });

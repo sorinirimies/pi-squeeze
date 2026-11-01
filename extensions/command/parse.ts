@@ -6,12 +6,13 @@ export type Command =
 	| { kind: "on" }
 	| { kind: "off" }
 	| { kind: "compactor"; compactor: Kind; on: boolean }
+	| { kind: "rtk"; on: boolean }
 	| { kind: "min"; chars: number }
 	| { kind: "invalid"; message: string };
 
 export const KINDS: Kind[] = ["search", "paths", "listing"];
 
-export const USAGE = "Usage: /squeeze [status] · on · off · search|paths|listing <on|off> · min <chars>";
+export const USAGE = "Usage: /squeeze [status] · on · off · search|paths|listing|rtk <on|off> · min <chars>";
 
 export function parseCommand(args: string | undefined): Command {
 	const [cmd, p1] = (args ?? "").trim().toLowerCase().split(/\s+/).filter(Boolean);
@@ -31,6 +32,8 @@ export function parseCommand(args: string | undefined): Command {
 				? { kind: "min", chars: n }
 				: { kind: "invalid", message: "Usage: /squeeze min <chars> (100 to 1000000)" };
 		}
+		case "rtk":
+			return p1 === "on" || p1 === "off" ? { kind: "rtk", on: p1 === "on" } : { kind: "invalid", message: "Usage: /squeeze rtk <on|off>" };
 		default:
 			if ((KINDS as string[]).includes(cmd)) {
 				return p1 === "on" || p1 === "off"
@@ -55,17 +58,18 @@ const TOP_LEVEL: CompletionItem[] = [
 	{ value: "search ", label: "search", description: "rg / grep results grouped by file (on or off)" },
 	{ value: "paths ", label: "paths", description: "fd / find results grouped by directory (on or off)" },
 	{ value: "listing ", label: "listing", description: "lsd / eza -l listings (on or off)" },
+	{ value: "rtk ", label: "rtk", description: "Rewrite git, cargo, docker… through rtk, when installed (on or off)" },
 	{ value: "min ", label: "min", description: "Smallest output to compact, in characters" },
 ];
 
 /** `prefix` is the whole argument text typed so far (pi replaces it with `value`). */
 export function completions(prefix: string): CompletionItem[] | null {
 	const text = (prefix ?? "").toLowerCase().replace(/^\s+/, "");
-	const kind = KINDS.find((k) => text.startsWith(`${k} `));
+	const kind = [...KINDS, "rtk"].find((k) => text.startsWith(`${k} `));
 	const pool: CompletionItem[] = kind
 		? [
-				{ value: `${kind} on`, label: "on", description: `Compact ${kind} output` },
-				{ value: `${kind} off`, label: "off", description: `Leave ${kind} output alone` },
+				{ value: `${kind} on`, label: "on", description: kind === "rtk" ? "Rewrite commands through rtk" : `Compact ${kind} output` },
+				{ value: `${kind} off`, label: "off", description: kind === "rtk" ? "Run commands as written" : `Leave ${kind} output alone` },
 			]
 		: TOP_LEVEL;
 	const out = pool.filter((i) => i.value.startsWith(text));
