@@ -11,7 +11,7 @@ export type Command =
 	| { kind: "invalid"; message: string };
 
 
-export const USAGE = "Usage: /squeeze [status] · on · off · search|paths|listing|diff|tests|rtk <on|off> · min <chars>";
+export const USAGE = `Usage: /squeeze [status] · on · off · ${KINDS.join("|")}|rtk <on|off> · min <chars>`;
 
 export function parseCommand(args: string | undefined): Command {
 	const [cmd, p1] = (args ?? "").trim().toLowerCase().split(/\s+/).filter(Boolean);
@@ -59,6 +59,8 @@ const TOP_LEVEL: CompletionItem[] = [
 	{ value: "listing ", label: "listing", description: "lsd / eza -l listings (on or off)" },
 	{ value: "diff ", label: "diff", description: "git diff with trimmed context (on or off)" },
 	{ value: "tests ", label: "tests", description: "cargo test without build noise and passing tests (on or off)" },
+	{ value: "git ", label: "git", description: "git status, log, show and blame, shorter (on or off)" },
+	{ value: "generic ", label: "generic", description: "ANSI codes, progress frames and repeated lines in any output (on or off)" },
 	{ value: "rtk ", label: "rtk", description: "Rewrite git, cargo, docker… through rtk, when installed (on or off)" },
 	{ value: "min ", label: "min", description: "Smallest output to compact, in characters" },
 ];

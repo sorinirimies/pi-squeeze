@@ -234,7 +234,7 @@ describe("compact router: diff and tests", () => {
 	test("a diff in another format passes through", () => {
 		for (const flags of ["--stat", "--name-only", "--color=always", "--check", "-s", "--word-diff"]) expect(compact(`git diff ${flags}`, diff)).toBeUndefined();
 		expect(compact("git log -p", diff)).toBeUndefined();
-		expect(compact("git status", diff)).toBeUndefined();
+		expect(compact("git stash list", diff)).toBeUndefined();
 		expect(compact("cargo test --message-format json", cargo)).toBeUndefined();
 		expect(compact("cargo build", cargo)).toBeUndefined();
 	});
@@ -242,10 +242,49 @@ describe("compact router: diff and tests", () => {
 	test("handles() says whether a native compactor owns the command; only test runs are compacted when they fail", () => {
 		expect(handles("git diff")).toBe(true);
 		expect(handles("cargo test")).toBe(true);
-		expect(handles("git status")).toBe(false);
+		expect(handles("git stash list")).toBe(false);
 		expect(compactsFailures("cargo test")).toBe(true);
 		expect(compactsFailures("git diff")).toBe(false);
 		expect(compactsFailures("rg x")).toBe(false);
+	});
+});
+
+describe("compact router: git, listing flags, dust, generic", () => {
+	const fx = (n: string) => readFileSync(join(import.meta.dir, "fixtures", n), "utf8");
+	const small = { minChars: 100 };
+
+	test("git status, log, show, blame and dust go to their compactors", () => {
+		expect(compact("git status", fx("git-status.txt"), small)!.kind).toBe("git");
+		expect(compact("git log -12", fx("git-log.txt"), small)!.kind).toBe("git");
+		expect(compact("git show HEAD", fx("git-show.txt"), small)!.kind).toBe("git");
+		expect(compact("git blame README.md", fx("git-blame.txt"), small)!.kind).toBe("git");
+		expect(compact("dust -n 12", fx("dust.txt"), small)!.kind).toBe("listing");
+	});
+
+	test("other formats of those commands are not parsed (only cleaned up)", () => {
+		for (const c of ["git status -s", "git status --porcelain", "git log --oneline", "git log -p", "git show --stat", "git blame --porcelain f", "dust -j"]) {
+			expect(compact(c, fx("git-status.txt"), small)?.kind).not.toBe("git");
+		}
+		expect(compact("dust -j", fx("dust.txt"), small)?.kind).not.toBe("listing");
+	});
+
+	test("file lists: rg --files / -l, grep -l / -L, git diff --name-only, git ls-files", () => {
+		const list = Array.from({ length: 30 }, (_, i) => `src/module/part${i}.ts`).join("\n");
+		for (const c of ["rg --files", "rg -l foo", "rg --files-with-matches foo", "grep -rl foo .", "grep -rL foo .", "git diff --name-only HEAD~2", "git ls-files"]) expect(compact(c, list, small)!.kind).toBe("paths");
+		for (const c of ["rg -l --null foo", "rg -lc foo", "git ls-files -s", "git ls-files -z", "git diff --name-only -z"]) expect(compact(c, list, small)?.kind).not.toBe("paths");
+		expect(handles("git diff --name-only")).toBe(true);
+	});
+
+	test("generic: any other output loses colours and repeats, except content commands, and it can be switched off", () => {
+		const out = `\u001b[31m${"warning: same thing\n".repeat(30)}\u001b[0m`;
+		expect(compact("bun install", out)!.kind).toBe("generic");
+		expect(compact("bun install", out, { kinds: { generic: false } })).toBeUndefined();
+		expect(compact("cat log.txt", out)).toBeUndefined();
+		expect(compact("bun install", "short")).toBeUndefined();
+		const plain = Array.from({ length: 40 }, (_, i) => `line ${i} is unique`).join("\n");
+		expect(compact("bun install", plain)).toBeUndefined();
+		// a specific compactor that gives up falls back to the generic clean-up
+		expect(compact("rg -n x", `\u001b[1mnot rg format\u001b[0m\n`.repeat(30))!.kind).toBe("generic");
 	});
 });
 

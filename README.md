@@ -28,6 +28,13 @@ It only touches output it fully understands, and otherwise passes it through unc
 | `lsd -l`, `eza -l` | type, size, short date and name (owner, group and permissions dropped) |
 | `git diff` | one header line per file (`path (new, +12 −0)`), `index`/mode/`---`/`+++` lines dropped, every changed line kept, context trimmed to 1 line, long files cut |
 | `cargo test` | totals line, then only warnings, failures, panics and result lines (build progress and passing tests dropped); also when the run failed |
+| `rg -l` / `rg --files` / `grep -l` / `git ls-files` / `git diff --name-only` | paths grouped by directory |
+| `git status` | `## main...origin/main [ahead 2]`, then `staged:` / `unstaged:` / `untracked:` with `M`/`A`/`D`/`R` codes; the hints go |
+| `git log` | one line per commit (short hash, date, author, subject); the body stays, capped at 8 lines; one author is said once |
+| `git show` | that commit line, then the compacted diff |
+| `git blame` | one header per run of lines from the same commit |
+| `dust` | size, tree and share; the bar chart goes |
+| anything else | colour codes dropped, progress bars (`\r`) keep their last frame, 4+ identical lines become `line  [×N]`, 3+ blank lines become one. Never for `cat`, `head`, `jq`, `curl`… (content commands) |
 | `git`, `cargo`, `docker`… | rewritten through [rtk](https://github.com/rtk-ai/rtk) when it is installed (switch: `/squeeze rtk off`) |
 
 Safety rules:
@@ -44,7 +51,7 @@ Safety rules:
 |---|---|
 | `/squeeze` or `/squeeze status` | the settings and the tokens saved so far |
 | `/squeeze [on\|off]` | switch everything |
-| `/squeeze [search\|paths\|listing\|diff\|tests] [on\|off]` | switch one compactor |
+| `/squeeze [search\|paths\|listing\|diff\|tests\|git\|generic] [on\|off]` | switch one compactor |
 | `/squeeze rtk [on\|off]` | rewrite git, cargo, docker… through [rtk](https://github.com/rtk-ai/rtk), when installed |
 | `/squeeze min <chars>` | smallest output worth compacting (default 400) |
 

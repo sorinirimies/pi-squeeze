@@ -7,7 +7,7 @@
 import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import type { Kind } from "./compact.ts";
+import { KINDS, type Kind } from "./compact.ts";
 
 export interface Config {
 	/** Master switch: when false nothing is compacted. */
@@ -32,7 +32,7 @@ export const DEFAULT_CONFIG: Config = {
 	enabled: true,
 	showStatus: true,
 	rtk: true,
-	kinds: { search: true, paths: true, listing: true, diff: true, tests: true },
+	kinds: Object.fromEntries(KINDS.map((k) => [k, true])) as Record<Kind, boolean>,
 	minChars: 400,
 	lineChars: 240,
 	perGroup: 15,
@@ -52,13 +52,7 @@ export function sanitizeConfig(raw: unknown): Config {
 		enabled: bool(r.enabled, d.enabled),
 		showStatus: bool(r.showStatus, d.showStatus),
 		rtk: bool(r.rtk, d.rtk),
-		kinds: {
-			search: bool(k.search, d.kinds.search),
-			paths: bool(k.paths, d.kinds.paths),
-			listing: bool(k.listing, d.kinds.listing),
-			diff: bool(k.diff, d.kinds.diff),
-			tests: bool(k.tests, d.kinds.tests),
-		},
+		kinds: Object.fromEntries(KINDS.map((kind) => [kind, bool(k[kind], d.kinds[kind])])) as Record<Kind, boolean>,
 		minChars: clampInt(r.minChars, 100, 1_000_000, d.minChars),
 		lineChars: clampInt(r.lineChars, 40, 4000, d.lineChars),
 		perGroup: clampInt(r.perGroup, 1, 500, d.perGroup),

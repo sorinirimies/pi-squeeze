@@ -1,0 +1,60 @@
+bd6a3dd4 (Sorin Albu-Irimies 2026-10-16 19:53:55 +0200   1) # Dodai UI
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200   2) 
+0a845ae4 (Sorin Albu-Irimies 2026-11-01 22:45:36 +0100   3) [![Audit](https://github.com/sorinirimies/dodai-ui/actions/workflows/security.yml/badge.svg)](https://github.com/sorinirimies/dodai-ui/actions/workflows/security.yml)
+0a845ae4 (Sorin Albu-Irimies 2026-11-01 22:45:36 +0100   4) [![Fuzz](https://github.com/sorinirimies/dodai-ui/actions/workflows/fuzz.yml/badge.svg)](https://github.com/sorinirimies/dodai-ui/actions/workflows/fuzz.yml)
+0a845ae4 (Sorin Albu-Irimies 2026-11-01 22:45:36 +0100   5) 
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200   6) A **design system** — not just a colour switcher — shipped as one crate per UI framework.
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200   7) One token set (colour roles, typography, spacing, shape, glow/scanline effects, resolved
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200   8) component styles) feeds four native adapters:
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200   9) 
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200  10) | Crate | Framework | What you get |
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200  11) |---|---|---|
+06ed80e0 (Sorin Albu-Irimies 2026-10-27 17:27:11 +0100  12) | [`dodai-core`](crates/dodai-core) | — | `Theme`, `Palette`, tokens, `ThemeSwitcher`, WCAG contrast, ANSI-256 fallback, the four design systems (features) and `motion` (easing, springs, curves, stagger, entry effects, tweens) |
+62ced492 (Sorin Albu-Irimies 2026-10-17 19:27:20 +0200  13) | [`dodai-charts-core`](crates/dodai-charts-core) | — | Renderer-agnostic chart maths: ticks, Heikin-Ashi, indicators, Renko, depth, Gantt, binning, gradients |
+89a5da11 (Sorin Albu-Irimies 2026-10-30 21:09:33 +0100  14) | [`dodai-instruments-core`](crates/dodai-instruments-core) | — | Renderer-agnostic instrument maths: scales, alarms, gauge, flight, tactical and seven-segment geometry |
+52594d2f (Sorin Albu-Irimies 2026-10-20 00:06:20 +0200  15) | [`dodai-shaders`](crates/dodai-shaders) | wgpu | 196 pixel shaders written in Rust (rust-gpu → WGSL, run on the GPU): Ghibli-style painted and cel-shaded 3D scenes, cyberpunk (rainy megacities, Blade Runner-inspired scenes), Material 3, Matrix, CRT/VHS/retro monitors, Ghostty ports, DMT hyperspace sacred geometry, pixel-art platformer/metroidvania, cosmic; follows the theme palette |
+bd6a3dd4 (Sorin Albu-Irimies 2026-10-16 19:53:55 +0200  16) | [`dodai-ratatui`](crates/dodai-ratatui) | Ratatui 0.30 | `TuiTheme`: chamfered `╱ ╲` blocks, `◢ BUTTON ◤`, tabs, badges, inputs, status bar, `Scanlines`, `ThemeBadge` |
+bd6a3dd4 (Sorin Albu-Irimies 2026-10-16 19:53:55 +0200  17) | [`dodai-iced`](crates/dodai-iced) | Iced 0.14 | `IcedTheme`: native `iced::Theme`, button/container/text-input/text styles with neon glow, canvas `ChamferFrame` |
+3b45cad2 (Sorin Albu-Irimies 2026-10-30 21:06:33 +0100  18) | [`dodai-gpui`](crates/dodai-gpui) | GPUI 0.2 | The design system: `Global` theme store, `cx.dodai()`, `DodaiStyled`, 160+ components |
+3b45cad2 (Sorin Albu-Irimies 2026-10-30 21:06:33 +0100  19) | [`dodai-gpui-charts`](crates/dodai-gpui-charts) | GPUI 0.2 | 70 interactive, animated charts (line, bar, pie, sankey, candlestick, treemap, …) |
+3b45cad2 (Sorin Albu-Irimies 2026-10-30 21:06:33 +0100  20) | [`dodai-gpui-instruments`](crates/dodai-gpui-instruments) | GPUI 0.2 | Dials, gauges, segment displays, scopes; `automotive`, `aviation`, `defense` sets (features) |
+5c8691ea (Sorin Albu-Irimies 2026-10-16 20:09:02 +0200  21) | [`dodai-topcoat`](crates/dodai-topcoat) | Topcoat / any SSR web | CSS custom properties, `.dodai-btn/.dodai-panel/.dodai-input/.dodai-tag/.dodai-tabs/.dodai-table`, `clip-path` chamfers, JS theme switcher |
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200  22) 
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200  23) ## Themes
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200  24) 
+003c9d0c (Sorin Albu-Irimies 2026-10-17 04:54:17 +0200  25) **Cyberpunk** (a cyberpunk-inspired theme):
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200  26) 
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200  27) | Token | Value |
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200  28) |---|---|
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200  29) | Signature yellow | `#fcee0a` (hover `#f2e900`) |
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200  30) | Cyan | `#00f0ff` |
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200  31) | Red | `#fe1038` |
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200  32) | Orange | `#ff6000` |
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200  33) | Surfaces / lines | `#000` · `#333` · `#4c4c4c` · text `#fff` / `#cbcbcb` |
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200  34) | Type | Blender Pro → Rajdhani fallback, UPPERCASE labels, tracked |
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200  35) | Shape | 0 radius, 2 px borders, 48 px controls, 16 px chamfer (cut top-left + bottom-right) |
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200  36) | Effects | yellow glow on hover/focus, optional CRT scanlines |
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200  37) 
+2bf79ac6 (Sorin Albu-Irimies 2026-10-16 01:41:48 +0200  38) Glow is configurable: `theme.with_glow_intensity(1.5)` (0 = off, 1 = as designed) scales glow alpha and radius in every adapter.
+2bf79ac6 (Sorin Albu-Irimies 2026-10-16 01:41:48 +0200  39) 
+3e9eed2e (Sorin Albu-Irimies 2026-10-19 15:12:04 +0200  40) Variants: `cyberpunk` (yellow), `cyberpunk-cyan` (cyan), `cyberpunk-red` (red), each also as a light theme on warm paper: `cyberpunk-light`, `cyberpunk-cyan-light`, `cyberpunk-red-light` (same chamfered shape, deeper neons for contrast, glow dialled down).
+50449af6 (Sorin Albu-Irimies 2026-10-18 20:59:31 +0200  41) 
+2af4f210 (Sorin Albu-Irimies 2026-10-25 23:41:02 +0100  42) **Neo-Brutalism** (`neobrutalism[-accent][-dark]`, 14 themes): 2 px outlines, 4 px hard shadows, flat colour blocks, buttons that sink into their shadow on hover.
+4cc2e389 (Sorin Albu-Irimies 2026-10-21 04:24:36 +0200  43) 
+50449af6 (Sorin Albu-Irimies 2026-10-18 20:59:31 +0200  44) **Material 3** (a Material-3-inspired light/dark pair): `material`, `material-dark` — rounded, mixed-case, flat tonal surfaces, no glow.
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200  45) Every theme is contrast-tested (text ≥ 7:1, primary label ≥ 4.5:1).
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200  46) 
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200  47) ## Use it
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200  48) 
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200  49) ```toml
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200  50) [dependencies]
+e979f9ec (Sorin Albu-Irimies 2026-10-19 14:15:36 +0200  51) dodai         = "0.1"   # everything: tokens + Cyberpunk + Material 3 + icons + shaders
+bd6a3dd4 (Sorin Albu-Irimies 2026-10-16 19:53:55 +0200  52) dodai-ratatui = "0.1"   # or -iced / -gpui / -topcoat
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200  53) ```
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200  54) 
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200  55) ```rust
+ee3bbfbb (Sorin Albu-Irimies 2026-10-27 01:31:30 +0100  56) use dodai_core::{ThemeSwitcher, ButtonVariant, ControlState};
+bd6a3dd4 (Sorin Albu-Irimies 2026-10-16 19:53:55 +0200  57) use dodai_ratatui::TuiTheme;
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200  58) 
+ee3bbfbb (Sorin Albu-Irimies 2026-10-27 01:31:30 +0100  59) let mut sw = dodai_core::switcher();              // all built-in themes
+^472fe46 (Sorin Albu-Irimies 2026-10-16 01:15:46 +0200  60) let mut tui = TuiTheme::new(sw.current().clone());

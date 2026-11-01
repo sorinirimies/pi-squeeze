@@ -1,0 +1,71 @@
+commit 0a845ae4dbd621a955bd4f5cc58f56d6ed5d8fc9
+Author: Sorin Albu-Irimies <mihaiirimies@gmail.com>
+Date:   Sun Nov 1 22:45:36 2026 +0100
+
+    docs(readme): add the Audit and Fuzz badges
+
+commit f3bfbf7816a7e0e82b69822e49327a4016e34e68
+Author: Sorin Albu-Irimies <mihaiirimies@gmail.com>
+Date:   Sun Nov 1 22:13:39 2026 +0100
+
+    Deps: libz-sys 1.1.31 (RUSTSEC advisory)
+
+commit 30c367ce182c4fb8dda8eeb284f98874b27d791a
+Author: Sorin Albu-Irimies <mihaiirimies@gmail.com>
+Date:   Sun Nov 1 22:02:21 2026 +0100
+
+    dodai-showcase: drop the unused direct dodai-shaders dependency
+
+commit 0078775981ef9a0439710b81826af3119d635324
+Author: Sorin Albu-Irimies <mihaiirimies@gmail.com>
+Date:   Sun Nov 1 21:34:57 2026 +0100
+
+    CI: msrv check leaves out dodai-frost, which needs wgpu and declares 1.87
+
+commit 00f4dbfe23c750b79d9305bb790d3701b65e2dcb
+Author: Sorin Albu-Irimies <mihaiirimies@gmail.com>
+Date:   Sun Nov 1 21:17:51 2026 +0100
+
+    Docs: no link to a private const
+
+commit 2da115427c5e60733051a8c67d34e39e69f213a4
+Author: Sorin Albu-Irimies <mihaiirimies@gmail.com>
+Date:   Sun Nov 1 21:15:29 2026 +0100
+
+    fx: name the texture budget constants
+
+commit f68c86b92dd294c41fb1806cd82add62349c9f0e
+Author: Sorin Albu-Irimies <mihaiirimies@gmail.com>
+Date:   Sun Nov 1 21:13:50 2026 +0100
+
+    Motion: data changed within two seconds of a click or key eases while Animate is off
+
+commit 639cd1267b6645ab22a2924327c4248c503684b5
+Author: Sorin Albu-Irimies <mihaiirimies@gmail.com>
+Date:   Sun Nov 1 21:11:22 2026 +0100
+
+    Patterns: hatch pie and donut slices and area fills, with a polygon-clipped hatch
+
+commit 5f11dc958f420197fdaa7a9622cdcf83f0e6e27a
+Author: Sorin Albu-Irimies <mihaiirimies@gmail.com>
+Date:   Sun Nov 1 17:37:00 2026 +0100
+
+    Live: thread-safe Feed that background sources push into
+
+commit f9504be36c97c12db27ff3f28154a586161277c3
+Author: Sorin Albu-Irimies <mihaiirimies@gmail.com>
+Date:   Sun Nov 1 17:36:31 2026 +0100
+
+    Charts: global series patterns (dashed lines, hatched bars and legend swatches) with a showcase switch
+
+commit 44035ea29e7f8ee4fe33b737ca460a9f32ddb084
+Author: Sorin Albu-Irimies <mihaiirimies@gmail.com>
+Date:   Sun Nov 1 17:11:01 2026 +0100
+
+    Charts: hover and selection easing keeps running while Animate is off (reduce motion stops it)
+
+commit e9de7ab12f3940c9abe27e17768d177ca0b968d6
+Author: Sorin Albu-Irimies <mihaiirimies@gmail.com>
+Date:   Sun Nov 1 17:05:33 2026 +0100
+
+    Charts: .interactive(bool) and .on_focus(..) on every component through Follow

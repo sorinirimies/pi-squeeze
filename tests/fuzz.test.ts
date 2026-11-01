@@ -9,6 +9,11 @@
 import { describe, expect, it } from "bun:test";
 import { compact } from "../extensions/core/compact.ts";
 import { parse, tokenize } from "../extensions/core/command.ts";
+import { compactBlame } from "../extensions/core/blame.ts";
+import { compactDust } from "../extensions/core/dust.ts";
+import { compactGeneric } from "../extensions/core/generic.ts";
+import { compactLog, compactShow } from "../extensions/core/gitlog.ts";
+import { compactStatus } from "../extensions/core/gitstatus.ts";
 import { compactDiff } from "../extensions/core/diff.ts";
 import { compactTests } from "../extensions/core/tests.ts";
 import { compactLsd } from "../extensions/core/lsd.ts";
@@ -76,6 +81,26 @@ describe("fuzz", () => {
 		compactDiff(d);
 		compactDiff(`diff --git a/x b/x\n${d}`);
 		compactTests(d);
+		compactLog(d);
+		compactShow(d);
+		compactStatus(d);
+		compactBlame(d);
+		compactDust(d);
+		compactGeneric(d);
+	});
+
+	fuzz("generic clean-up never loses a distinct line", (r) => {
+		const lines = Array.from({ length: 1 + Math.floor(r() * 30) }, () => pick(r, ["same", "other", "x", "", "uniq" + Math.floor(r() * 99)]).replace(/\n/g, " "));
+		const out = compactGeneric(lines.join("\n"))!.text;
+		for (const l of new Set(lines.filter((l) => l.trim()))) expect(out).toContain(l);
+	});
+
+	fuzz("a commit list keeps every subject", (r) => {
+		const subjects = Array.from({ length: 1 + Math.floor(r() * 10) }, (_, i) => `subject ${i} ${text(r, 8).replace(/[\n\r]/g, " ").trim()}`);
+		const raw = subjects.map((s, i) => `commit ${"a".repeat(40 - String(i).length)}${i}\nAuthor: A <a@b.c>\nDate:   Sun Nov 1 22:45:36 2026 +0100\n\n    ${s}\n`).join("\n");
+		const out = compactLog(raw, { lineChars: 10000, perGroup: 15, total: 1000 });
+		expect(out).toBeDefined();
+		for (const s of subjects) expect(out!.text).toContain(s);
 	});
 
 	fuzz("a compacted diff keeps every changed line of every hunk", (r) => {

@@ -93,7 +93,7 @@ describe("extension", () => {
 		await hooks.tool_result!(result("rg -n import extensions"), ctx);
 		await commands.squeeze!.handler("", ctx);
 		await commands.squeeze!.handler("bogus", ctx);
-		expect(ctx.notes[0]![0]).toMatch(/^squeeze on · rtk on · search on · paths on · listing on · diff on · tests on · min 400 chars\nsqueeze: 1 outputs compacted/);
+		expect(ctx.notes[0]![0]).toMatch(/^squeeze on · rtk on · search on · paths on · listing on · diff on · tests on · git on · generic on · min 400 chars\nsqueeze: 1 outputs compacted/);
 		expect(ctx.notes[1]![1]).toBe("warning");
 	});
 
@@ -136,23 +136,23 @@ describe("extension", () => {
 		};
 
 		test("rewrites a command through rtk and remembers the answer", async () => {
-			const seen = fake(0, "rtk git status\n");
+			const seen = fake(0, "rtk docker ps\n");
 			const { hooks } = load();
-			const ev = call("git status");
+			const ev = call("docker ps");
 			await hooks.tool_call!(ev, fakeCtx());
-			expect(ev.input.command).toBe("rtk git status");
-			await hooks.tool_call!(call("git status"), fakeCtx());
-			expect(seen).toEqual(["git status"]);
+			expect(ev.input.command).toBe("rtk docker ps");
+			await hooks.tool_call!(call("docker ps"), fakeCtx());
+			expect(seen).toEqual(["docker ps"]);
 			useRunner();
 		});
 
 		test("leaves the command alone when rtk has no rewrite, denies, or returns the same", async () => {
 			const { hooks } = load();
-			for (const [status, out] of [[1, ""], [2, ""], [0, "git log"], [0, ""], [null, "rtk x"]] as const) {
+			for (const [status, out] of [[1, ""], [2, ""], [0, "docker images"], [0, ""], [null, "rtk x"]] as const) {
 				fake(status, out);
-				const ev = call("git log");
+				const ev = call("docker images");
 				await hooks.tool_call!(ev, fakeCtx());
-				expect(ev.input.command).toBe("git log");
+				expect(ev.input.command).toBe("docker images");
 			}
 			useRunner();
 		});
@@ -175,7 +175,7 @@ describe("extension", () => {
 			const { hooks } = load();
 			const a = call("rg -n x src");
 			await hooks.tool_call!(a, fakeCtx());
-			await hooks.tool_call!(call("git status", "read"), fakeCtx());
+			await hooks.tool_call!(call("docker ps", "read"), fakeCtx());
 			await hooks.tool_call!(call(42), fakeCtx());
 			await hooks.tool_call!(call("   "), fakeCtx());
 			expect(a.input.command).toBe("rg -n x src");
@@ -188,7 +188,7 @@ describe("extension", () => {
 			useRunner(() => (calls++, { status: null, stdout: "", missing: true }));
 			resetRtk();
 			const { hooks } = load();
-			await hooks.tool_call!(call("git status"), fakeCtx());
+			await hooks.tool_call!(call("docker ps"), fakeCtx());
 			await hooks.tool_call!(call("git diff"), fakeCtx());
 			expect(calls).toBe(1);
 			useRunner();
@@ -204,20 +204,20 @@ describe("extension", () => {
 		});
 
 		test("rtk off and squeeze off both skip the rewrite; the real runner works", async () => {
-			const seen = fake(0, "rtk git status");
+			const seen = fake(0, "rtk docker ps");
 			const { commands, hooks } = load();
 			await commands.squeeze!.handler("rtk off", fakeCtx());
-			await hooks.tool_call!(call("git status"), fakeCtx());
+			await hooks.tool_call!(call("docker ps"), fakeCtx());
 			await commands.squeeze!.handler("rtk on", fakeCtx());
 			await commands.squeeze!.handler("off", fakeCtx());
-			await hooks.tool_call!(call("git status"), fakeCtx());
+			await hooks.tool_call!(call("docker ps"), fakeCtx());
 			expect(seen).toEqual([]);
 			await commands.squeeze!.handler("on", fakeCtx());
 			useRunner();
 			resetRtk();
-			const ev = call("git status");
+			const ev = call("docker ps");
 			await hooks.tool_call!(ev, fakeCtx()); // the real process: rewritten if rtk is installed, else untouched
-			expect(["git status", "rtk git status"]).toContain(ev.input.command as string);
+			expect(["docker ps", "rtk docker ps"]).toContain(ev.input.command as string);
 		});
 	});
 });
