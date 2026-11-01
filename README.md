@@ -28,7 +28,7 @@ It only touches output it fully understands, and otherwise passes it through unc
 | `lsd -l`, `eza -l` | type, size, short date and name (owner, group and permissions dropped) |
 | `git diff` | one header line per file (`path (new, +12 −0)`), `index`/mode/`---`/`+++` lines dropped, every changed line kept, context trimmed to 1 line, long files cut |
 | `cargo test` | totals line, then only warnings, failures, panics and result lines (build progress and passing tests dropped); also when the run failed |
-| `git`, `cargo`, `docker`… | rewritten through [rtk](https://github.com/rtk-ai/rtk) when it is installed (see `/squeeze rtk`) |
+| `git`, `cargo`, `docker`… | rewritten through [rtk](https://github.com/rtk-ai/rtk) when it is installed (switch: `/squeeze rtk off`) |
 
 Safety rules:
 
