@@ -1,6 +1,6 @@
 #!/usr/bin/env nu
 # ──────────────────────────────────────────────────────────────────────────────
-# Squeeze — Auto-merge a Dependabot PR after CI (auto-merge.yml)
+# pi-squeeze — Auto-merge a Dependabot PR after CI (auto-merge.yml)
 # ──────────────────────────────────────────────────────────────────────────────
 #   nu scripts/ci/auto_merge.nu find <repo> <branch> <sha>   output: number (empty = skip)
 #   nu scripts/ci/auto_merge.nu classify <repo> <number>     outputs: automerge, type
@@ -30,7 +30,7 @@ def "main find" [repo: string, branch: string, sha: string] {
 }
 
 def "main classify" [repo: string, number: string] {
-    let pr = gh_json [pr view $number --repo $repo --json title,commits]
+    let pr = gh_json [pr view $number --repo $repo --json "title,commits"]
     print $"PR #($number): ($pr.title)"
     let messages = $pr.commits | get messageBody | str join "\n"
     ^nu scripts/ci/update_type.nu --title $pr.title --messages $messages --output ($env.GITHUB_OUTPUT? | default "")
