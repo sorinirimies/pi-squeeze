@@ -15,6 +15,8 @@ export type Options = {
 	minChars?: number;
 	/** The result must be at most this share of the original, or the original is kept. */
 	maxRatio?: number;
+	/** Compactors that may run; a missing entry means on. */
+	kinds?: Partial<Record<Kind, boolean>>;
 };
 
 const SEARCH = new Set(["rg", "grep", "egrep", "ugrep"]);
@@ -50,10 +52,10 @@ function pick(command: string): { kind: Kind; run: (out: string, l: Limits) => S
 
 /** Compacts the output of `command`, or returns undefined to leave it exactly as it is. */
 export function compact(command: string, output: string, opts: Options = {}): Result | undefined {
-	const { limits = DEFAULT_LIMITS, minChars = 400, maxRatio = 0.9 } = opts;
+	const { limits = DEFAULT_LIMITS, minChars = 400, maxRatio = 0.9, kinds = {} } = opts;
 	if (output.length < minChars) return undefined;
 	const chosen = pick(command);
-	if (!chosen) return undefined;
+	if (!chosen || kinds[chosen.kind] === false) return undefined;
 	const sq = chosen.run(output, limits);
 	if (!sq) return undefined;
 	if (sq.text.length > output.length * maxRatio) return undefined;

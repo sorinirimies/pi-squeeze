@@ -1,21 +1,42 @@
 /**
  * pi-squeeze: Squeezes tool output so the agent's context stays small.
  *
- * Pure logic lives in core/ (tested directly); this file only wires it to pi's hooks.
- * Output is only ever replaced when the result is clearly smaller, and a truncated
- * result says where the full output was saved.
+ * Pure logic lives in core/ and command/ (tested directly); this file only wires it to pi.
+ * Output is only ever replaced when the result is clearly smaller, and a truncated result
+ * says where the full output was saved. Settings persist in <agent dir>/squeeze.json.
  */
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import { completions, parseCommand } from "./command/parse.ts";
 import { compact } from "./core/compact.ts";
+import { type Config, DEFAULT_CONFIG, optionsOf, readConfig, saveConfig } from "./core/config.ts";
 import { saveFull } from "./core/save.ts";
-import { emptyStats, record, summary } from "./core/stats.ts";
+import { emptyStats, record, saved, summary, tokens } from "./core/stats.ts";
+
+type StatusUi = { ui: { setStatus(key: string, text: string): void } };
+
+export const settingsText = (c: Config): string =>
+	`${c.enabled ? "on" : "off"} · search ${c.kinds.search ? "on" : "off"} · paths ${c.kinds.paths ? "on" : "off"} · listing ${c.kinds.listing ? "on" : "off"} · min ${c.minChars} chars`;
 
 export default function (pi: ExtensionAPI) {
+	let config: Config = { ...DEFAULT_CONFIG, kinds: { ...DEFAULT_CONFIG.kinds } };
 	const stats = emptyStats();
-	let enabled = process.env.PI_SQUEEZE !== "off";
+	if (process.env.PI_SQUEEZE === "off") config.enabled = false;
 
-	pi.on("tool_result", async (event) => {
-		if (!enabled || event.toolName !== "bash" || event.isError) return;
+	const showStatus = (ctx: StatusUi) => {
+		const n = tokens(saved(stats));
+		ctx.ui.setStatus("squeeze", config.enabled && config.showStatus && n > 0 ? `squeeze: ~${n >= 1000 ? `${(n / 1000).toFixed(1)}k` : n} tokens saved` : "");
+	};
+
+	pi.on("session_start", async (_event, ctx) => {
+		const { config: loaded, problem } = await readConfig();
+		config = loaded;
+		if (process.env.PI_SQUEEZE === "off") config.enabled = false;
+		if (problem) ctx.ui.notify(`squeeze: ${problem}; using the defaults`, "warning");
+		showStatus(ctx);
+	});
+
+	pi.on("tool_result", async (event, ctx) => {
+		if (!config.enabled || event.toolName !== "bash" || event.isError) return;
 		const command = (event.input as { command?: unknown }).command;
 		if (typeof command !== "string") return;
 		// pi already truncated this one: its text is not the tool's own format any more.
@@ -24,25 +45,52 @@ export default function (pi: ExtensionAPI) {
 		if (blocks.length !== 1 || blocks[0]!.type !== "text") return;
 		const original = blocks[0]!.text;
 
-		const r = compact(command, original);
+		const r = compact(command, original, optionsOf(config));
 		if (!r) return;
 		record(stats, r);
+		showStatus(ctx);
 		const text = r.truncated ? `${r.text}\n[squeeze: output shortened; full output: ${saveFull(original)}]` : r.text;
 		return { content: [{ type: "text", text }] };
 	});
 
 	pi.registerCommand("squeeze", {
-		description: "pi-squeeze: /squeeze [status|on|off] shows savings or switches compaction",
-		getArgumentCompletions: (prefix: string) =>
-			["status", "on", "off"].filter((s) => s.startsWith(prefix)).map((s) => ({ value: s, label: s })),
+		description: "pi-squeeze: status, on, off, search|paths|listing on|off, min <chars>",
+		getArgumentCompletions: (prefix: string) => completions(prefix),
 		handler: async (args, ctx) => {
-			const arg = args.trim();
-			if (arg === "on" || arg === "off") {
-				enabled = arg === "on";
-				ctx.ui.notify(`squeeze ${arg}`, "info");
-				return;
+			const cmd = parseCommand(args);
+			// The setting applies to this session either way; a failed save only means it is not remembered.
+			const persist = async () => {
+				try {
+					await saveConfig(config);
+				} catch (error) {
+					ctx.ui.notify(`squeeze: could not save the setting (${(error as Error)?.message ?? String(error)}); it applies to this session only`, "warning");
+				}
+				showStatus(ctx);
+			};
+			switch (cmd.kind) {
+				case "status":
+					ctx.ui.notify(`squeeze ${settingsText(config)}\n${summary(stats)}`, "info");
+					return;
+				case "on":
+				case "off":
+					config.enabled = cmd.kind === "on";
+					await persist();
+					ctx.ui.notify(`squeeze ${cmd.kind}`, "info");
+					return;
+				case "compactor":
+					config.kinds[cmd.compactor] = cmd.on;
+					await persist();
+					ctx.ui.notify(`squeeze: ${cmd.compactor} ${cmd.on ? "on" : "off"}`, "info");
+					return;
+				case "min":
+					config.minChars = cmd.chars;
+					await persist();
+					ctx.ui.notify(`squeeze: output under ${cmd.chars} characters is left alone`, "info");
+					return;
+				case "invalid":
+					ctx.ui.notify(cmd.message, "warning");
+					return;
 			}
-			ctx.ui.notify(`${enabled ? "on" : "off"} · ${summary(stats)}`, "info");
 		},
 	});
 }

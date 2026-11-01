@@ -33,7 +33,18 @@ Safety rules:
 * Every cut leaves a marker (`… [+12 more in this file]`), and the full original goes to a temp file whose path is in the output.
 * `read`, `edit` and `write` are never changed.
 
-`/squeeze` shows the savings, `/squeeze off` and `/squeeze on` switch it. `PI_SQUEEZE=off` disables it at start.
+## Commands
+
+| Command | |
+|---|---|
+| `/squeeze` or `/squeeze status` | the settings and the tokens saved so far |
+| `/squeeze [on\|off]` | switch everything |
+| `/squeeze [search\|paths\|listing] [on\|off]` | switch one compactor |
+| `/squeeze min <chars>` | smallest output worth compacting (default 400) |
+
+Settings are remembered in `<pi agent dir>/squeeze.json` (`PI_CODING_AGENT_DIR`, else `~/.pi/agent`); it also holds
+`lineChars`, `perGroup` and `total`, the limits of a compacted result. `PI_SQUEEZE=off` disables it at start.
+The status line shows the tokens saved.
 
 ## Development
 
