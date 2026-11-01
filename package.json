@@ -1,0 +1,34 @@
+{
+  "name": "pi-squeeze",
+  "version": "0.1.0",
+  "description": "Squeezes tool output and steers commands to fast CLI tools, so the agent's context stays small: uses rtk when installed, native compactors otherwise.",
+  "keywords": ["pi-package", "pi-extension"],
+  "license": "MIT",
+  "author": "Sorin Albu-Irimies",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sorinirimies/pi-squeeze.git"
+  },
+  "homepage": "https://github.com/sorinirimies/pi-squeeze#readme",
+  "files": ["extensions", "README.md", "LICENSE"],
+  "pi": {
+    "extensions": ["./extensions/squeeze.ts"]
+  },
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit",
+    "check": "nu scripts/ci/quality_gate.nu"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  },
+  "overrides": {
+    "undici": "8.12.3",
+    "minimatch": "11.0.3"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-coding-agent": "^1.4.0",
+    "@types/bun": "^1.4.4",
+    "typescript": "^7.0.2"
+  }
+}
