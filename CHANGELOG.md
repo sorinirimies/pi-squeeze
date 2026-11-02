@@ -3,6 +3,16 @@
 Generated from [Conventional Commits](https://www.conventionalcommits.org) by
 [git-cliff](https://git-cliff.org). Do not edit by hand.
 
+## [0.3.0](https://github.com/sorinirimies/pi-squeeze/releases/tag/v0.3.0) — 2026-11-02
+
+
+### ✨ Features
+
+- Log what each compaction saved to squeeze-savings.jsonl for usage trackers ([`ef56560`](https://github.com/sorinirimies/pi-squeeze/commit/ef565602ec0c41bba965819056a8572b2eb6453e))
+
+### 🔧 Build & CI
+
+- **deps:** Bump Gitea workflow actions ([`c268e69`](https://github.com/sorinirimies/pi-squeeze/commit/c268e697c6c99ae456ff2a31b91ae3f186aeec07))
 ## [0.2.1](https://github.com/sorinirimies/pi-squeeze/releases/tag/v0.2.1) — 2026-11-02
 
 
