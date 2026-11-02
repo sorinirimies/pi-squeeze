@@ -1,0 +1,4 @@
+.rw-r--r--@    6 EBEMXC4 wheel  1 Jan  2020 a.txt
+.rw-r--r--@ 5.0k EBEMXC4 wheel  2 Nov 01:00 big.bin
+lrwxr-xr-x@    - EBEMXC4 wheel  2 Nov 01:00 link -> a.txt
+drwxr-xr-x@    - EBEMXC4 wheel  2 Nov 01:00 sub

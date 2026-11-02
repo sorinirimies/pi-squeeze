@@ -1,0 +1,7 @@
+total 24
+drwxr-xr-x@    6 EBEMXC4  wheel    192 Nov  2 01:00 .
+drwxrwxrwt  1291 root     wheel  41312 Nov  2 01:00 ..
+-rw-r--r--@    1 EBEMXC4  wheel      6 Jan  1  2020 a.txt
+-rw-r--r--@    1 EBEMXC4  wheel   5000 Nov  2 01:00 big.bin
+lrwxr-xr-x@    1 EBEMXC4  wheel      5 Nov  2 01:00 link -> a.txt
+drwxr-xr-x@    2 EBEMXC4  wheel     64 Nov  2 01:00 sub

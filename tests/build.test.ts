@@ -237,6 +237,8 @@ describe("router: build, tests, tree, sniffing, failed runs", () => {
 		expect(compact("cargo build", fx("cargo-build-err.txt"), small)!.kind).toBe("build");
 		expect(compact("cargo audit", fx("cargo-audit.txt"), small)!.kind).toBe("build");
 		expect(compact("cargo tree", fx("cargo-tree.txt"), small)!.kind).toBe("tree");
+		expect(compact("cargo +nightly tree", fx("cargo-tree.txt"), small)!.kind).toBe("tree");
+		expect(compact("cargo +nightly", fx("cargo-tree.txt"), small)?.kind).not.toBe("tree");
 		expect(compact("tree -L 4", fx("cargo-tree.txt"), small)!.kind).toBe("tree");
 		expect(compact("eza --tree", fx("cargo-tree.txt"), small)!.kind).toBe("tree");
 		expect(compact("npx tsc --noEmit", fx("tsc.txt"), small)!.kind).toBe("build");

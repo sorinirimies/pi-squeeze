@@ -25,7 +25,7 @@ It only touches output it fully understands, and otherwise passes it through unc
 |---|---|
 | `rg -n` / `grep -n` | totals line, then matches grouped by file (path written once, indent trimmed, long lines and busy files cut) |
 | `fd`, `find` | paths grouped by directory |
-| `lsd -l`, `eza -l` | type, size, short date and name (owner, group and permissions dropped) |
+| `lsd -l`, `eza -l`, `ls -l` | type, size, short date and name (owner, group, permissions and the `total` line dropped) |
 | `git diff` | one header line per file (`path (new, +12 −0)`), `index`/mode/`---`/`+++` lines dropped, every changed line kept, context trimmed to 1 line, long files cut |
 | `cargo test` | totals line, then only warnings, failures, panics and result lines (build progress and passing tests dropped); also when the run failed |
 | `rg -l` / `rg --files` / `grep -l` / `git ls-files` / `git diff --name-only` | paths grouped by directory |
@@ -45,6 +45,7 @@ It only touches output it fully understands, and otherwise passes it through unc
 
 Output with a marker of its own (a `tsc` error list, a gradle build, a `bun test` run, rustc diagnostics) is recognised whatever ran it: `just check`, `npm run build`, `make test`, `… 2>&1`.
 A **failed** command is compacted too, but only for test and build output, where the errors are the point.
+`git -C dir …`, `git --no-pager …`, `--color=never` and `cargo +nightly …` are read as the plain command.
 
 Safety rules:
 

@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { hasFlag, hasOperator, parse, stripCd, tokenize } from "../extensions/core/command.ts";
 import { compact, handles } from "../extensions/core/compact.ts";
 import { capLines, cutLine } from "../extensions/core/elide.ts";
-import { compactLsd } from "../extensions/core/lsd.ts";
+import { compactLsd, human } from "../extensions/core/lsd.ts";
 import { compactPaths } from "../extensions/core/paths.ts";
 import { compactRg, parseRows } from "../extensions/core/rg.ts";
 import { emptyStats, record, summary, tokens } from "../extensions/core/stats.ts";
@@ -179,6 +179,26 @@ describe("lsd", () => {
 		const raw = ["lrwxr-xr-x me staff 7 B Sat Oct 31 17:02:38 2026 ln -> x", "drwxr-xr-x me staff 7 B Sat Oct 31 17:02:38 2026 d", "-rw-r--r-- me staff 7 B Sat Oct 31 17:02:38 2026 f"].join("\n");
 		expect(compactLsd(raw)!.text).toContain("l  7B  Oct 31 17:02  ln -> x");
 	});
+
+	test("ls -la: the total line, . and .., links, owner and group go; bytes become K", () => {
+		const r = compactLsd(fx("ls-la.txt"))!;
+		expect(r.text.split("\n")).toEqual(["-  6B  Jan 1 2020  a.txt", "-  4.9K  Nov 2 01:00  big.bin", "l  5B  Nov 2 01:00  link -> a.txt", "d  Nov 2 01:00  sub"]);
+	});
+
+	test("eza -la and eza -lag (with a group column) read the same", () => {
+		const want = ["-  6  Jan 1 2020  a.txt", "-  5.0k  Nov 2 01:00  big.bin", "l  -  Nov 2 01:00  link -> a.txt", "d  Nov 2 01:00  sub"];
+		expect(compactLsd(fx("eza-la.txt"))!.text.split("\n")).toEqual(want);
+		expect(compactLsd(fx("eza-lag.txt"))!.text.split("\n")).toEqual(want);
+	});
+
+	test("one format per listing: a line from another tool makes it pass through", () => {
+		expect(compactLsd(`${fx("eza-la.txt")}${fx("lsd-la.txt")}`)).toBeUndefined();
+		expect(compactLsd("total 8\na\nb\nc")).toBeUndefined();
+	});
+
+	test("human sizes", () => {
+		expect([0, 1023, 1024, 5000, 15 * 1024, 3 * 1024 ** 3, 2 * 1024 ** 5].map(human)).toEqual(["0B", "1023B", "1.0K", "4.9K", "15K", "3.0G", "2048T"]);
+	});
 });
 
 describe("compact router", () => {
@@ -217,6 +237,20 @@ describe("compact router", () => {
 		expect(compact("lsd -la", ls)!.kind).toBe("listing");
 		expect(compact("lsd --long", ls)!.kind).toBe("listing");
 		expect(compact("lsd", ls)).toBeUndefined();
+	});
+
+	test("ls -l and eza -l too, unless a flag adds or changes columns", () => {
+		const big = (f: string) => fx(f).repeat(30);
+		expect(compact("ls -la", big("ls-la.txt").replace(/total 24\n/g, ""))!.kind).toBe("listing");
+		expect(compact("eza -la", big("eza-la.txt"))!.kind).toBe("listing");
+		for (const c of ["ls -lai", "ls -ls", "ls -ln", "ls -lo", "ls -lg", "eza -l --git", "eza -lH", "ls -l --full-time", "lsd -l --header", "ls -la"]) expect(compact(c, big("lsd-la.txt").replace(/^/, c === "ls -la" ? "x\n" : "")), c).toBeUndefined();
+	});
+
+	test("git global options and --color=never do not hide the subcommand", () => {
+		const log = fx("git-log.txt");
+		for (const c of ["git -C repo log", "git -c core.pager=cat log", "git --no-pager log", "git -P --no-optional-locks log", "git --git-dir=.git --work-tree=. log", "git log --no-color", "git log --color=never"]) expect(compact(c, log)?.kind, c).toBe("git");
+		expect(compact("git -C", log)?.kind).not.toBe("git");
+		expect(compact("git log --color=always", log)?.kind).not.toBe("git");
 	});
 });
 

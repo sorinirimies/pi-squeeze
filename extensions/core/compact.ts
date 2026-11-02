@@ -37,7 +37,7 @@ export type Options = {
 
 const SEARCH = new Set(["rg", "grep", "egrep", "ugrep"]);
 const PATHS = new Set(["fd", "fdfind", "find"]);
-const LISTING = new Set(["lsd", "eza", "exa"]);
+const LISTING = new Set(["lsd", "eza", "exa", "ls"]);
 const LIST_ONLY = { long: ["--files", "--files-with-matches", "--files-without-match"], short: ["l"] };
 const NOT_A_LIST = { long: ["--json", "--count", "--null", "--print0", "--stats", "--vimgrep"], short: ["c", "0", "z"] };
 
@@ -46,7 +46,7 @@ const NOT_PLAIN_SEARCH = { long: ["--json", "--count", "--files-with-matches", "
 const NOT_PLAIN_PATHS = { long: ["--exec", "--exec-batch", "--list-details", "--print0", "--format"], short: ["x", "X", "l", "0"] };
 
 /** Flags of `git log`, `show`, `blame` and `status` that leave the default format. */
-const GIT_FORMAT = ["--oneline", "--pretty", "--format", "--stat", "--shortstat", "--numstat", "--name-only", "--name-status", "--raw", "--graph", "--patch", "--color-words", "--word-diff", "--porcelain", "--line-porcelain", "--incremental", "--short", "--branch", "--stage", "--eol", "--debug", "--format", "--null"];
+const GIT_FORMAT = ["--oneline", "--pretty", "--stat", "--shortstat", "--numstat", "--name-only", "--name-status", "--raw", "--graph", "--patch", "--color-words", "--word-diff", "--porcelain", "--line-porcelain", "--incremental", "--short", "--branch", "--stage", "--eol", "--debug", "--format", "--null", "--color"];
 const GIT_FORMAT_SHORT = ["p", "s", "z", "b", "e", "t", "v"];
 
 /** `git diff` flags that change the output format away from a unified diff. */
@@ -59,8 +59,9 @@ function plainFind(args: string[]): boolean {
 	return !args.some((a) => ["-exec", "-execdir", "-ls", "-print0", "-printf", "-fprint", "-delete", "-ok"].includes(a));
 }
 
-function pickCargo(args: string[]): ReturnType<typeof pick> {
-	const [sub, ...rest] = args;
+function pickCargo(all: string[]): ReturnType<typeof pick> {
+	// `cargo +nightly build`: the toolchain does not change the output.
+	const [sub, ...rest] = all[0]?.startsWith("+") ? all.slice(1) : all;
 	if (hasFlag(rest, ["--format", "--message-format", "--prefix", "--charset", "--timings"])) return undefined;
 	switch (sub) {
 		case "test":
@@ -90,8 +91,23 @@ const SNIFFERS: { kind: Kind; run: (out: string, l: Limits) => Squeezed | undefi
 	{ kind: "build", run: compactAudit },
 ];
 
-function pickGit(args: string[]): ReturnType<typeof pick> {
-	const [sub, ...rest] = args;
+/** `git` options before the subcommand that do not change its output: `-C dir`, `-c k=v`, `--no-pager`, ... */
+function gitSubcommand(args: string[]): string[] {
+	let i = 0;
+	while (i < args.length) {
+		const a = args[i]!;
+		if (a === "-C" || a === "-c") i += 2;
+		else if (["--no-pager", "-P", "--no-optional-locks", "--literal-pathspecs"].includes(a) || /^--(git-dir|work-tree)=/.test(a)) i++;
+		else break;
+	}
+	return args.slice(i);
+}
+
+/** `--color=never` and `--no-color` leave the output as it is without them. */
+const noColor = (args: string[]) => args.filter((a) => a !== "--color=never" && a !== "--no-color");
+
+function pickGit(all: string[]): ReturnType<typeof pick> {
+	const [sub, ...rest] = noColor(gitSubcommand(all));
 	switch (sub) {
 		case "diff":
 			if (hasFlag(rest, ["--name-only"]) && !hasFlag(rest, ["--null"], ["z"])) return { kind: "paths", run: compactPaths };
@@ -135,6 +151,8 @@ function pick(command: string): { kind: Kind; run: (out: string, l: Limits) => S
 	if (program === "dust") return hasFlag(args, ["--output-json"], ["j"]) ? undefined : { kind: "listing", run: compactDust };
 	if (LISTING.has(program)) {
 		if (!hasFlag(args, ["--long"], ["l"])) return undefined;
+		// Other column sets (inode, blocks, group only, full time, numeric ids, octal) do not parse.
+		if (hasFlag(args, ["--inode", "--blocks", "--size", "--full-time", "--time-style", "--numeric-uid-gid", "--git", "--header", "--octal-permissions", "--total-size", "--context"], ["i", "s", "n", "g", "o", "H", "Z"])) return undefined;
 		return { kind: "listing", run: compactLsd };
 	}
 	return undefined;
