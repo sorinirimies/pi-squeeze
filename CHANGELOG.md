@@ -3,6 +3,17 @@
 Generated from [Conventional Commits](https://www.conventionalcommits.org) by
 [git-cliff](https://git-cliff.org). Do not edit by hand.
 
+## [0.2.0](https://github.com/sorinirimies/pi-squeeze/releases/tag/v0.2.0) — 2026-11-02
+
+
+### ✨ Features
+
+- Compactors for package installs, pytest, jest/vitest, linters, logs, docker build, xcodebuild/swift and Android (gradle, adb); look through a trailing | tail / | head ([`3a1d262`](https://github.com/sorinirimies/pi-squeeze/commit/3a1d2626f37f632e5df19cafdd244aa63c1497f7))
+- Android, Maven and JVM compactors: Android Lint, detekt, Kotlin/KSP warnings, R8, AAPT, gradle tasks/projects/insight reports, mvn, javac, stack traces, adb uiautomator/getprop/ps/top/dumpsys; compact pi-truncated output from its full log ([`9d11dff`](https://github.com/sorinirimies/pi-squeeze/commit/9d11dffe61c9aa1c431a025d67cd03fc0b354661))
+
+### 🧪 Tests
+
+- Anonymise the remaining fixtures ([`0b303d1`](https://github.com/sorinirimies/pi-squeeze/commit/0b303d1a5f8919f4e3fb7cdfa309939fa5ea640f))
 ## [0.1.0](https://github.com/sorinirimies/pi-squeeze/releases/tag/v0.1.0) — 2026-11-02
 
 
