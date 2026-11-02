@@ -3,6 +3,21 @@
 Generated from [Conventional Commits](https://www.conventionalcommits.org) by
 [git-cliff](https://git-cliff.org). Do not edit by hand.
 
+## [0.2.1](https://github.com/sorinirimies/pi-squeeze/releases/tag/v0.2.1) — 2026-11-02
+
+
+### 🐛 Fixes
+
+- **ci:** A 409 from the other host publishing the same version first is not a failure; add release-gitea-starscream and pull-gitea-starscream recipes ([`941241e`](https://github.com/sorinirimies/pi-squeeze/commit/941241eb355186241df1c7fb6a457ba00d9811f5))
+
+### 📚 Docs
+
+- This repo's agent rules as a project skill in .agents/skills ([`132a476`](https://github.com/sorinirimies/pi-squeeze/commit/132a4760c2c386cf720e89810dd8453aae77c3c0))
+- Drop the per-repo agent rules skill; the shared skills cover it ([`2d834a7`](https://github.com/sorinirimies/pi-squeeze/commit/2d834a726a1d2b395e2889a4a1471c97dc3f5bf5))
+
+### 🔧 Build & CI
+
+- **deps:** Bump taiki-e/install-action from 2.88.0 to 2.88.1 (#2) ([`0b2b07a`](https://github.com/sorinirimies/pi-squeeze/commit/0b2b07aeebd97370c6cbb5fb03c03b9786a764b7))
 ## [0.2.0](https://github.com/sorinirimies/pi-squeeze/releases/tag/v0.2.0) — 2026-11-02
 
 
