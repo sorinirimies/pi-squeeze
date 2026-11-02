@@ -25,13 +25,15 @@ import { compactTests } from "../extensions/core/tests.ts";
 import { compactLsd } from "../extensions/core/lsd.ts";
 import { compactPaths } from "../extensions/core/paths.ts";
 import { compactRg, compactRgPlain } from "../extensions/core/rg.ts";
-import { compactPackages } from "../extensions/core/adb.ts";
+import { compactDumpsys, compactPackagePaths, compactPackages, compactProcesses, compactProperties, compactUiDump } from "../extensions/core/adb.ts";
+import { compactJavac } from "../extensions/core/javac.ts";
+import { compactMaven, compactMavenTree } from "../extensions/core/maven.ts";
 import { compactDockerBuild } from "../extensions/core/docker.ts";
 import { compactGradleDeps } from "../extensions/core/gradle.ts";
 import { compactInstall } from "../extensions/core/install.ts";
 import { compactJest } from "../extensions/core/jest.ts";
 import { compactLint, compactLintSniffed } from "../extensions/core/lint.ts";
-import { compactLogs } from "../extensions/core/logs.ts";
+import { compactLogs, compactTrace } from "../extensions/core/logs.ts";
 import { compactPytest } from "../extensions/core/pytest.ts";
 import { compactXcode } from "../extensions/core/xcode.ts";
 
@@ -124,6 +126,22 @@ describe("fuzz", () => {
 		compactXcode(`${d}\n** BUILD FAILED **`);
 		compactGradleDeps(`+--- a\n${d}`);
 		compactPackages(d);
+	});
+
+	fuzz("Android and JVM compactors never throw, whatever the input", (r) => {
+		const d = doc(r);
+		compactPackagePaths(d);
+		compactProperties(d);
+		compactProperties(`[a]: [x\n${d}`);
+		compactProcesses(`USER PID PPID VSZ\n${d}`);
+		compactProcesses(`PID USER PR NI VIRT RES SHR S[%CPU] %MEM TIME+ ARGS\n${d}`);
+		compactDumpsys(d);
+		compactUiDump(`<hierarchy><node ${d.replace(/\n/g, " ")}>${d}</node>`);
+		compactMaven(`${d}\n[INFO] Running a.B\n${d}\n[ERROR] BUILD FAILURE`);
+		compactMavenTree(`[INFO] ${d}\n[INFO] BUILD SUCCESS`);
+		compactJavac(`A.java:1: error: x\n${d}`);
+		compactTrace(`Exception\n\tat java.a.B(c)\n\tat java.a.B(c)\n\tat a.B(c)\n${d}`);
+		compactGradle(`> Task :a\nMissing class a.B\n/w/A.kt:1: Warning: x [Id]\n${d}\nBUILD FAILED in 1s\n* What went wrong:\n${d}`);
 	});
 
 	fuzz("lint keeps every finding's location and message; install keeps every unrecognised line", (r) => {

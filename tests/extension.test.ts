@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { readFileSync, rmSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { configPath } from "../extensions/core/config.ts";
 import { resetRtk, useRunner } from "../extensions/core/rtk.ts";
@@ -39,9 +40,29 @@ describe("extension", () => {
 		expect(await h(result("rg -n import extensions", raw, { isError: true }))).toBeUndefined();
 		expect(await h(result(42))).toBeUndefined();
 		expect(await h(result("rg -n import extensions", raw, { details: { truncation: {} } }))).toBeUndefined();
+		expect(await h(result("rg -n import extensions", raw, { details: { truncation: {}, fullOutputPath: "/nonexistent/squeeze-full.log" } }))).toBeUndefined();
 		expect(await h(result("rg -n import extensions", raw, { content: [{ type: "image" }] }))).toBeUndefined();
 		expect(await h(result("rg -n import extensions", raw, { content: [] }))).toBeUndefined();
 		expect(await h(result("cat x"))).toBeUndefined();
+	});
+
+	test("output pi cut to its tail: the full output it saved is compacted, and pointed to", async () => {
+		const { hooks } = load();
+		const dir = mkdtempSync(join(tmpdir(), "squeeze-full-"));
+		const full = join(dir, "bash.log");
+		const maven = readFileSync(join(import.meta.dir, "fixtures", "maven-test-fail.txt"), "utf8");
+		writeFileSync(full, maven);
+		const tail = maven.slice(-4000);
+		const shown = `${tail}\n\n[Showing lines 40-137 of 137. Full output: ${full}]\n\nCommand exited with code 1`;
+		const ctx = fakeCtx();
+		const out = await hooks.tool_result!(result("mvn test", shown, { isError: true, details: { truncation: { truncated: true }, fullOutputPath: full } }), ctx);
+		expect(out.content[0].text).toContain("maven: 3 test classes passed");
+		expect(out.content[0].text).toContain("throwsDeep");
+		expect(out.content[0].text).toContain(`[squeeze: output shortened; full output: ${full}]`);
+		expect(ctx.status.squeeze).toMatch(/tokens saved/);
+		// Never longer than what pi would have shown.
+		expect(await hooks.tool_result!(result("mvn test", "[ERROR] BUILD FAILURE", { details: { truncation: { truncated: true }, fullOutputPath: full } }), fakeCtx())).toBeUndefined();
+		rmSync(dir, { recursive: true, force: true });
 	});
 
 	test("a failed test run is compacted, any other failed command is left alone", async () => {

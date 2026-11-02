@@ -124,16 +124,21 @@ describe("gradle", () => {
 		expect(t).toHaveLength(2);
 	});
 
-	test("Kotlin diagnostics lose the shared directory", () => {
-		const raw = ["> Task :app:compileKotlin", "w: file:///work/app/src/main/A.kt:3:5 Unused variable", "w: file:///work/app/src/main/b/B.kt:9:1 Deprecated", "e: file:///work/app/src/main/b/C.kt:1:1 Boom", "BUILD FAILED in 1s", ""].join("\n");
-		const t = compactGradle(raw)!.text;
-		expect(t).toContain("w: …/A.kt:3:5 Unused variable");
-		expect(t).toContain("w: …/b/B.kt:9:1 Deprecated");
+	test("Kotlin warnings are grouped by message; errors stay one per line and lose the shared directory", () => {
+		const raw = ["> Task :app:compileKotlin", "w: file:///work/app/src/main/A.kt:3:5 Unused variable", "w: file:///work/app/src/main/b/B.kt:9:1 Unused variable", "w: [ksp] /work/app/src/main/b/D.kt:2: Deprecated", "e: file:///work/app/src/main/b/C.kt:1:1 Boom", "e: file:///work/app/src/main/E.kt:2:2 Bang", "BUILD FAILED in 1s", ""].join("\n");
+		const t = compactGradle(raw)!.text.split("\n");
+		expect(t).toContain("kotlin: 3 warnings in 3 files (under /work/app/src/main/)");
+		expect(t).toContain("warning Unused variable (2)");
+		expect(t).toContain("  A.kt:3:5 b/B.kt:9:1");
+		expect(t).toContain("warning Deprecated  b/D.kt:2");
 		expect(t).toContain("e: …/b/C.kt:1:1 Boom");
-		const single = compactGradle("> Task :x\nw: /a/b/C.kt:1:1 one\nBUILD SUCCESSFUL in 1s")!.text;
-		expect(single).toContain("w: /a/b/C.kt:1:1 one");
-		const nodir = compactGradle("> Task :x\nw: /A.kt:1:1 one\nw: /B.kt:1:1 two\nBUILD SUCCESSFUL in 1s")!.text;
-		expect(nodir).toContain("w: /A.kt:1:1 one");
+		expect(t).toContain("e: …/E.kt:2:2 Bang");
+		const single = compactGradle("> Task :x\ne: /a/b/C.kt:1:1 one\nBUILD SUCCESSFUL in 1s")!.text;
+		expect(single).toContain("e: /a/b/C.kt:1:1 one");
+		const nodir = compactGradle("> Task :x\ne: /A.kt:1:1 one\ne: /B.kt:1:1 two\nBUILD SUCCESSFUL in 1s")!.text;
+		expect(nodir).toContain("e: /A.kt:1:1 one");
+		const url = compactGradle("> Task :x\ne: /a/b/C.kt:1:1 one\nsent to https://otlp.example.net:443/v1 ok\nBUILD SUCCESSFUL in 1s")!.text;
+		expect(url).toContain("e: /a/b/C.kt:1:1 one");
 	});
 
 	test("long lines are cut, the total is capped, other text passes through", () => {

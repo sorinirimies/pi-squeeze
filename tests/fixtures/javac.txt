@@ -1,0 +1,60 @@
+src/com/example/app/Main.java:8: warning: [rawtypes] found raw type: List
+        List raw = new ArrayList();
+        ^
+  missing type arguments for generic class List<E>
+  where E is a type-variable:
+    E extends Object declared in interface List
+src/com/example/app/Main.java:8: warning: [rawtypes] found raw type: ArrayList
+        List raw = new ArrayList();
+                       ^
+  missing type arguments for generic class ArrayList<E>
+  where E is a type-variable:
+    E extends Object declared in class ArrayList
+src/com/example/app/Main.java:9: warning: [unchecked] unchecked call to add(E) as a member of the raw type List
+        raw.add("x");
+               ^
+  where E is a type-variable:
+    E extends Object declared in interface List
+src/com/example/app/Main.java:10: warning: [deprecation] Date(int,int,int) in Date has been deprecated
+        Date d = new Date(2020, 1, 1);
+                 ^
+src/com/example/app/Main.java:12: error: cannot find symbol
+        String s = undefinedName;
+                   ^
+  symbol:   variable undefinedName
+  location: class Main
+src/com/example/app/Main.java:13: error: incompatible types: String cannot be converted to int
+        int n = "text";
+                ^
+src/com/example/app/Main.java:14: error: cannot find symbol
+        Strin q = null;
+        ^
+  symbol:   class Strin
+  location: class Main
+src/com/example/app/Main.java:16: error: cannot find symbol
+        missing(1);
+        ^
+  symbol:   method missing(int)
+  location: class Main
+src/com/example/app/Other.java:5: error: cannot find symbol
+        List<String> l = new java.util.ArrayList();
+        ^
+  symbol:   class List
+  location: class Other
+src/com/example/app/Other.java:5: warning: [rawtypes] found raw type: ArrayList
+        List<String> l = new java.util.ArrayList();
+                                      ^
+  missing type arguments for generic class ArrayList<E>
+  where E is a type-variable:
+    E extends Object declared in class ArrayList
+src/com/example/app/Other.java:6: warning: [deprecation] Date(int,int,int) in Date has been deprecated
+        new java.util.Date(1999, 1, 1);
+        ^
+src/com/example/app/Other.java:7: warning: [removal] Integer(int) in Integer has been deprecated and marked for removal
+        Integer i = new Integer(3);
+                    ^
+src/com/example/app/Other.java:8: warning: [removal] stop() in Thread has been deprecated and marked for removal
+        Thread.currentThread().stop();
+                              ^
+5 errors
+8 warnings

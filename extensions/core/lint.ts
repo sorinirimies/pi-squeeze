@@ -8,14 +8,14 @@
  * Source frames, help text and fix suggestions go (the location leads back to them). Formats:
  * ESLint stylish, Biome, Ruff (full and concise), `flutter analyze`, and the one-line
  * `path:line:col: message` shape that flake8, mypy, pylint, ktlint, detekt, swiftlint and
- * shellcheck share. Anything else in the output passes the whole of it through.
+ * shellcheck share, and Android Lint's text report (its source lines and explanations go). Anything else in the output passes the whole of it through.
  */
 import { capLines, cutLine, DEFAULT_LIMITS, type Limits, type Squeezed } from "./elide.ts";
 import { stripAnsi } from "./generic.ts";
 
 export type Diag = { file: string; line: string; col?: string; severity: string; rule?: string; message: string };
 /** `lossy`: the format had more than the findings (frames, help, fixes), which the result leaves out. */
-type Parsed = { tool: string; diags: Diag[]; notes: string[]; lossy?: boolean };
+export type Parsed = { tool: string; diags: Diag[]; notes: string[]; lossy?: boolean };
 
 /** ESLint's default `stylish` formatter. */
 export function parseEslint(lines: string[]): Parsed | undefined {
@@ -110,9 +110,25 @@ export function parseLocated(lines: string[]): Parsed | undefined {
 	return diags.length ? { tool: "lint", diags, notes } : undefined;
 }
 
+/** Android Lint's text report: `path:12: Warning: message [IssueId]`, the source line, `~~~~`, explanations. */
+const ANDROID_LINT = /^(\S.*?):(\d+): (Error|Warning|Information|Hint|Fatal): (.*) \[(\w+)\]$/;
+
+export function parseAndroidLint(lines: string[]): Parsed | undefined {
+	const diags: Diag[] = [];
+	const notes: string[] = [];
+	for (const l of lines) {
+		const m = ANDROID_LINT.exec(l);
+		if (m) diags.push({ file: m[1]!, line: m[2]!, severity: m[3]!.toLowerCase(), rule: m[5], message: m[4]! });
+		// Source lines, underlines and explanations are indented; the summary is `3 errors, 1 warning`.
+		else if (/^\d+ errors?(, \d+ warnings?)?$|^\d+ warnings?$|^No issues found/.test(l)) notes.push(l);
+		else if (l.trim() !== "" && !/^\s/.test(l)) return undefined;
+	}
+	return diags.length ? { tool: "android lint", diags, notes, lossy: true } : undefined;
+}
+
 /** The directory every absolute path shares, to be written once. */
-function sharedDir(files: string[]): string {
-	if (files.length < 2 || !files.every((f) => f.startsWith("/"))) return "";
+export function sharedDir(files: string[]): string {
+	if (!files.length || !files.every((f) => f.startsWith("/"))) return "";
 	let prefix = files[0]!.slice(0, files[0]!.lastIndexOf("/") + 1);
 	for (const f of files) while (!f.startsWith(prefix)) prefix = prefix.slice(0, prefix.lastIndexOf("/", prefix.length - 2) + 1);
 	return prefix.length > 1 ? prefix : "";
@@ -125,7 +141,9 @@ export function renderDiags({ tool, diags, notes, lossy = false }: Parsed, limit
 	const dir = sharedDir([...new Set(diags.map((d) => d.file))]);
 	const groups = new Map<string, string[]>();
 	for (const d of diags) {
-		const key = `${d.severity ? `${d.severity} ` : ""}${d.rule ? `${d.rule}: ` : ""}${d.message}`;
+		// A message that names its own file (detekt's license rule) groups with the others once the name goes.
+		const message = d.message.replaceAll(d.file, "<file>");
+		const key = `${d.severity ? `${d.severity} ` : ""}${d.rule ? `${d.rule}: ` : ""}${message}`;
 		const at = `${d.file.slice(dir.length)}:${d.line}${d.col ? `:${d.col}` : ""}`;
 		groups.set(key, [...(groups.get(key) ?? []), at]);
 	}
@@ -136,7 +154,12 @@ export function renderDiags({ tool, diags, notes, lossy = false }: Parsed, limit
 	let cut = false;
 	const sorted = [...groups].sort((a, b) => b[1].length - a[1].length);
 	for (const [key, at] of sorted) {
-		out.push(cutLine(`${key}${at.length > 1 ? ` (${at.length})` : ""}`, limits.lineChars));
+		// A finding of its own is one line: message, then where.
+		if (at.length === 1) {
+			out.push(cutLine(`${key}  ${at[0]}`, limits.lineChars));
+			continue;
+		}
+		out.push(cutLine(`${key} (${at.length})`, limits.lineChars));
 		const shown = at.slice(0, limits.perGroup * 2);
 		// Locations share lines, as many as fit.
 		let line = " ";
@@ -155,7 +178,7 @@ export function renderDiags({ tool, diags, notes, lossy = false }: Parsed, limit
 	return { text: capped.text, truncated: lossy || cut || capped.truncated };
 }
 
-const PARSERS = [parseEslint, parseBiome, parseRuff, parseDart, parseLocated];
+const PARSERS = [parseEslint, parseBiome, parseRuff, parseDart, parseAndroidLint, parseLocated];
 
 export function compactLint(output: string, limits: Limits = DEFAULT_LIMITS): Squeezed | undefined {
 	const lines = stripAnsi(output).split("\n");
@@ -170,6 +193,7 @@ export function compactLint(output: string, limits: Limits = DEFAULT_LIMITS): Sq
 /** For sniffing: only formats with an unmistakable shape (a `path:line` line alone could be anything). */
 export function compactLintSniffed(output: string, limits: Limits = DEFAULT_LIMITS): Squeezed | undefined {
 	const lines = stripAnsi(output).split("\n");
-	const p = parseEslint(lines) ?? parseBiome(lines) ?? parseRuff(lines);
+	const android = lines.some((l) => /^\s+~+$/.test(l)) ? parseAndroidLint(lines) : undefined;
+	const p = parseEslint(lines) ?? parseBiome(lines) ?? parseRuff(lines) ?? android;
 	return p ? renderDiags(p, limits) : undefined;
 }

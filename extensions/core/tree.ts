@@ -11,10 +11,12 @@
  */
 import { cutLine, DEFAULT_LIMITS, type Limits, type Squeezed } from "./elide.ts";
 
-/** Box-drawing trees indent by 4; gradle's ASCII one (`+--- `, `|    `) by 5. */
+/** Box-drawing trees indent by 4; gradle's ASCII one (`+--- `, `|    `) by 5, Maven's by 3. */
 const STYLES = [
 	{ prefix: /^((?:│   |    )*)/, branch: /^(?:│   |    )*(?:├── |└── )/, unit: 4 },
 	{ prefix: /^((?:\|    | {5})*)/, branch: /^(?:\|    | {5})*(?:\+--- |\\--- )/, unit: 5 },
+	// Maven's `dependency:tree`: `+- `, `\- `, `|  `.
+	{ prefix: /^((?:\|  | {3})*)/, branch: /^(?:\|  | {3})*(?:\+- |\\- )/, unit: 3 },
 ];
 
 /** Levels kept below the root. */

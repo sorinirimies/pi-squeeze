@@ -1,0 +1,31 @@
+Isolated Projects is an incubating feature.
+Reusing configuration cache.
+> Task :core:logger:preBuild UP-TO-DATE
+> Task :core:logger:preReleaseBuild UP-TO-DATE
+> Task :core:logger:processReleaseManifest UP-TO-DATE
+> Task :core:logger:mapReleaseSourceSetPaths
+> Task :core:logger:processReleaseNavigationResources
+> Task :core:logger:generateReleaseResources
+> Task :core:logger:mergeReleaseResources
+> Task :core:logger:verifyReleaseResources FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':core:logger:verifyReleaseResources' (registered by plugin 'com.android.internal.library').
+> A failure occurred while executing com.android.build.gradle.tasks.VerifyLibraryResourcesTask$Action
+   > Android resource linking failed
+     ERROR: /home/dev/app/core/logger/build/intermediates/merged_res/release/mergeReleaseResources/layout/probe.xml:1: AAPT: error: attribute android:bogus not found.
+         
+     ERROR: /home/dev/app/core/logger/build/intermediates/merged_res/release/mergeReleaseResources/layout/probe.xml:2: AAPT: error: resource string/missing_probe (aka com.example.logger:string/missing_probe) not found.
+         
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 1s
+6 actionable tasks: 5 executed, 1 up-to-date
+Configuration cache entry reused.

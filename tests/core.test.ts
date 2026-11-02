@@ -334,3 +334,19 @@ describe("stats", () => {
 		expect(tokens(10)).toBe(3);
 	});
 });
+
+describe("reading pi's full output back", () => {
+	test("a file is read; a missing one, a non-string path or one over the limit is not", async () => {
+		const { mkdtempSync, writeFileSync, rmSync } = await import("node:fs");
+		const { tmpdir } = await import("node:os");
+		const { readFullOutput } = await import("../extensions/core/files.ts");
+		const dir = mkdtempSync(join(tmpdir(), "squeeze-read-"));
+		const f = join(dir, "out.log");
+		writeFileSync(f, "hello");
+		expect(readFullOutput(f)).toBe("hello");
+		expect(readFullOutput(f, 2)).toBeUndefined();
+		expect(readFullOutput(join(dir, "missing"))).toBeUndefined();
+		expect(readFullOutput(42)).toBeUndefined();
+		rmSync(dir, { recursive: true, force: true });
+	});
+});

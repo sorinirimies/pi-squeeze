@@ -6,7 +6,7 @@
 [![Audit](https://github.com/sorinirimies/pi-squeeze/actions/workflows/security.yml/badge.svg)](https://github.com/sorinirimies/pi-squeeze/actions/workflows/security.yml)
 [![Fuzz](https://github.com/sorinirimies/pi-squeeze/actions/workflows/fuzz.yml/badge.svg)](https://github.com/sorinirimies/pi-squeeze/actions/workflows/fuzz.yml)
 
-Shrinks bash output before it reaches the agent's context: native compactors for git, search, listings, tests, builds (cargo, gradle, Xcode, tsc, docker), linters, package installs and logs, plus rtk when installed. Full output stays one temp file away.
+Shrinks bash output before it reaches the agent's context: native compactors for git, search, listings, tests, builds (cargo, gradle, Maven, javac, Xcode, tsc, docker), Android (adb, lint, detekt), linters, package installs and logs, plus rtk when installed. Full output stays one temp file away.
 
 A [pi](https://github.com/earendil-works/pi-coding-agent) extension.
 
@@ -39,7 +39,7 @@ It only touches output it fully understands, and otherwise passes it through unc
 | `cargo audit` | one line per advisory (id, crate, version, kind, title, fix) |
 | `cargo tree`, `tree`, `eza --tree` | cut below 3 levels, `… [+15 lines deeper]` under each cut |
 | `tsc` | errors grouped by file (`a.ts (8)`, `1:7 TS2322 …`) |
-| `gradle`, `./gradlew` | task lines counted (`11 tasks (5 executed, 4 no-source, 2 up-to-date)`); failures, compiler errors, test failures and the `BUILD` line stay; daemon and `--scan` hints go; Kotlin `w:`/`e:` paths lose their shared directory |
+| `gradle`, `./gradlew` | task lines counted (`11 tasks (5 executed, 4 no-source, 2 up-to-date)`); failures, compiler errors, test failures and the `BUILD` line stay; daemon, configuration-cache, JVM and `--scan` chatter goes; reported files lose their shared directory |
 | `bun test`, `go test` | passing tests counted, not listed; failures and totals stay |
 | `pytest` | session header, progress dots and `PASSED` lines go; failures, warnings and the short summary stay; full-width `====` banners shrink |
 | `jest`, `vitest` | passing tests and files go, skipped ones are counted; failures with their diff and frame, and the totals, stay |
@@ -47,14 +47,23 @@ It only touches output it fully understands, and otherwise passes it through unc
 | `eslint`, `biome`, `ruff`, `flake8`, `mypy`, `pylint`, `ktlint`, `detekt`, `swiftlint`, `shellcheck`, `flutter analyze` | findings grouped by rule and message, each location once (`error eqeqeq: … (5)` then `m.js:2:46 m1.js:2:47 …`), the shared directory said once; frames and fix suggestions go |
 | `npm` / `pnpm` / `yarn` / `bun install`, `pip install`, `uv sync`, `pod install`, `bundle install`, `flutter pub get` | download and progress lines go; per-package lines become one line (`Collecting (9): requests, rich, …`); deprecation warnings become one list of names; errors and the summary stay |
 | `docker build` | `[internal]` steps, layer downloads, `CACHED` / `DONE` lines go; each step keeps its header and what it printed |
-| `docker logs`, `docker compose logs`, `kubectl logs`, `journalctl`, `adb logcat` | 3+ lines that differ only in timestamps and numbers keep the first and last; framework stack frames fold; logcat drops the date and thread id; past the limit the start goes, not the end |
-| `gradle` on Android | also: AGP option warnings said once, detekt / ktlint paths shortened, framework frames in test failures folded; `gradle dependencies` is cut like a tree |
-| `adb shell pm list packages` | grouped by the first two name segments |
+| `docker logs`, `docker compose logs`, `kubectl logs`, `journalctl`, `adb logcat` (not `-f` / `--follow`) | 3+ lines that differ only in timestamps and numbers keep the first and last; framework stack frames fold; logcat drops the date and thread id; past the limit the start goes, not the end |
+| `gradle` on Android | also: Kotlin / KSP warnings, detekt / ktlint findings and Android Lint issues grouped by message with their locations (lint's source lines, explanations and baseline advice go); repeated warnings and `--warning-mode all` deprecations said once with a count, without the upgrade-guide links; R8 `Missing class` and `Duplicate class` lines become one list of classes; "Searched in the following locations" becomes a count; `A failure occurred while executing …` wrappers go and the failure summary does not repeat what was printed above it; framework frames fold |
+| `gradle tasks`, `gradle projects`, `dependencyInsight`, `dependencies` | tasks: names per group, descriptions go; projects: every path once, grouped by the first segment (`:api (261): …`); insight: the attribute tables go; dependencies: cut like a tree |
+| `mvn`, `./mvnw`, `mvnd` | `Downloading` / `Downloaded` lines and their progress counted; `[INFO]` lines go except the result, the test totals and modules that failed; a passing test class takes its output (Spring banners, logs) with it; errors said once, the `[Help 1]` footer goes; `dependency:tree` is cut like a tree |
+| `javac` | errors keep their source line, caret and `symbol:` / `location:`; warnings grouped by kind (`warning rawtypes: found raw type: List (2)`); `Recompile with -Xlint` notes go |
+| a JVM stack trace from anything (`java -jar`, a test JVM, a log) | framework frames (java., kotlin., android., org.junit., org.springframework.…) fold to `… N framework frames`; the exception, each `Caused by:`, your own frames and `... N more` stay; also when the command failed |
+| `adb exec-out uiautomator dump /dev/tty` | one line per node that says something, indented by nesting, with where to tap: `TextView "Network & internet" #title @375,608`; empty wrappers and off-screen nodes go |
+| `adb shell getprop`, `settings list …` | keys that share a prefix written once, every value kept: `aaudio: hw_burst_min_usec=2000 mmap_policy=2` |
+| `adb shell ps -A`, `top -n 1` | kernel threads and idle processes counted, not listed; column padding goes |
+| `adb shell dumpsys …` | lines deeper than an entry's own go with a count; 3+ lines of the same shape keep their ends |
+| `adb shell pm list packages [-f]` | grouped by the first two name segments; with `-f`, name then path, hashed install directories elided |
+| `adb logcat` (`threadtime`, `time`, `brief`) | as logs above; with `adb -s <serial>` too |
 | `… \| tail -50`, `… \| head -n 20` | the command before the pipe picks the compactor |
 | anything else | colour codes dropped, progress bars (`\r`) keep their last frame, 4+ identical lines become `line  [×N]`, 3+ blank lines become one. Never for `cat`, `head`, `jq`, `curl`… (content commands) |
 | `git`, `cargo`, `docker`… | rewritten through [rtk](https://github.com/rtk-ai/rtk) when it is installed (switch: `/squeeze rtk off`) |
 
-Output with a marker of its own (a `tsc` error list, a gradle build, a `bun test` run, rustc diagnostics) is recognised whatever ran it: `just check`, `npm run build`, `make test`, `… 2>&1`.
+Output with a marker of its own (a `tsc` error list, a gradle or Maven build, `javac` errors, a JVM stack trace, a `uiautomator` dump, a `bun test` run, rustc diagnostics) is recognised whatever ran it: `just check`, `npm run build`, `make test`, `… 2>&1`.
 A **failed** command is compacted too, but only for test and build output, where the errors are the point.
 `git -C dir …`, `git --no-pager …`, `--color=never` and `cargo +nightly …` are read as the plain command.
 

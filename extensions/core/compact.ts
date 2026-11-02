@@ -1,7 +1,7 @@
 /** Chooses the compactor for a bash command and applies the safety rules. */
 import { hasFlag, type Invocation, parse } from "./command.ts";
 import { DEFAULT_LIMITS, type Limits, type Squeezed } from "./elide.ts";
-import { compactPackages } from "./adb.ts";
+import { compactDumpsys, compactPackagePaths, compactPackages, compactProcesses, compactProperties, compactUiDump } from "./adb.ts";
 import { compactAudit } from "./audit.ts";
 import { compactBlame } from "./blame.ts";
 import { compactDiff } from "./diff.ts";
@@ -9,9 +9,11 @@ import { compactDockerBuild } from "./docker.ts";
 import { compactDust } from "./dust.ts";
 import { compactGradle, compactGradleDeps } from "./gradle.ts";
 import { compactInstall } from "./install.ts";
+import { compactJavac } from "./javac.ts";
 import { compactJest } from "./jest.ts";
 import { compactLint, compactLintSniffed } from "./lint.ts";
-import { compactLogs } from "./logs.ts";
+import { compactLogs, compactTrace } from "./logs.ts";
+import { compactMaven, compactMavenTree } from "./maven.ts";
 import { compactPytest } from "./pytest.ts";
 import { compactGeneric, isContent } from "./generic.ts";
 import { compactLog, compactShow } from "./gitlog.ts";
@@ -39,7 +41,7 @@ export type Options = {
 	maxRatio?: number;
 	/** Compactors that may run; a missing entry means on. */
 	kinds?: Partial<Record<Kind, boolean>>;
-	/** The command failed: only test, build, lint and install output is worth compacting then (the errors are the point). */
+	/** The command failed: only test, build, lint, install and log output is worth compacting then (the errors, or the stack trace, are the point). */
 	failed?: boolean;
 	/** Is `path` (relative to the command's directory) an existing file? Lets search output without line numbers be grouped. */
 	isFile?: (path: string) => boolean;
@@ -104,6 +106,10 @@ const SNIFFERS: { kind: Kind; run: (out: string, l: Limits) => Squeezed | undefi
 	{ kind: "build", run: compactRustc },
 	{ kind: "build", run: compactAudit },
 	{ kind: "lint", run: compactLintSniffed },
+	{ kind: "build", run: compactMaven },
+	{ kind: "build", run: compactJavac },
+	{ kind: "tree", run: compactUiDump },
+	{ kind: "logs", run: compactTrace },
 ];
 
 /** `git` options before the subcommand that do not change its output: `-C dir`, `-c k=v`, `--no-pager`, ... */
@@ -209,8 +215,25 @@ const LOG_COMMANDS = (program: string, args: string[]): boolean =>
 	((program === "docker" || program === "podman") && (args[0] === "logs" || (args[0] === "compose" && args[1] === "logs"))) ||
 	(program === "docker-compose" && args[0] === "logs") ||
 	(program === "kubectl" && args[0] === "logs") ||
-	(program === "adb" && args[0] === "logcat") ||
 	["journalctl", "stern", "pidcat"].includes(program);
+
+/** `adb [-s serial|-d|-e|-t id] <command>`: logcat, and what `adb shell` prints for packages, properties, processes, dumpsys and UI dumps. */
+function pickAdb(all: string[]): ReturnType<typeof pick> {
+	let i = 0;
+	while (i < all.length && /^-[sHPLt]$|^-[de]$/.test(all[i]!)) i += /^-[de]$/.test(all[i]!) ? 1 : 2;
+	const [sub, ...rest] = all.slice(i);
+	// `adb shell "dumpsys battery"` is `adb shell dumpsys battery`.
+	const cmd = rest.join(" ").trim().split(/\s+/);
+	const line = cmd.join(" ");
+	if (sub === "logcat") return { kind: "logs", run: compactLogs };
+	if ((sub === "shell" || sub === "exec-out") && /^uiautomator dump \/dev\/(?:tty|stdout)\b/.test(line)) return { kind: "tree", run: compactUiDump };
+	if (sub !== "shell") return undefined;
+	if (/^(?:pm|cmd package) list packages\b/.test(line)) return cmd.includes("-f") ? { kind: "listing", run: compactPackagePaths } : { kind: "listing", run: compactPackages };
+	if (line === "getprop" || /^settings list (?:global|secure|system)$/.test(line)) return { kind: "listing", run: compactProperties };
+	if (/^ps(?: -A| -e)*$/.test(line) || /^top\b/.test(line)) return { kind: "listing", run: compactProcesses };
+	if (cmd[0] === "dumpsys" && cmd.length > 1) return { kind: "tree", run: compactDumpsys };
+	return undefined;
+}
 
 /** Package managers, linters, test runners, logs, docker and Xcode. */
 function pickTool({ program, args }: Invocation): ReturnType<typeof pick> {
@@ -227,8 +250,11 @@ function pickTool({ program, args }: Invocation): ReturnType<typeof pick> {
 	}
 	if (program === "pytest" || program === "py.test") return { kind: "tests", run: compactPytest };
 	if (program === "jest" || program === "vitest") return { kind: "tests", run: compactJest };
-	if (LOG_COMMANDS(program, args)) return hasFlag(args, ["--follow"], ["f"]) && program !== "adb" ? undefined : { kind: "logs", run: compactLogs };
-	if (program === "adb" && sub === "shell" && /^(pm|cmd package) list packages\b/.test(args.slice(1).join(" "))) return { kind: "listing", run: compactPackages };
+	if (program === "mvn" || program === "mvnw" || program === "mvnd")
+		return args.some((a) => /dependency:tree$/.test(a)) ? { kind: "tree", run: compactMavenTree } : { kind: args.includes("test") ? "tests" : "build", run: compactMaven };
+	if (program === "javac") return { kind: "build", run: compactJavac };
+	if (LOG_COMMANDS(program, args)) return hasFlag(args, ["--follow"], ["f"]) ? undefined : { kind: "logs", run: compactLogs };
+	if (program === "adb") return pickAdb(args);
 	if (((program === "docker" || program === "podman") && (sub === "build" || (sub === "buildx" && args[1] === "build") || (sub === "compose" && args[1] === "build"))) || (program === "docker-compose" && sub === "build"))
 		return { kind: "build", run: compactDockerBuild };
 	if (program === "xcodebuild") return { kind: args.includes("test") ? "tests" : "build", run: compactXcode };
@@ -276,8 +302,8 @@ function pick(command: string, isFile?: (path: string) => boolean): { kind: Kind
 /** True when a native compactor takes care of `command`'s output (whatever the switches say). */
 export const handles = (command: string): boolean => pick(unpipe(command)) !== undefined;
 
-/** Kinds whose output is worth compacting when the command failed: there the failures are the point. */
-const FAILED_OK = new Set<Kind>(["tests", "build", "lint", "install"]);
+/** Kinds whose output is worth compacting when the command failed: there the failures (or the crash's stack trace) are the point. */
+const FAILED_OK = new Set<Kind>(["tests", "build", "lint", "install", "logs"]);
 
 /** Compacts the output of `command`, or returns undefined to leave it exactly as it is. */
 export function compact(full: string, output: string, opts: Options = {}): Result | undefined {

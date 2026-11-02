@@ -270,12 +270,14 @@ describe("xcodebuild and swift", () => {
 });
 
 describe("android", () => {
-	test("gradle on an Android project: AGP option warnings once, test failures, detekt paths shortened", () => {
+	test("gradle on an Android project: AGP option warnings once, test failures, detekt findings grouped", () => {
 		const raw = fx("gradle-android.txt");
 		const r = compactGradle(raw)!;
 		expect(ratio(r.text, raw)).toBeLessThan(0.25);
 		expect(r.text).toContain("SqueezeProbeTest > throws FAILED");
-		expect(r.text).toContain("…/main/java/com/example/logger/SqueezeProbe.kt:4:9: Private property `unused` is unused. [UnusedPrivateProperty]");
+		expect(r.text).toContain("detekt / ktlint: 3 findings in 2 files (under /home/dev/app/core/logger/src/)");
+		expect(r.text).toContain("AbsentOrWrongFileLicense: Expected license not found or incorrect in the file: <file>. (2)");
+		expect(r.text).toContain("UnusedPrivateProperty: Private property `unused` is unused.  main/java/com/example/logger/SqueezeProbe.kt:4:9");
 		expect(r.text.match(/WARNING: The option setting 'android\.experimental\.lint\.reservedMemoryPerTask=2g'/g)).toHaveLength(1);
 		expect(r.text).not.toMatch(/suppressAgpWarnings|The current default is|\* Try:|Run with --scan|={20}/);
 	});
@@ -335,7 +337,7 @@ describe("router: installs, linters, runners, logs, docker, xcode, adb, pipes", 
 		expect(kind("swift test", fx("swift-test.txt"))).toBe("tests");
 		expect(kind("./gradlew :app:dependencies", fx("cargo-tree.txt"))).toBe("tree");
 		const log = Array.from({ length: 30 }, (_, i) => `2026-11-02T01:00:${String(i).padStart(2, "0")}Z GET /health 200`).join("\n");
-		for (const c of ["docker logs web", "docker compose logs web", "docker-compose logs", "kubectl logs pod/x", "journalctl -u nginx", "adb logcat -d", "adb logcat -f x"]) expect(kind(c, log)).toBe("logs");
+		for (const c of ["docker logs web", "docker compose logs web", "docker-compose logs", "kubectl logs pod/x", "journalctl -u nginx", "adb logcat -d", "adb -s emulator-5554 logcat"]) expect(kind(c, log)).toBe("logs");
 		const pm = Array.from({ length: 30 }, (_, i) => `package:com.example.app${i}`).join("\n");
 		expect(kind("adb shell pm list packages", pm)).toBe("listing");
 		expect(kind("ack -f", fx("fd.txt"))).toBe("paths");
@@ -352,7 +354,8 @@ describe("router: installs, linters, runners, logs, docker, xcode, adb, pipes", 
 		expect(handles("ack -h x")).toBe(false);
 		expect(handles("uv run")).toBe(false);
 		expect(handles("swift package resolve")).toBe(false);
-		expect(handles("adb shell dumpsys battery")).toBe(false);
+		expect(handles("adb shell dumpsys")).toBe(false);
+		expect(handles("adb shell am start -n x/.Main")).toBe(false);
 		expect(handles("cargo test | tail -n 40")).toBe(true);
 		expect(handles("cargo test | grep x")).toBe(false);
 	});
@@ -371,11 +374,11 @@ describe("router: installs, linters, runners, logs, docker, xcode, adb, pipes", 
 		expect(kind("npm run lint | tail -30", fx("eslint.txt"))).toBe("lint");
 	});
 
-	test("a failed run: lint and install output are compacted too, logs are not", () => {
+	test("a failed run: lint, install and log output are compacted too", () => {
 		expect(kind("npx eslint src", fx("eslint.txt"), { failed: true })).toBe("lint");
 		expect(kind("pip install x", fx("pip-install.txt"), { failed: true })).toBe("install");
 		const log = Array.from({ length: 30 }, (_, i) => `2026-11-02T01:00:${String(i).padStart(2, "0")}Z GET /health 200`).join("\n");
-		expect(kind("docker logs web", log, { failed: true })).toBeUndefined();
+		expect(kind("docker logs web", log, { failed: true })).toBe("logs");
 		expect(kind("npx eslint src", fx("eslint.txt"), { kinds: { lint: false } })).not.toBe("lint");
 	});
 });

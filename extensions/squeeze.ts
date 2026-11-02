@@ -3,14 +3,15 @@
  *
  * Pure logic lives in core/ and command/ (tested directly); this file only wires it to pi.
  * Output is only ever replaced when the result is clearly smaller, and a truncated result
- * says where the full output was saved. Settings persist in <agent dir>/squeeze.json.
+ * says where the full output was saved. When pi itself cut a long output to its tail, the
+ * full output pi saved is compacted instead (a build's tail alone often misses its errors). Settings persist in <agent dir>/squeeze.json.
  */
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { completions, parseCommand } from "./command/parse.ts";
 import { compact, KINDS } from "./core/compact.ts";
 import { type Config, DEFAULT_CONFIG, optionsOf, readConfig, saveConfig } from "./core/config.ts";
 import { rewrite } from "./core/rtk.ts";
-import { fileIn } from "./core/files.ts";
+import { fileIn, readFullOutput } from "./core/files.ts";
 import { saveFull } from "./core/save.ts";
 import { emptyStats, record, saved, summary, tokens } from "./core/stats.ts";
 
@@ -49,17 +50,27 @@ export default function (pi: ExtensionAPI) {
 		if (!config.enabled || event.toolName !== "bash") return;
 		const command = (event.input as { command?: unknown }).command;
 		if (typeof command !== "string") return;
-		// pi already truncated this one: its text is not the tool's own format any more.
-		if ((event.details as { truncation?: unknown } | undefined)?.truncation) return;
 		const blocks = event.content;
 		if (blocks.length !== 1 || blocks[0]!.type !== "text") return;
-		const original = blocks[0]!.text;
+		const shown = blocks[0]!.text;
+		// pi cut this one to its tail and saved the whole of it: compact the whole, not the tail.
+		const details = event.details as { truncation?: unknown; fullOutputPath?: unknown } | undefined;
+		const fullPath = details?.truncation ? details.fullOutputPath : undefined;
+		let original = shown;
+		if (details?.truncation) {
+			const full = readFullOutput(fullPath);
+			if (full === undefined) return;
+			// The exit status pi appends to a failed run's text.
+			original = full + (/\n\nCommand exited with code \d+$/.exec(shown)?.[0] ?? "");
+		}
 
 		const r = compact(command, original, { ...optionsOf(config), failed: event.isError, isFile: fileIn(ctx.cwd) });
-		if (!r) return;
-		record(stats, r);
+		// Never more than pi would have shown.
+		if (!r || r.text.length >= shown.length) return;
+		record(stats, { ...r, before: shown.length });
 		showStatus(ctx);
-		const text = r.truncated ? `${r.text}\n[squeeze: output shortened; full output: ${saveFull(original)}]` : r.text;
+		const where = fullPath ?? (r.truncated ? saveFull(original) : undefined);
+		const text = where ? `${r.text}\n[squeeze: output shortened; full output: ${where}]` : r.text;
 		return { content: [{ type: "text", text }] };
 	});
 

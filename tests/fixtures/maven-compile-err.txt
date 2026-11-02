@@ -1,0 +1,66 @@
+[INFO] Scanning for projects...
+[INFO] Loaded 24324 auto-discovered prefixes for remote repository central (prefixes-central.txt)
+[INFO] 
+[INFO] -------------------< com.example:demo-api >--------------------
+[INFO] Building demo-api 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] Loaded 73 auto-discovered prefixes for remote repository apache.snapshots (prefixes-apache.snapshots.txt)
+[INFO] 
+[INFO] --- protobuf:4.0.3:generate (generate) @ demo-api ---
+[INFO] Resolving artifact "com.google.protobuf:protoc:exe:osx-aarch_64:4.33.2"
+[INFO] Resolving artifact "io.grpc:protoc-gen-grpc-java:exe:osx-aarch_64:1.77.1"
+[INFO] Registering "/home/dev/demo/target/generated-sources/protobuf" as a Maven main source root for compiler plugins
+[INFO] Registering "/home/dev/demo/target/generated-sources/protobuf" as a Maven main source root for compiler plugins
+[INFO] Found 1 proto source file and 0 descriptor files to compile, but all are up-to-date so none will be built this time
+[INFO] NOTHING TO DO: There is nothing to do. If this is unexpected, review the above logs for more details.
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ demo-api ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 0 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.14.1:compile (default-compile) @ demo-api ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 8 source files with javac [debug parameters release 21] to target/classes
+[INFO] Annotation processing is enabled because one or more processors were found
+  on the class path. A future release of javac may disable annotation processing
+  unless at least one processor is specified by name (-processor), or a search
+  path is specified (--processor-path, --processor-module-path), or annotation
+  processing is enabled explicitly (-proc:only, -proc:full).
+  Use -Xlint:-options to suppress this message.
+  Use -proc:none to disable annotation processing.
+[INFO] /home/dev/demo/src/main/java/com/example/demo/health/RuntimeHealthIndicator.java: /home/dev/demo/src/main/java/com/example/demo/health/RuntimeHealthIndicator.java uses or overrides a deprecated API.
+[INFO] /home/dev/demo/src/main/java/com/example/demo/health/RuntimeHealthIndicator.java: Recompile with -Xlint:deprecation for details.
+[INFO] /home/dev/demo/src/main/java/com/example/demo/health/RuntimeHealthIndicator.java: /home/dev/demo/src/main/java/com/example/demo/health/RuntimeHealthIndicator.java uses unchecked or unsafe operations.
+[INFO] /home/dev/demo/src/main/java/com/example/demo/health/RuntimeHealthIndicator.java: Recompile with -Xlint:unchecked for details.
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /home/dev/demo/src/main/java/com/example/demo/health/RuntimeHealthIndicator.java:[25,34] cannot find symbol
+  symbol:   variable undefinedThing
+  location: class com.example.demo.health.RuntimeHealthIndicator
+[ERROR] /home/dev/demo/src/main/java/com/example/demo/health/RuntimeHealthIndicator.java:[24,72] cannot find symbol
+  symbol:   method availableProcesors()
+  location: class java.lang.Runtime
+[INFO] 2 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[ERROR] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  2.489 s
+[INFO] Finished at: 2026-11-02T02:06:25+01:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.14.1:compile (default-compile) on project demo-api: Compilation failure: Compilation failure: 
+[ERROR] /home/dev/demo/src/main/java/com/example/demo/health/RuntimeHealthIndicator.java:[25,34] cannot find symbol
+[ERROR]   symbol:   variable undefinedThing
+[ERROR]   location: class com.example.demo.health.RuntimeHealthIndicator
+[ERROR] /home/dev/demo/src/main/java/com/example/demo/health/RuntimeHealthIndicator.java:[24,72] cannot find symbol
+[ERROR]   symbol:   method availableProcesors()
+[ERROR]   location: class java.lang.Runtime
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
