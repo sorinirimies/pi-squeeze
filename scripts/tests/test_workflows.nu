@@ -65,6 +65,16 @@ def "test workflows: deps updates run the full gate before pushing" [] {
     assert ($raw | str contains "cancel-in-progress: false") "never cancels mid-push"
 }
 
+def "test workflows: a release can be cut from CI" [] {
+    let wf = open (root | path join ".github" "workflows" "release.yml")
+    assert equal ($wf.on.workflow_dispatch.inputs.bump.options) ["patch" "minor" "major" "current"]
+    let runs = $wf.jobs.release.steps | get -o run | compact
+    let at = {|cmd| $runs | enumerate | where {|r| $r.item | str contains $cmd } | get 0.index }
+    assert ((do $at "quality_gate.nu") < (do $at "release_prepare.nu")) "the gate runs before the bump"
+    assert ((do $at "release_prepare.nu") < (do $at "npm_publish.nu")) "the tag exists before publishing"
+    assert (open --raw (root | path join "justfile") | str contains "release-ci bump=")
+}
+
 def "test workflows: the fuzz workflow runs the fuzz script" [] {
     for host in [".github" ".gitea"] {
         let raw = (open --raw (root | path join $host "workflows" "fuzz.yml"))

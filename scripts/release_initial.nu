@@ -25,7 +25,7 @@ def main [] {
     ^git-cliff --output CHANGELOG.md --tag $tag
     ^git add CHANGELOG.md
     if (do { ^git diff --cached --quiet } | complete | get exit_code) != 0 {
-        ^git commit -q -m $"chore: release ($tag)"
+        ^git commit -q -m $"chore: release ($tag | str substring 1..)"
     }
     ^git tag -a $tag -m $"Release ($tag)"
     print $"(ansi green)✓(ansi reset) tagged ($tag)"

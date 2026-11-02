@@ -87,8 +87,10 @@ Layout:
 | `scripts/` | Nushell only, each with a test in `scripts/tests/` |
 | `.github/`, `.gitea/` | CI, release, nightlies on both hosts |
 
-Releases: `just release patch` bumps `package.json`, regenerates `CHANGELOG.md` with git-cliff, tags and
-pushes; the Release workflow publishes to npm (secret `NPM_TOKEN`).
+Releases run in CI: **Actions → Release → Run workflow** with a bump (`patch`, `minor`, `major`, or
+`current` for the version already in `package.json`), or `just release-ci patch`. The workflow runs the
+quality gate, bumps `package.json`, regenerates `CHANGELOG.md` with git-cliff, commits, tags, pushes and
+publishes to npm (secret `NPM_TOKEN`). Locally, `just release patch` does the same up to the tag push.
 
 ## License
 

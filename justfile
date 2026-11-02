@@ -156,6 +156,11 @@ release-initial-all: _check-git-cliff check
     nu scripts/release_initial.nu
     nu scripts/remotes.nu push
 
+# Release from CI: gate, bump (patch | minor | major | current), changelog, tag, push, publish
+release-ci bump="patch":
+    gh workflow run release.yml --field bump={{ bump }}
+    @print "✅ started: gh run watch (gh run list --workflow release.yml --limit 1 --json databaseId --jq '.[0].databaseId')"
+
 # Re-run the GitHub Release workflow for an existing tag (e.g. just release-retrigger 0.1.0)
 release-retrigger version:
     gh workflow run release.yml --field tag=v{{ version }}
