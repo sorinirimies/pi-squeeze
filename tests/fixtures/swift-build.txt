@@ -1,0 +1,56 @@
+Building for debugging...
+[Planning deferred tasks]
+[19 / 28]
+[20 / 29] Demo
+/private/tmp/sqfx/sw/Sources/Demo/F2.swift:1:31: [1;33mwarning: [1;39mvariable 'k' was never mutated; consider changing to 'let' constant[0;0m [#]8;;https://docs.swift.org/compiler/documentation/diagnostics/variable-never-mutated\VariableNeverMutated]8;;\]
+[0;36m1 |[0;0m public func f2() -> Int { var k = 2; return k }
+  [0;36m|[0;0m                               `- [1;33mwarning: [1;39mvariable 'k' was never mutated; consider changing to 'let' constant[0;0m [#]8;;https://docs.swift.org/compiler/documentation/diagnostics/variable-never-mutated\VariableNeverMutated]8;;\]
+[0;36m2 |[0;0m 
+
+[#VariableNeverMutated]: <https://docs.swift.org/compiler/documentation/diagnostics/variable-never-mutated>
+/private/tmp/sqfx/sw/Sources/Demo/F3.swift:1:31: [1;33mwarning: [1;39mvariable 'k' was never mutated; consider changing to 'let' constant[0;0m [#]8;;https://docs.swift.org/compiler/documentation/diagnostics/variable-never-mutated\VariableNeverMutated]8;;\]
+[0;36m1 |[0;0m public func f3() -> Int { var k = 3; return k }
+  [0;36m|[0;0m                               `- [1;33mwarning: [1;39mvariable 'k' was never mutated; consider changing to 'let' constant[0;0m [#]8;;https://docs.swift.org/compiler/documentation/diagnostics/variable-never-mutated\VariableNeverMutated]8;;\]
+[0;36m2 |[0;0m 
+
+[#VariableNeverMutated]: <https://docs.swift.org/compiler/documentation/diagnostics/variable-never-mutated>
+[36 / 39] Demo
+/private/tmp/sqfx/sw/Sources/Demo/F6.swift:1:31: [1;33mwarning: [1;39mvariable 'k' was never mutated; consider changing to 'let' constant[0;0m [#]8;;https://docs.swift.org/compiler/documentation/diagnostics/variable-never-mutated\VariableNeverMutated]8;;\]
+[0;36m1 |[0;0m public func f6() -> Int { var k = 6; return k }
+  [0;36m|[0;0m                               `- [1;33mwarning: [1;39mvariable 'k' was never mutated; consider changing to 'let' constant[0;0m [#]8;;https://docs.swift.org/compiler/documentation/diagnostics/variable-never-mutated\VariableNeverMutated]8;;\]
+[0;36m2 |[0;0m 
+
+[#VariableNeverMutated]: <https://docs.swift.org/compiler/documentation/diagnostics/variable-never-mutated>
+/private/tmp/sqfx/sw/Sources/Demo/F1.swift:1:31: [1;33mwarning: [1;39mvariable 'k' was never mutated; consider changing to 'let' constant[0;0m [#]8;;https://docs.swift.org/compiler/documentation/diagnostics/variable-never-mutated\VariableNeverMutated]8;;\]
+[0;36m1 |[0;0m public func f1() -> Int { var k = 1; return k }
+  [0;36m|[0;0m                               `- [1;33mwarning: [1;39mvariable 'k' was never mutated; consider changing to 'let' constant[0;0m [#]8;;https://docs.swift.org/compiler/documentation/diagnostics/variable-never-mutated\VariableNeverMutated]8;;\]
+[0;36m2 |[0;0m 
+
+[#VariableNeverMutated]: <https://docs.swift.org/compiler/documentation/diagnostics/variable-never-mutated>
+/private/tmp/sqfx/sw/Sources/Demo/F4.swift:1:31: [1;33mwarning: [1;39mvariable 'k' was never mutated; consider changing to 'let' constant[0;0m [#]8;;https://docs.swift.org/compiler/documentation/diagnostics/variable-never-mutated\VariableNeverMutated]8;;\]
+[0;36m1 |[0;0m public func f4() -> Int { var k = 4; return k }
+  [0;36m|[0;0m                               `- [1;33mwarning: [1;39mvariable 'k' was never mutated; consider changing to 'let' constant[0;0m [#]8;;https://docs.swift.org/compiler/documentation/diagnostics/variable-never-mutated\VariableNeverMutated]8;;\]
+[0;36m2 |[0;0m 
+
+[#VariableNeverMutated]: <https://docs.swift.org/compiler/documentation/diagnostics/variable-never-mutated>
+/private/tmp/sqfx/sw/Sources/Demo/Demo.swift:1:50: [1;33mwarning: [1;39minitialization of immutable value 'unused' was never used; consider replacing with assignment to '_' or removing it[0;0m [#]8;;https://docs.swift.org/compiler/documentation/diagnostics/no-usage\NoUsage]8;;\]
+[0;36m1 |[0;0m public func add(_ a: Int, _ b: Int) -> Int { let unused = 3; var v = a; return v + b }
+  [0;36m|[0;0m                                                  `- [1;33mwarning: [1;39minitialization of immutable value 'unused' was never used; consider replacing with assignment to '_' or removing it[0;0m [#]8;;https://docs.swift.org/compiler/documentation/diagnostics/no-usage\NoUsage]8;;\]
+[0;36m2 |[0;0m public func old() -> String { return "x" }
+[0;36m3 |[0;0m 
+
+/private/tmp/sqfx/sw/Sources/Demo/Demo.swift:1:66: [1;33mwarning: [1;39mvariable 'v' was never mutated; consider changing to 'let' constant[0;0m [#]8;;https://docs.swift.org/compiler/documentation/diagnostics/variable-never-mutated\VariableNeverMutated]8;;\]
+[0;36m1 |[0;0m public func add(_ a: Int, _ b: Int) -> Int { let unused = 3; var v = a; return v + b }
+  [0;36m|[0;0m                                                                  `- [1;33mwarning: [1;39mvariable 'v' was never mutated; consider changing to 'let' constant[0;0m [#]8;;https://docs.swift.org/compiler/documentation/diagnostics/variable-never-mutated\VariableNeverMutated]8;;\]
+[0;36m2 |[0;0m public func old() -> String { return "x" }
+[0;36m3 |[0;0m 
+
+[#NoUsage]: <https://docs.swift.org/compiler/documentation/diagnostics/no-usage>
+[#VariableNeverMutated]: <https://docs.swift.org/compiler/documentation/diagnostics/variable-never-mutated>
+/private/tmp/sqfx/sw/Sources/Demo/F5.swift:1:31: [1;33mwarning: [1;39mvariable 'k' was never mutated; consider changing to 'let' constant[0;0m [#]8;;https://docs.swift.org/compiler/documentation/diagnostics/variable-never-mutated\VariableNeverMutated]8;;\]
+[0;36m1 |[0;0m public func f5() -> Int { var k = 5; return k }
+  [0;36m|[0;0m                               `- [1;33mwarning: [1;39mvariable 'k' was never mutated; consider changing to 'let' constant[0;0m [#]8;;https://docs.swift.org/compiler/documentation/diagnostics/variable-never-mutated\VariableNeverMutated]8;;\]
+[0;36m2 |[0;0m 
+
+[#VariableNeverMutated]: <https://docs.swift.org/compiler/documentation/diagnostics/variable-never-mutated>
+Build complete! (2,87 sec)

@@ -25,6 +25,15 @@ import { compactTests } from "../extensions/core/tests.ts";
 import { compactLsd } from "../extensions/core/lsd.ts";
 import { compactPaths } from "../extensions/core/paths.ts";
 import { compactRg, compactRgPlain } from "../extensions/core/rg.ts";
+import { compactPackages } from "../extensions/core/adb.ts";
+import { compactDockerBuild } from "../extensions/core/docker.ts";
+import { compactGradleDeps } from "../extensions/core/gradle.ts";
+import { compactInstall } from "../extensions/core/install.ts";
+import { compactJest } from "../extensions/core/jest.ts";
+import { compactLint, compactLintSniffed } from "../extensions/core/lint.ts";
+import { compactLogs } from "../extensions/core/logs.ts";
+import { compactPytest } from "../extensions/core/pytest.ts";
+import { compactXcode } from "../extensions/core/xcode.ts";
 
 const ITERS = Number(process.env.FUZZ_ITERS ?? 400);
 const SEED = Number(process.env.FUZZ_SEED ?? Math.floor(Math.random() * 2 ** 31));
@@ -102,6 +111,39 @@ describe("fuzz", () => {
 		compactGoTest(`ok  \tp\t1s\n${d}`);
 		compactTree(`root\n├── a\n${d}`);
 		compactTsc(d);
+		compactInstall(`Collecting x\n${d}`);
+		compactPytest(`${d}\n=== 1 passed in 0.1s ===`);
+		compactJest(`${d}\nTests: 1 passed`);
+		compactLint(d);
+		compactLint(`${d}\n✖ 1 problem`);
+		compactLintSniffed(`a.js:1:1 lint/x ━━━\n${d}\nChecked 1 file`);
+		compactLint(`E1 x\n --> a.py:1:1\n${d}`);
+		compactLogs(d);
+		compactLogs(`11-02 01:36:28.503  1  2 D T: x\n${d}`);
+		compactDockerBuild(`#1 [1/2] RUN x\n${d}`);
+		compactXcode(`${d}\n** BUILD FAILED **`);
+		compactGradleDeps(`+--- a\n${d}`);
+		compactPackages(d);
+	});
+
+	fuzz("lint keeps every finding's location and message; install keeps every unrecognised line", (r) => {
+		const findings = Array.from({ length: 1 + Math.floor(r() * 30) }, (_, i) => ({ file: pick(r, ["a.py", "src/b.py", "c/d.kt"]), line: 1 + i, msg: `msg ${Math.floor(r() * 5)} ${text(r, 6).replace(/[\s:[\]()]/g, "x")}` }));
+		const out = compactLint(findings.map((f) => `${f.file}:${f.line}:1: ${f.msg}`).join("\n"), { lineChars: 100000, perGroup: 100000, total: 100000 })!.text;
+		for (const f of findings) {
+			expect(out).toContain(`${f.file}:${f.line}:1`);
+			expect(out).toContain(f.msg);
+		}
+		const other = Array.from({ length: 1 + Math.floor(r() * 10) }, (_, i) => `error ${i} ${text(r, 10).replace(/[\n\r\u001b]/g, " ").trim()}`);
+		const inst = compactInstall(["Collecting a", ...other].join("\n"), { lineChars: 100000, perGroup: 15, total: 100000 })!.text;
+		for (const o of other) expect(inst).toContain(o);
+	});
+
+	fuzz("logs keep the last line and never grow", (r) => {
+		const lines = Array.from({ length: 4 + Math.floor(r() * 60) }, () => pick(r, [`2026-11-02T01:00:0${Math.floor(r() * 9)}Z ping ${Math.floor(r() * 3)}`, `other ${text(r, 8).replace(/[\n\r\u001b]/g, " ")}`, "  at java.lang.Thread.run(Thread.java:1)"]));
+		const out = compactLogs(lines.join("\n"), { lineChars: 100000, perGroup: 15, total: 100000 })!.text.split("\n");
+		expect(out.length).toBeLessThanOrEqual(lines.length);
+		// A folded frame run is the one thing allowed to replace the last line.
+		if (!/ at java/.test(lines.at(-1)!)) expect(out.at(-1)).toBe(lines.at(-1));
 	});
 
 	fuzz("tsc keeps every error message; gradle keeps every failed task", (r) => {

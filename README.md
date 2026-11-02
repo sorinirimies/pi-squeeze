@@ -6,7 +6,7 @@
 [![Audit](https://github.com/sorinirimies/pi-squeeze/actions/workflows/security.yml/badge.svg)](https://github.com/sorinirimies/pi-squeeze/actions/workflows/security.yml)
 [![Fuzz](https://github.com/sorinirimies/pi-squeeze/actions/workflows/fuzz.yml/badge.svg)](https://github.com/sorinirimies/pi-squeeze/actions/workflows/fuzz.yml)
 
-Shrinks bash output before it reaches the agent's context: native compactors for git, cargo, rg, ls, test and build output, plus rtk when installed. Full output stays one temp file away.
+Shrinks bash output before it reaches the agent's context: native compactors for git, search, listings, tests, builds (cargo, gradle, Xcode, tsc, docker), linters, package installs and logs, plus rtk when installed. Full output stays one temp file away.
 
 A [pi](https://github.com/earendil-works/pi-coding-agent) extension.
 
@@ -23,7 +23,7 @@ It only touches output it fully understands, and otherwise passes it through unc
 
 | Command | Becomes |
 |---|---|
-| `rg -n` / `grep -rn` | totals line, then matches grouped by file (path written once, indent trimmed, long lines and busy files cut) |
+| `rg -n` / `grep -rn` / `ack` | totals line, then matches grouped by file (path written once, indent trimmed, long lines and busy files cut) |
 | `rg pattern dir` / `grep -r` (no `-n`) | the same, but only when every `path:` prefix is a file that exists in the session's directory (a colon in the text is never taken for a path) |
 | `fd`, `find` | paths grouped by directory |
 | `lsd -l`, `eza -l`, `ls -l` | type, size, short date and name (owner, group, permissions and the `total` line dropped) |
@@ -41,6 +41,16 @@ It only touches output it fully understands, and otherwise passes it through unc
 | `tsc` | errors grouped by file (`a.ts (8)`, `1:7 TS2322 …`) |
 | `gradle`, `./gradlew` | task lines counted (`11 tasks (5 executed, 4 no-source, 2 up-to-date)`); failures, compiler errors, test failures and the `BUILD` line stay; daemon and `--scan` hints go; Kotlin `w:`/`e:` paths lose their shared directory |
 | `bun test`, `go test` | passing tests counted, not listed; failures and totals stay |
+| `pytest` | session header, progress dots and `PASSED` lines go; failures, warnings and the short summary stay; full-width `====` banners shrink |
+| `jest`, `vitest` | passing tests and files go, skipped ones are counted; failures with their diff and frame, and the totals, stay |
+| `xcodebuild`, `swift build` / `test` | build steps (`CompileSwift`, `Ld`, `CodeSign` and their command lines) and progress counted, not listed; warnings grouped by message; errors keep frame and notes; passing XCTest / Swift Testing tests counted; the `** BUILD SUCCEEDED **` line stays |
+| `eslint`, `biome`, `ruff`, `flake8`, `mypy`, `pylint`, `ktlint`, `detekt`, `swiftlint`, `shellcheck`, `flutter analyze` | findings grouped by rule and message, each location once (`error eqeqeq: … (5)` then `m.js:2:46 m1.js:2:47 …`), the shared directory said once; frames and fix suggestions go |
+| `npm` / `pnpm` / `yarn` / `bun install`, `pip install`, `uv sync`, `pod install`, `bundle install`, `flutter pub get` | download and progress lines go; per-package lines become one line (`Collecting (9): requests, rich, …`); deprecation warnings become one list of names; errors and the summary stay |
+| `docker build` | `[internal]` steps, layer downloads, `CACHED` / `DONE` lines go; each step keeps its header and what it printed |
+| `docker logs`, `docker compose logs`, `kubectl logs`, `journalctl`, `adb logcat` | 3+ lines that differ only in timestamps and numbers keep the first and last; framework stack frames fold; logcat drops the date and thread id; past the limit the start goes, not the end |
+| `gradle` on Android | also: AGP option warnings said once, detekt / ktlint paths shortened, framework frames in test failures folded; `gradle dependencies` is cut like a tree |
+| `adb shell pm list packages` | grouped by the first two name segments |
+| `… \| tail -50`, `… \| head -n 20` | the command before the pipe picks the compactor |
 | anything else | colour codes dropped, progress bars (`\r`) keep their last frame, 4+ identical lines become `line  [×N]`, 3+ blank lines become one. Never for `cat`, `head`, `jq`, `curl`… (content commands) |
 | `git`, `cargo`, `docker`… | rewritten through [rtk](https://github.com/rtk-ai/rtk) when it is installed (switch: `/squeeze rtk off`) |
 
@@ -62,7 +72,7 @@ Safety rules:
 |---|---|
 | `/squeeze` or `/squeeze status` | the settings and the tokens saved so far |
 | `/squeeze [on\|off]` | switch everything |
-| `/squeeze [search\|paths\|listing\|diff\|tests\|git\|build\|tree\|generic] [on\|off]` | switch one compactor |
+| `/squeeze [search\|paths\|listing\|diff\|tests\|git\|build\|lint\|install\|logs\|tree\|generic] [on\|off]` | switch one compactor |
 | `/squeeze rtk [on\|off]` | rewrite git, cargo, docker… through [rtk](https://github.com/rtk-ai/rtk), when installed |
 | `/squeeze min <chars>` | smallest output worth compacting (default 400) |
 

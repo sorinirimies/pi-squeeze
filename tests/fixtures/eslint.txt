@@ -1,0 +1,39 @@
+
+/private/tmp/sqfx/js/src/m.js
+  2:29  warning  Unexpected var, use let or const instead  no-var
+  2:33  error    'y' is assigned a value but never used    no-unused-vars
+  2:46  error    Expected '===' and instead saw '=='       eqeqeq
+  2:57  error    Unexpected 'debugger' statement           no-debugger
+  2:76  error    `eval` can be harmful                     no-eval
+
+/private/tmp/sqfx/js/src/m1.js
+  2:30  warning  Unexpected var, use let or const instead  no-var
+  2:34  error    'y' is assigned a value but never used    no-unused-vars
+  2:47  error    Expected '===' and instead saw '=='       eqeqeq
+  2:58  error    Unexpected 'debugger' statement           no-debugger
+  2:77  error    `eval` can be harmful                     no-eval
+
+/private/tmp/sqfx/js/src/m2.js
+  2:30  warning  Unexpected var, use let or const instead  no-var
+  2:34  error    'y' is assigned a value but never used    no-unused-vars
+  2:47  error    Expected '===' and instead saw '=='       eqeqeq
+  2:58  error    Unexpected 'debugger' statement           no-debugger
+  2:77  error    `eval` can be harmful                     no-eval
+
+/private/tmp/sqfx/js/src/m3.js
+  2:30  warning  Unexpected var, use let or const instead  no-var
+  2:34  error    'y' is assigned a value but never used    no-unused-vars
+  2:47  error    Expected '===' and instead saw '=='       eqeqeq
+  2:58  error    Unexpected 'debugger' statement           no-debugger
+  2:77  error    `eval` can be harmful                     no-eval
+
+/private/tmp/sqfx/js/src/m4.js
+  2:30  warning  Unexpected var, use let or const instead  no-var
+  2:34  error    'y' is assigned a value but never used    no-unused-vars
+  2:47  error    Expected '===' and instead saw '=='       eqeqeq
+  2:58  error    Unexpected 'debugger' statement           no-debugger
+  2:77  error    `eval` can be harmful                     no-eval
+
+✖ 25 problems (20 errors, 5 warnings)
+  0 errors and 5 warnings potentially fixable with the `--fix` option.
+

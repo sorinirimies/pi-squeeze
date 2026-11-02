@@ -1,0 +1,39 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: /private/tmp/sqfx/py
+collected 35 items
+
+test_a.py ..............................FFs                              [ 94%]
+test_b.py ..                                                             [100%]
+
+=================================== FAILURES ===================================
+__________________________________ test_fail ___________________________________
+
+    def test_fail():
+        d={"a":1,"b":[1,2,3]}
+>       assert d=={"a":1,"b":[1,2,4]}
+E       AssertionError: assert {'a': 1, 'b': [1, 2, 3]} == {'a': 1, 'b': [1, 2, 4]}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'b': [1, 2, 3]} != {'b': [1, 2, 4]}
+E         Use -v to get more diff
+
+test_a.py:7: AssertionError
+___________________________________ test_err ___________________________________
+
+>   def test_err(): raise ValueError("boom")
+                    ^^^^^^^^^^^^^^^^^^^^^^^^
+E   ValueError: boom
+
+test_a.py:8: ValueError
+=============================== warnings summary ===============================
+test_b.py::test_ok
+  /private/tmp/sqfx/py/test_b.py:2: DeprecationWarning: old api
+    def test_ok(): warnings.warn("old api", DeprecationWarning); assert True
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED test_a.py::test_fail - AssertionError: assert {'a': 1, 'b': [1, 2, 3]}...
+FAILED test_a.py::test_err - ValueError: boom
+============== 2 failed, 32 passed, 1 skipped, 1 warning in 0.07s ==============

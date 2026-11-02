@@ -211,7 +211,8 @@ describe("compact router", () => {
 	});
 
 	test("leaves piped, short, unknown and flag-changed commands alone", () => {
-		expect(compact("rg -n import | head", raw)).toBeUndefined();
+		expect(compact("rg -n import | sort", raw)).toBeUndefined();
+		expect(compact("rg -n import | head -n 5 | tail -2", raw)).toBeUndefined();
 		expect(compact("rg -n import", "a.ts:1:x")).toBeUndefined();
 		expect(compact("cat file", raw)).toBeUndefined();
 		expect(compact("rg -c import", raw)).toBeUndefined();

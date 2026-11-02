@@ -1,0 +1,822 @@
+Downloading ruff (9.0MiB)
+ Downloaded ruff
+Installed 1 package in 2ms
+warning: `incorrect-blank-line-before-class` (D203) and `blank-line-before-class` (D211) are incompatible. Ignoring `incorrect-blank-line-before-class`.
+warning: `multi-line-summary-first-line` (D212) and `multi-line-summary-second-line` (D213) are incompatible. Ignoring `multi-line-summary-second-line`.
+E401 [*] Multiple imports on one line
+ --> bad.py:1:1
+  |
+1 | import os, sys
+  | ^^^^^^^^^^^^^^
+2 | from typing import *
+3 | def f(x):
+  |
+help: Split imports
+  |
+  - import os, sys
+1 + import os
+2 + import sys
+3 | from typing import *
+  |
+
+D100 Missing docstring in public module
+--> bad.py:1:1
+
+I001 [*] Import block is un-sorted or un-formatted
+ --> bad.py:1:1
+  |
+1 | / import os, sys
+2 | | from typing import *
+  | |____________________^
+3 |   def f(x):
+4 |       l = 1
+  |
+help: Organize imports
+  |
+  - import os, sys
+1 + import os
+2 + import sys
+3 | from typing import *
+4 +
+5 +
+6 | def f(x):
+  |
+
+CPY001 Missing copyright notice at top of file
+--> bad.py:1:1
+
+F401 [*] `os` imported but unused
+ --> bad.py:1:8
+  |
+1 | import os, sys
+  |        ^^
+2 | from typing import *
+3 | def f(x):
+  |
+help: Remove unused import
+  |
+  - import os, sys
+1 | from typing import *
+  |
+
+F401 [*] `sys` imported but unused
+ --> bad.py:1:12
+  |
+1 | import os, sys
+  |            ^^^
+2 | from typing import *
+3 | def f(x):
+  |
+help: Remove unused import
+  |
+  - import os, sys
+1 | from typing import *
+  |
+
+F403 `from typing import *` used; unable to detect undefined names
+ --> bad.py:2:1
+  |
+1 | import os, sys
+2 | from typing import *
+  | ^^^^^^^^^^^^^^^^^^^^
+3 | def f(x):
+4 |     l = 1
+  |
+
+ANN201 Missing return type annotation for public function `f`
+ --> bad.py:3:5
+  |
+1 | import os, sys
+2 | from typing import *
+3 | def f(x):
+  |     ^
+4 |     l = 1
+5 |     if x == None:
+  |
+help: Add return type annotation
+
+D103 Missing docstring in public function
+ --> bad.py:3:5
+  |
+1 | import os, sys
+2 | from typing import *
+3 | def f(x):
+  |     ^
+4 |     l = 1
+5 |     if x == None:
+  |
+
+ANN001 Missing type annotation for function argument `x`
+ --> bad.py:3:7
+  |
+1 | import os, sys
+2 | from typing import *
+3 | def f(x):
+  |       ^
+4 |     l = 1
+5 |     if x == None:
+  |
+
+E741 Ambiguous variable name: `l`
+ --> bad.py:4:5
+  |
+2 | from typing import *
+3 | def f(x):
+4 |     l = 1
+  |     ^
+5 |     if x == None:
+6 |         return eval("x")
+  |
+
+F841 Local variable `l` is assigned to but never used
+ --> bad.py:4:5
+  |
+2 | from typing import *
+3 | def f(x):
+4 |     l = 1
+  |     ^
+5 |     if x == None:
+6 |         return eval("x")
+  |
+help: Remove assignment to unused variable `l`
+  |
+3 | def f(x):
+  -     l = 1
+4 |     if x == None:
+  |
+note: This is an unsafe fix and may change runtime behavior
+
+E711 Comparison to `None` should be `cond is None`
+ --> bad.py:5:13
+  |
+3 | def f(x):
+4 |     l = 1
+5 |     if x == None:
+  |             ^^^^
+6 |         return eval("x")
+7 |     try: pass
+  |
+help: Replace with `cond is None`
+  |
+4 |     l = 1
+  -     if x == None:
+5 +     if x is None:
+6 |         return eval("x")
+  |
+note: This is an unsafe fix and may change runtime behavior
+
+S307 Use of possibly insecure function; consider using `ast.literal_eval`
+ --> bad.py:6:16
+  |
+4 |     l = 1
+5 |     if x == None:
+6 |         return eval("x")
+  |                ^^^^^^^^^
+7 |     try: pass
+8 |     except: pass
+  |
+
+SIM105 Use `contextlib.suppress(BaseException)` instead of `try`-`except`-`pass`
+ --> bad.py:7:5
+  |
+5 |       if x == None:
+6 |           return eval("x")
+7 | /     try: pass
+8 | |     except: pass
+  | |________________^
+help: Replace `try`-`except`-`pass` with `with contextlib.suppress(BaseException): ...`
+  |
+2 | from typing import *
+3 + import contextlib
+4 | def f(x):
+5 |     l = 1
+6 |     if x == None:
+7 |         return eval("x")
+  -     try: pass
+  -     except: pass
+8 +     with contextlib.suppress(BaseException): pass
+  |
+note: This is an unsafe fix and may change runtime behavior
+
+E701 Multiple statements on one line (colon)
+ --> bad.py:7:8
+  |
+5 |     if x == None:
+6 |         return eval("x")
+7 |     try: pass
+  |        ^
+8 |     except: pass
+  |
+
+E722 Do not use bare `except`
+ --> bad.py:8:5
+  |
+6 |         return eval("x")
+7 |     try: pass
+8 |     except: pass
+  |     ^^^^^^
+
+S110 `try`-`except`-`pass` detected, consider logging the exception
+ --> bad.py:8:5
+  |
+6 |         return eval("x")
+7 |     try: pass
+8 |     except: pass
+  |     ^^^^^^^^^^^^
+
+E701 Multiple statements on one line (colon)
+ --> bad.py:8:11
+  |
+6 |         return eval("x")
+7 |     try: pass
+8 |     except: pass
+  |           ^
+
+E401 [*] Multiple imports on one line
+ --> bad2.py:1:1
+  |
+1 | import os, sys
+  | ^^^^^^^^^^^^^^
+2 | from typing import *
+3 | def f(x):
+  |
+help: Split imports
+  |
+  - import os, sys
+1 + import os
+2 + import sys
+3 | from typing import *
+  |
+
+D100 Missing docstring in public module
+--> bad2.py:1:1
+
+I001 [*] Import block is un-sorted or un-formatted
+ --> bad2.py:1:1
+  |
+1 | / import os, sys
+2 | | from typing import *
+  | |____________________^
+3 |   def f(x):
+4 |       l = 1
+  |
+help: Organize imports
+  |
+  - import os, sys
+1 + import os
+2 + import sys
+3 | from typing import *
+4 +
+5 +
+6 | def f(x):
+  |
+
+CPY001 Missing copyright notice at top of file
+--> bad2.py:1:1
+
+F401 [*] `os` imported but unused
+ --> bad2.py:1:8
+  |
+1 | import os, sys
+  |        ^^
+2 | from typing import *
+3 | def f(x):
+  |
+help: Remove unused import
+  |
+  - import os, sys
+1 | from typing import *
+  |
+
+F401 [*] `sys` imported but unused
+ --> bad2.py:1:12
+  |
+1 | import os, sys
+  |            ^^^
+2 | from typing import *
+3 | def f(x):
+  |
+help: Remove unused import
+  |
+  - import os, sys
+1 | from typing import *
+  |
+
+F403 `from typing import *` used; unable to detect undefined names
+ --> bad2.py:2:1
+  |
+1 | import os, sys
+2 | from typing import *
+  | ^^^^^^^^^^^^^^^^^^^^
+3 | def f(x):
+4 |     l = 1
+  |
+
+ANN201 Missing return type annotation for public function `f`
+ --> bad2.py:3:5
+  |
+1 | import os, sys
+2 | from typing import *
+3 | def f(x):
+  |     ^
+4 |     l = 1
+5 |     if x == None:
+  |
+help: Add return type annotation
+
+D103 Missing docstring in public function
+ --> bad2.py:3:5
+  |
+1 | import os, sys
+2 | from typing import *
+3 | def f(x):
+  |     ^
+4 |     l = 1
+5 |     if x == None:
+  |
+
+ANN001 Missing type annotation for function argument `x`
+ --> bad2.py:3:7
+  |
+1 | import os, sys
+2 | from typing import *
+3 | def f(x):
+  |       ^
+4 |     l = 1
+5 |     if x == None:
+  |
+
+E741 Ambiguous variable name: `l`
+ --> bad2.py:4:5
+  |
+2 | from typing import *
+3 | def f(x):
+4 |     l = 1
+  |     ^
+5 |     if x == None:
+6 |         return eval("x")
+  |
+
+F841 Local variable `l` is assigned to but never used
+ --> bad2.py:4:5
+  |
+2 | from typing import *
+3 | def f(x):
+4 |     l = 1
+  |     ^
+5 |     if x == None:
+6 |         return eval("x")
+  |
+help: Remove assignment to unused variable `l`
+  |
+3 | def f(x):
+  -     l = 1
+4 |     if x == None:
+  |
+note: This is an unsafe fix and may change runtime behavior
+
+E711 Comparison to `None` should be `cond is None`
+ --> bad2.py:5:13
+  |
+3 | def f(x):
+4 |     l = 1
+5 |     if x == None:
+  |             ^^^^
+6 |         return eval("x")
+7 |     try: pass
+  |
+help: Replace with `cond is None`
+  |
+4 |     l = 1
+  -     if x == None:
+5 +     if x is None:
+6 |         return eval("x")
+  |
+note: This is an unsafe fix and may change runtime behavior
+
+S307 Use of possibly insecure function; consider using `ast.literal_eval`
+ --> bad2.py:6:16
+  |
+4 |     l = 1
+5 |     if x == None:
+6 |         return eval("x")
+  |                ^^^^^^^^^
+7 |     try: pass
+8 |     except: pass
+  |
+
+SIM105 Use `contextlib.suppress(BaseException)` instead of `try`-`except`-`pass`
+ --> bad2.py:7:5
+  |
+5 |       if x == None:
+6 |           return eval("x")
+7 | /     try: pass
+8 | |     except: pass
+  | |________________^
+help: Replace `try`-`except`-`pass` with `with contextlib.suppress(BaseException): ...`
+  |
+2 | from typing import *
+3 + import contextlib
+4 | def f(x):
+5 |     l = 1
+6 |     if x == None:
+7 |         return eval("x")
+  -     try: pass
+  -     except: pass
+8 +     with contextlib.suppress(BaseException): pass
+  |
+note: This is an unsafe fix and may change runtime behavior
+
+E701 Multiple statements on one line (colon)
+ --> bad2.py:7:8
+  |
+5 |     if x == None:
+6 |         return eval("x")
+7 |     try: pass
+  |        ^
+8 |     except: pass
+  |
+
+E722 Do not use bare `except`
+ --> bad2.py:8:5
+  |
+6 |         return eval("x")
+7 |     try: pass
+8 |     except: pass
+  |     ^^^^^^
+
+S110 `try`-`except`-`pass` detected, consider logging the exception
+ --> bad2.py:8:5
+  |
+6 |         return eval("x")
+7 |     try: pass
+8 |     except: pass
+  |     ^^^^^^^^^^^^
+
+E701 Multiple statements on one line (colon)
+ --> bad2.py:8:11
+  |
+6 |         return eval("x")
+7 |     try: pass
+8 |     except: pass
+  |           ^
+
+D100 Missing docstring in public module
+--> test_a.py:1:1
+
+I001 [*] Import block is un-sorted or un-formatted
+ --> test_a.py:1:1
+  |
+1 | import pytest
+  | ^^^^^^^^^^^^^
+2 | def add(a,b): return a+b
+3 | @pytest.mark.parametrize("i", range(30))
+  |
+help: Organize imports
+  |
+1 | import pytest
+2 +
+3 +
+4 | def add(a,b): return a+b
+  |
+
+CPY001 Missing copyright notice at top of file
+--> test_a.py:1:1
+
+ANN201 Missing return type annotation for public function `add`
+ --> test_a.py:2:5
+  |
+1 | import pytest
+2 | def add(a,b): return a+b
+  |     ^^^
+3 | @pytest.mark.parametrize("i", range(30))
+4 | def test_many(i): assert add(i,1)==i+1
+  |
+help: Add return type annotation
+
+D103 Missing docstring in public function
+ --> test_a.py:2:5
+  |
+1 | import pytest
+2 | def add(a,b): return a+b
+  |     ^^^
+3 | @pytest.mark.parametrize("i", range(30))
+4 | def test_many(i): assert add(i,1)==i+1
+  |
+
+ANN001 Missing type annotation for function argument `a`
+ --> test_a.py:2:9
+  |
+1 | import pytest
+2 | def add(a,b): return a+b
+  |         ^
+3 | @pytest.mark.parametrize("i", range(30))
+4 | def test_many(i): assert add(i,1)==i+1
+  |
+
+ANN001 Missing type annotation for function argument `b`
+ --> test_a.py:2:11
+  |
+1 | import pytest
+2 | def add(a,b): return a+b
+  |           ^
+3 | @pytest.mark.parametrize("i", range(30))
+4 | def test_many(i): assert add(i,1)==i+1
+  |
+
+ANN201 Missing return type annotation for public function `test_many`
+ --> test_a.py:4:5
+  |
+2 | def add(a,b): return a+b
+3 | @pytest.mark.parametrize("i", range(30))
+4 | def test_many(i): assert add(i,1)==i+1
+  |     ^^^^^^^^^
+5 | def test_fail(): 
+6 |     d={"a":1,"b":[1,2,3]}
+  |
+help: Add return type annotation: `None`
+  |
+3 | @pytest.mark.parametrize("i", range(30))
+  - def test_many(i): assert add(i,1)==i+1
+4 + def test_many(i) -> None: assert add(i,1)==i+1
+5 | def test_fail(): 
+  |
+note: This is an unsafe fix and may change runtime behavior
+
+D103 Missing docstring in public function
+ --> test_a.py:4:5
+  |
+2 | def add(a,b): return a+b
+3 | @pytest.mark.parametrize("i", range(30))
+4 | def test_many(i): assert add(i,1)==i+1
+  |     ^^^^^^^^^
+5 | def test_fail(): 
+6 |     d={"a":1,"b":[1,2,3]}
+  |
+
+ANN001 Missing type annotation for function argument `i`
+ --> test_a.py:4:15
+  |
+2 | def add(a,b): return a+b
+3 | @pytest.mark.parametrize("i", range(30))
+4 | def test_many(i): assert add(i,1)==i+1
+  |               ^
+5 | def test_fail(): 
+6 |     d={"a":1,"b":[1,2,3]}
+  |
+
+S101 Use of `assert` detected
+ --> test_a.py:4:19
+  |
+2 | def add(a,b): return a+b
+3 | @pytest.mark.parametrize("i", range(30))
+4 | def test_many(i): assert add(i,1)==i+1
+  |                   ^^^^^^
+5 | def test_fail(): 
+6 |     d={"a":1,"b":[1,2,3]}
+  |
+
+ANN201 Missing return type annotation for public function `test_fail`
+ --> test_a.py:5:5
+  |
+3 | @pytest.mark.parametrize("i", range(30))
+4 | def test_many(i): assert add(i,1)==i+1
+5 | def test_fail(): 
+  |     ^^^^^^^^^
+6 |     d={"a":1,"b":[1,2,3]}
+7 |     assert d=={"a":1,"b":[1,2,4]}
+  |
+help: Add return type annotation: `None`
+  |
+4 | def test_many(i): assert add(i,1)==i+1
+  - def test_fail(): 
+5 + def test_fail() -> None: 
+6 |     d={"a":1,"b":[1,2,3]}
+  |
+note: This is an unsafe fix and may change runtime behavior
+
+D103 Missing docstring in public function
+ --> test_a.py:5:5
+  |
+3 | @pytest.mark.parametrize("i", range(30))
+4 | def test_many(i): assert add(i,1)==i+1
+5 | def test_fail(): 
+  |     ^^^^^^^^^
+6 |     d={"a":1,"b":[1,2,3]}
+7 |     assert d=={"a":1,"b":[1,2,4]}
+  |
+
+W291 [*] Trailing whitespace
+ --> test_a.py:5:17
+  |
+3 | @pytest.mark.parametrize("i", range(30))
+4 | def test_many(i): assert add(i,1)==i+1
+5 | def test_fail(): 
+  |                 ^
+6 |     d={"a":1,"b":[1,2,3]}
+7 |     assert d=={"a":1,"b":[1,2,4]}
+  |
+help: Remove trailing whitespace
+  |
+4 | def test_many(i): assert add(i,1)==i+1
+  - def test_fail(): 
+5 + def test_fail():
+6 |     d={"a":1,"b":[1,2,3]}
+  |
+
+S101 Use of `assert` detected
+ --> test_a.py:7:5
+  |
+5 | def test_fail(): 
+6 |     d={"a":1,"b":[1,2,3]}
+7 |     assert d=={"a":1,"b":[1,2,4]}
+  |     ^^^^^^
+8 | def test_err(): raise ValueError("boom")
+9 | @pytest.mark.skip(reason="later")
+  |
+
+ANN201 Missing return type annotation for public function `test_err`
+  --> test_a.py:8:5
+   |
+ 6 |     d={"a":1,"b":[1,2,3]}
+ 7 |     assert d=={"a":1,"b":[1,2,4]}
+ 8 | def test_err(): raise ValueError("boom")
+   |     ^^^^^^^^
+ 9 | @pytest.mark.skip(reason="later")
+10 | def test_skip(): pass
+   |
+help: Add return type annotation: `Never`
+   |
+1  | import pytest
+2  + from typing import Never
+3  | def add(a,b): return a+b
+--------------------------------------------------------------------------------
+8  |     assert d=={"a":1,"b":[1,2,4]}
+   - def test_err(): raise ValueError("boom")
+9  + def test_err() -> Never: raise ValueError("boom")
+10 | @pytest.mark.skip(reason="later")
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+D103 Missing docstring in public function
+  --> test_a.py:8:5
+   |
+ 6 |     d={"a":1,"b":[1,2,3]}
+ 7 |     assert d=={"a":1,"b":[1,2,4]}
+ 8 | def test_err(): raise ValueError("boom")
+   |     ^^^^^^^^
+ 9 | @pytest.mark.skip(reason="later")
+10 | def test_skip(): pass
+   |
+
+EM101 Exception must not use a string literal, assign to variable first
+  --> test_a.py:8:34
+   |
+ 6 |     d={"a":1,"b":[1,2,3]}
+ 7 |     assert d=={"a":1,"b":[1,2,4]}
+ 8 | def test_err(): raise ValueError("boom")
+   |                                  ^^^^^^
+ 9 | @pytest.mark.skip(reason="later")
+10 | def test_skip(): pass
+   |
+help: Assign to variable; remove string literal
+
+ANN201 Missing return type annotation for public function `test_skip`
+  --> test_a.py:10:5
+   |
+ 8 | def test_err(): raise ValueError("boom")
+ 9 | @pytest.mark.skip(reason="later")
+10 | def test_skip(): pass
+   |     ^^^^^^^^^
+help: Add return type annotation: `None`
+   |
+9  | @pytest.mark.skip(reason="later")
+   - def test_skip(): pass
+10 + def test_skip() -> None: pass
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+D103 Missing docstring in public function
+  --> test_a.py:10:5
+   |
+ 8 | def test_err(): raise ValueError("boom")
+ 9 | @pytest.mark.skip(reason="later")
+10 | def test_skip(): pass
+   |     ^^^^^^^^^
+
+D100 Missing docstring in public module
+--> test_b.py:1:1
+
+I001 [*] Import block is un-sorted or un-formatted
+ --> test_b.py:1:1
+  |
+1 | import warnings
+  | ^^^^^^^^^^^^^^^
+2 | def test_ok(): warnings.warn("old api", DeprecationWarning); assert True
+3 | def test_ok2(): assert 1
+  |
+help: Organize imports
+  |
+1 | import warnings
+2 +
+3 +
+4 | def test_ok(): warnings.warn("old api", DeprecationWarning); assert True
+  |
+
+CPY001 Missing copyright notice at top of file
+--> test_b.py:1:1
+
+ANN201 Missing return type annotation for public function `test_ok`
+ --> test_b.py:2:5
+  |
+1 | import warnings
+2 | def test_ok(): warnings.warn("old api", DeprecationWarning); assert True
+  |     ^^^^^^^
+3 | def test_ok2(): assert 1
+  |
+help: Add return type annotation: `None`
+  |
+1 | import warnings
+  - def test_ok(): warnings.warn("old api", DeprecationWarning); assert True
+2 + def test_ok() -> None: warnings.warn("old api", DeprecationWarning); assert True
+3 | def test_ok2(): assert 1
+  |
+note: This is an unsafe fix and may change runtime behavior
+
+D103 Missing docstring in public function
+ --> test_b.py:2:5
+  |
+1 | import warnings
+2 | def test_ok(): warnings.warn("old api", DeprecationWarning); assert True
+  |     ^^^^^^^
+3 | def test_ok2(): assert 1
+  |
+
+B028 No explicit `stacklevel` keyword argument found
+ --> test_b.py:2:16
+  |
+1 | import warnings
+2 | def test_ok(): warnings.warn("old api", DeprecationWarning); assert True
+  |                ^^^^^^^^^^^^^
+3 | def test_ok2(): assert 1
+  |
+help: Set `stacklevel=2`
+  |
+1 | import warnings
+  - def test_ok(): warnings.warn("old api", DeprecationWarning); assert True
+2 + def test_ok(): warnings.warn("old api", DeprecationWarning, stacklevel=2); assert True
+3 | def test_ok2(): assert 1
+  |
+note: This is an unsafe fix and may change runtime behavior
+
+E702 Multiple statements on one line (semicolon)
+ --> test_b.py:2:60
+  |
+1 | import warnings
+2 | def test_ok(): warnings.warn("old api", DeprecationWarning); assert True
+  |                                                            ^
+3 | def test_ok2(): assert 1
+  |
+
+S101 Use of `assert` detected
+ --> test_b.py:2:62
+  |
+1 | import warnings
+2 | def test_ok(): warnings.warn("old api", DeprecationWarning); assert True
+  |                                                              ^^^^^^
+3 | def test_ok2(): assert 1
+  |
+
+ANN201 Missing return type annotation for public function `test_ok2`
+ --> test_b.py:3:5
+  |
+1 | import warnings
+2 | def test_ok(): warnings.warn("old api", DeprecationWarning); assert True
+3 | def test_ok2(): assert 1
+  |     ^^^^^^^^
+help: Add return type annotation: `None`
+  |
+2 | def test_ok(): warnings.warn("old api", DeprecationWarning); assert True
+  - def test_ok2(): assert 1
+3 + def test_ok2() -> None: assert 1
+  |
+note: This is an unsafe fix and may change runtime behavior
+
+D103 Missing docstring in public function
+ --> test_b.py:3:5
+  |
+1 | import warnings
+2 | def test_ok(): warnings.warn("old api", DeprecationWarning); assert True
+3 | def test_ok2(): assert 1
+  |     ^^^^^^^^
+
+S101 Use of `assert` detected
+ --> test_b.py:3:17
+  |
+1 | import warnings
+2 | def test_ok(): warnings.warn("old api", DeprecationWarning); assert True
+3 | def test_ok2(): assert 1
+  |                 ^^^^^^
+
+Found 69 errors.
+[*] 11 fixable with `--fix` (13 unsafe fixes available with `--fix --unsafe-fixes`).

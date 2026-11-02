@@ -1,5 +1,5 @@
 /**
- * Tree output (`cargo tree`, `tree`, `eza --tree`) cut below a depth, with a marker that says
+ * Tree output (`cargo tree`, `tree`, `eza --tree`, `gradle dependencies`) cut below a depth, with a marker that says
  * how many lines were left out under each cut:
  *
  *   ├── ratatui v0.30.2
@@ -11,8 +11,11 @@
  */
 import { cutLine, DEFAULT_LIMITS, type Limits, type Squeezed } from "./elide.ts";
 
-const PREFIX = /^((?:│   |    )*)/;
-const BRANCH = /^(?:│   |    )*(?:├── |└── )/;
+/** Box-drawing trees indent by 4; gradle's ASCII one (`+--- `, `|    `) by 5. */
+const STYLES = [
+	{ prefix: /^((?:│   |    )*)/, branch: /^(?:│   |    )*(?:├── |└── )/, unit: 4 },
+	{ prefix: /^((?:\|    | {5})*)/, branch: /^(?:\|    | {5})*(?:\+--- |\\--- )/, unit: 5 },
+];
 
 /** Levels kept below the root. */
 const DEPTH = 3;
@@ -20,17 +23,19 @@ const DEPTH = 3;
 export function compactTree(output: string, limits: Limits = DEFAULT_LIMITS): Squeezed | undefined {
 	const lines = output.split("\n");
 	while (lines.length && lines.at(-1) === "") lines.pop();
-	if (lines.length < 5 || !lines.some((l) => BRANCH.test(l))) return undefined;
+	const style = STYLES.find((s) => lines.some((l) => s.branch.test(l)));
+	if (lines.length < 5 || !style) return undefined;
+	const { prefix, branch, unit } = style;
 	const out: string[] = [];
 	let hidden: string[] = [];
 	const flush = () => {
 		if (hidden.length === 1) out.push(cutLine(hidden[0]!, limits.lineChars));
-		else if (hidden.length) out.push(`${"    ".repeat(DEPTH)}… [+${hidden.length} lines deeper]`);
+		else if (hidden.length) out.push(`${" ".repeat(DEPTH * unit)}… [+${hidden.length} lines deeper]`);
 		hidden = [];
 	};
 	for (const l of lines) {
-		const units = PREFIX.exec(l)![1]!.length / 4;
-		const depth = BRANCH.test(l) || units > 0 ? units + 1 : 0;
+		const units = prefix.exec(l)![1]!.length / unit;
+		const depth = branch.test(l) || units > 0 ? units + 1 : 0;
 		if (depth > DEPTH) {
 			hidden.push(l);
 			continue;

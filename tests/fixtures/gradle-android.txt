@@ -1,0 +1,245 @@
+Isolated Projects is an incubating feature.
+Calculating task graph as no cached configuration is available for tasks: :core:logger:testDebugUnitTest :core:logger:detekt
+> Task :build-plugins:dependency-rules:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :build-plugins:codeartifact:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :build-plugins:remote-cache:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :build-plugins:project-graph:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :build-plugins:project-graph:generateExternalPluginSpecBuilders UP-TO-DATE
+> Task :build-plugins:project-graph:extractPrecompiledScriptPluginPlugins UP-TO-DATE
+> Task :build-plugins:codeartifact:generateExternalPluginSpecBuilders UP-TO-DATE
+> Task :build-plugins:codeartifact:extractPrecompiledScriptPluginPlugins UP-TO-DATE
+> Task :build-plugins:dependency-rules:generateExternalPluginSpecBuilders UP-TO-DATE
+> Task :build-plugins:dependency-rules:extractPrecompiledScriptPluginPlugins UP-TO-DATE
+> Task :build-plugins:codeartifact:compilePluginsBlocks UP-TO-DATE
+> Task :build-plugins:codeartifact:generatePrecompiledScriptPluginAccessors UP-TO-DATE
+> Task :build-plugins:project-graph:compilePluginsBlocks UP-TO-DATE
+> Task :build-plugins:codeartifact:generateScriptPluginAdapters UP-TO-DATE
+> Task :build-plugins:dependency-rules:compilePluginsBlocks UP-TO-DATE
+> Task :build-plugins:project-graph:generatePrecompiledScriptPluginAccessors UP-TO-DATE
+> Task :build-plugins:project-graph:generateScriptPluginAdapters UP-TO-DATE
+> Task :build-plugins:dependency-rules:generatePrecompiledScriptPluginAccessors UP-TO-DATE
+> Task :build-plugins:dependency-rules:generateScriptPluginAdapters UP-TO-DATE
+> Task :build-plugins:dependency-rules:compileKotlin UP-TO-DATE
+> Task :build-plugins:dependency-rules:compileJava NO-SOURCE
+> Task :build-plugins:dependency-rules:pluginDescriptors UP-TO-DATE
+> Task :build-plugins:dependency-rules:processResources UP-TO-DATE
+> Task :build-plugins:dependency-rules:classes UP-TO-DATE
+> Task :build-plugins:codeartifact:compileKotlin UP-TO-DATE
+> Task :build-plugins:project-graph:compileKotlin UP-TO-DATE
+> Task :build-plugins:codeartifact:compileJava NO-SOURCE
+> Task :build-plugins:project-graph:compileJava NO-SOURCE
+> Task :build-plugins:codeartifact:pluginDescriptors UP-TO-DATE
+> Task :build-plugins:project-graph:pluginDescriptors UP-TO-DATE
+> Task :build-plugins:dependency-rules:jar UP-TO-DATE
+> Task :build-plugins:codeartifact:processResources UP-TO-DATE
+> Task :build-plugins:project-graph:processResources UP-TO-DATE
+> Task :build-plugins:codeartifact:classes UP-TO-DATE
+> Task :build-plugins:project-graph:classes UP-TO-DATE
+> Task :build-plugins:project-graph:jar UP-TO-DATE
+> Task :build-plugins:codeartifact:jar UP-TO-DATE
+> Task :build-plugins:remote-cache:generateExternalPluginSpecBuilders UP-TO-DATE
+> Task :build-plugins:remote-cache:extractPrecompiledScriptPluginPlugins UP-TO-DATE
+> Task :build-plugins:remote-cache:compilePluginsBlocks UP-TO-DATE
+> Task :build-plugins:remote-cache:generatePrecompiledScriptPluginAccessors UP-TO-DATE
+> Task :build-plugins:remote-cache:generateScriptPluginAdapters UP-TO-DATE
+> Task :build-plugins:remote-cache:compileKotlin UP-TO-DATE
+> Task :build-plugins:remote-cache:compileJava NO-SOURCE
+> Task :build-plugins:remote-cache:pluginDescriptors UP-TO-DATE
+> Task :build-plugins:remote-cache:processResources UP-TO-DATE
+> Task :build-plugins:remote-cache:classes UP-TO-DATE
+> Task :build-plugins:remote-cache:jar UP-TO-DATE
+
+
+
+Type-safe project accessors is an incubating feature.
+> Task :build-plugins:build-metrics:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :build-logic:plugins:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :paf-dev-toolkit-idea-plugin:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :build-plugins:build-metrics:compileKotlin UP-TO-DATE
+> Task :build-plugins:build-metrics:compileJava NO-SOURCE
+> Task :build-plugins:build-metrics:pluginDescriptors UP-TO-DATE
+> Task :build-plugins:build-metrics:processResources UP-TO-DATE
+> Task :build-plugins:build-metrics:classes UP-TO-DATE
+> Task :build-plugins:build-metrics:jar UP-TO-DATE
+> Task :paf-dev-toolkit-idea-plugin:compileKotlin UP-TO-DATE
+> Task :paf-dev-toolkit-idea-plugin:compileJava NO-SOURCE
+> Task :paf-dev-toolkit-idea-plugin:initializeIntellijPlatformPlugin
+> Task :paf-dev-toolkit-idea-plugin:patchPluginXml UP-TO-DATE
+> Task :paf-dev-toolkit-idea-plugin:pluginDescriptors UP-TO-DATE
+> Task :paf-dev-toolkit-idea-plugin:processResources UP-TO-DATE
+> Task :paf-dev-toolkit-idea-plugin:classes UP-TO-DATE
+> Task :paf-dev-toolkit-idea-plugin:generateManifest UP-TO-DATE
+> Task :paf-dev-toolkit-idea-plugin:jar UP-TO-DATE
+> Task :build-logic:plugins:generateExternalPluginSpecBuilders UP-TO-DATE
+> Task :build-logic:plugins:extractPrecompiledScriptPluginPlugins UP-TO-DATE
+> Task :build-logic:plugins:compilePluginsBlocks UP-TO-DATE
+> Task :build-logic:plugins:generatePrecompiledScriptPluginAccessors UP-TO-DATE
+> Task :build-logic:plugins:generateScriptPluginAdapters UP-TO-DATE
+> Task :build-logic:plugins:compileKotlin UP-TO-DATE
+> Task :build-logic:plugins:compileJava NO-SOURCE
+> Task :build-logic:plugins:pluginDescriptors UP-TO-DATE
+> Task :build-logic:plugins:processResources UP-TO-DATE
+> Task :build-logic:plugins:classes UP-TO-DATE
+> Task :build-logic:plugins:jar UP-TO-DATE
+
+> Configure project :
+The Dependency Analysis plugin is only known to work with versions of AGP between 8.10.0 and 9.3.1. You are using 9.4.1. Proceed at your own risk.
+
+> Configure project :config:lint-library
+WARNING: The option setting 'android.aar.metadata.defaultMinCompileSdkToCompileSdk=false' is deprecated.
+The current default is 'true'.
+It will be removed in version 10.0 of the Android Gradle plugin.
+Add android.sync.suppressAgpWarnings=UNSUPPORTED_PROJECT_OPTION_USE to the gradle.properties file to suppress this warning.
+WARNING: The option setting 'android.experimental.lint.reservedMemoryPerTask=2g' is experimental.
+Add android.sync.suppressAgpWarnings=UNSUPPORTED_PROJECT_OPTION_USE to the gradle.properties file to suppress this warning.
+
+> Configure project :core:logger
+WARNING: The option setting 'android.experimental.testOptions.managedDevices.emulator.showKernelLogging=true' is experimental.
+The current default is 'false'.
+Add android.sync.suppressAgpWarnings=UNSUPPORTED_PROJECT_OPTION_USE to the gradle.properties file to suppress this warning.
+WARNING: The option setting 'android.experimental.testOptions.managedDevices.setupTimeoutMinutes=30' is experimental.
+Add android.sync.suppressAgpWarnings=UNSUPPORTED_PROJECT_OPTION_USE to the gradle.properties file to suppress this warning.
+
+> Task :config:detekt:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :core:logger:preBuild UP-TO-DATE
+> Task :core:logger:generateDebugAssets UP-TO-DATE
+> Task :core:logger:generateDebugTestFixturesAssets UP-TO-DATE
+> Task :utils:test:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :utils:test:processResources NO-SOURCE
+> Task :core:logger:generateDebugUnitTestAssets UP-TO-DATE
+> Task :core:logger:preDebugTestFixturesBuild UP-TO-DATE
+> Task :utils:coroutines:androidPreBuild UP-TO-DATE
+> Task :utils:coroutines:jvmProcessResources NO-SOURCE
+> Task :core:logger:preDebugUnitTestBuild UP-TO-DATE
+> Task :utils:test:processTestFixturesResources NO-SOURCE
+> Task :utils:coroutines:processJvmMainResources SKIPPED
+> Task :core:logger:koverFindJar UP-TO-DATE
+> Task :core:logger:preDebugBuild UP-TO-DATE
+> Task :core:logger:javaPreCompileDebugTestFixtures UP-TO-DATE
+> Task :utils:coroutines:kmpPartiallyResolvedDependenciesChecker
+> Task :core:logger:mapDebugUnitTestSourceSetPaths UP-TO-DATE
+> Task :utils:coroutines:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :utils:test:compileKotlin NO-SOURCE
+> Task :utils:coroutines:preAndroidMainBuild UP-TO-DATE
+> Task :core:logger:javaPreCompileDebug UP-TO-DATE
+> Task :core:logger:writeDebugTestFixturesAarMetadata UP-TO-DATE
+> Task :core:logger:processDebugNavigationResources UP-TO-DATE
+> Task :core:logger:generateDebugResources UP-TO-DATE
+> Task :core:logger:mapDebugSourceSetPaths UP-TO-DATE
+> Task :core:logger:generateDebugTestFixturesEmptyResourceFiles UP-TO-DATE
+> Task :core:logger:writeDebugAarMetadata UP-TO-DATE
+> Task :utils:coroutines:writeAndroidMainAarMetadata UP-TO-DATE
+> Task :utils:test:compileJava NO-SOURCE
+> Task :utils:coroutines:generateAndroidMainEmptyResourceFiles UP-TO-DATE
+> Task :core:logger:extractDeepLinksDebug UP-TO-DATE
+> Task :utils:coroutines:processAndroidMainManifest UP-TO-DATE
+> Task :core:logger:mergeDebugAssets UP-TO-DATE
+> Task :core:logger:processDebugManifest UP-TO-DATE
+> Task :core:logger:mergeDebugTestFixturesAssets UP-TO-DATE
+> Task :core:logger:packageDebugResources UP-TO-DATE
+> Task :core:logger:processDebugTestFixturesManifest UP-TO-DATE
+> Task :core:logger:compileDebugLibraryResources UP-TO-DATE
+> Task :core:logger:generateDebugUnitTestResources UP-TO-DATE
+> Task :utils:test:classes UP-TO-DATE
+> Task :utils:coroutines:compileKotlinJvm UP-TO-DATE
+> Task :core:logger:javaPreCompileDebugUnitTest UP-TO-DATE
+> Task :core:logger:mergeDebugUnitTestAssets UP-TO-DATE
+> Task :core:logger:mergeDebugUnitTestManifest UP-TO-DATE
+> Task :utils:test:jar UP-TO-DATE
+> Task :core:logger:parseDebugLocalResources UP-TO-DATE
+> Task :core:logger:checkDebugUnitTestAarMetadata UP-TO-DATE
+> Task :utils:coroutines:compileJvmMainJava NO-SOURCE
+> Task :core:logger:processDebugUnitTestManifest UP-TO-DATE
+> Task :utils:coroutines:jvmMainClasses UP-TO-DATE
+> Task :core:logger:generateDebugRFile UP-TO-DATE
+> Task :core:logger:mergeDebugUnitTestResources UP-TO-DATE
+> Task :utils:coroutines:jvmJar UP-TO-DATE
+> Task :utils:coroutines:compileAndroidMain UP-TO-DATE
+> Task :utils:coroutines:bundleAndroidMainClassesToCompileJar UP-TO-DATE
+> Task :utils:coroutines:bundleAndroidMainClassesToRuntimeJar UP-TO-DATE
+> Task :utils:coroutines:processAndroidMainJavaRes UP-TO-DATE
+> Task :utils:test:compileTestFixturesKotlin UP-TO-DATE
+> Task :utils:test:compileTestFixturesJava NO-SOURCE
+> Task :utils:test:testFixturesClasses UP-TO-DATE
+> Task :utils:test:testFixturesJar UP-TO-DATE
+> Task :core:logger:processDebugUnitTestResources UP-TO-DATE
+> Task :core:logger:packageDebugUnitTestForUnitTest UP-TO-DATE
+> Task :core:logger:generateDebugUnitTestConfig UP-TO-DATE
+> Task :config:detekt:processResources
+
+> Task :core:logger:compileDebugKotlin
+w: Opt-in requirement marker 'kotlinx.coroutines.ExperimentalCoroutinesApi' is unresolved. Make sure it's present in the module dependencies.
+w: Opt-in requirement marker 'kotlinx.coroutines.FlowPreview' is unresolved. Make sure it's present in the module dependencies.
+
+> Task :core:logger:compileDebugJavaWithJavac NO-SOURCE
+> Task :core:logger:processDebugJavaRes
+> Task :core:logger:bundleLibRuntimeToJarDebug
+> Task :core:logger:bundleLibCompileToJarDebug
+> Task :core:logger:compileDebugTestFixturesKotlin NO-SOURCE
+> Task :core:logger:compileDebugTestFixturesJavaWithJavac NO-SOURCE
+> Task :core:logger:processDebugTestFixturesJavaRes NO-SOURCE
+> Task :core:logger:bundleLibCompileToJarDebugTestFixtures UP-TO-DATE
+> Task :core:logger:bundleLibRuntimeToJarDebugTestFixtures UP-TO-DATE
+> Task :core:logger:compileDebugUnitTestKotlin
+> Task :core:logger:processDebugUnitTestJavaRes UP-TO-DATE
+> Task :core:logger:compileDebugUnitTestJavaWithJavac NO-SOURCE
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+
+> Task :core:logger:testDebugUnitTest
+
+SqueezeProbeTest > adds numbers FAILED
+    java.lang.AssertionError at SqueezeProbeTest.kt:9
+
+SqueezeProbeTest > throws FAILED
+    java.lang.IllegalStateException at SqueezeProbeTest.kt:14
+
+7 tests completed, 2 failed
+
+> Task :core:logger:testDebugUnitTest FAILED
+> Task :config:detekt:compileKotlin
+> Task :config:detekt:compileJava NO-SOURCE
+> Task :config:detekt:classes
+> Task :config:detekt:jar
+
+> Task :core:logger:detekt FAILED
+/home/dev/app/core/logger/src/main/java/com/example/logger/SqueezeProbe.kt:1:1: Expected license not found or incorrect in the file: /home/dev/app/core/logger/src/main/java/com/example/logger/SqueezeProbe.kt. [AbsentOrWrongFileLicense]
+/home/dev/app/core/logger/src/test/java/com/example/logger/SqueezeProbeTest.kt:1:1: Expected license not found or incorrect in the file: /home/dev/app/core/logger/src/test/java/com/example/logger/SqueezeProbeTest.kt. [AbsentOrWrongFileLicense]
+/home/dev/app/core/logger/src/main/java/com/example/logger/SqueezeProbe.kt:4:9: Private property `unused` is unused. [UnusedPrivateProperty]
+
+
+[Incubating] Problems report is available at: file:///home/dev/app/build/reports/problems/problems-report.html
+
+FAILURE: Build completed with 2 failures.
+
+1: Task failed with an exception.
+-----------
+* What went wrong:
+Execution failed for task ':core:logger:testDebugUnitTest'.
+> There were failing tests. See the report at: file:///home/dev/app/core/logger/build/reports/tests/testDebugUnitTest/index.html
+
+* Try:
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+==============================================================================
+
+2: Task failed with an exception.
+-----------
+* What went wrong:
+Execution failed for task ':core:logger:detekt' (registered by plugin 'io.gitlab.arturbosch.detekt').
+> Analysis failed with 3 weighted issues.
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.
+==============================================================================
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.8.0/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 22s
+120 actionable tasks: 12 executed, 108 up-to-date
+Configuration cache entry stored.

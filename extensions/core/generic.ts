@@ -16,8 +16,11 @@ const CONTENT = /(?:^|[\s|;&(])(cat|head|tail|sed|awk|jq|yq|bat|less|more|curl|w
 
 export const isContent = (command: string): boolean => CONTENT.test(command);
 
+/** Colour codes and terminal hyperlinks out; the text they wrapped stays. */
+export const stripAnsi = (text: string): string => text.replace(ANSI, "");
+
 export function compactGeneric(output: string, _limits?: Limits): Squeezed | undefined {
-	const lines = output.replace(ANSI, "").split("\n").map((l) => {
+	const lines = stripAnsi(output).split("\n").map((l) => {
 		const frame = l.replace(/\r+$/, "");
 		return (frame.includes("\r") ? frame.slice(frame.lastIndexOf("\r") + 1) : frame).trimEnd();
 	});

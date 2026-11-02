@@ -1,0 +1,300 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -scheme Demo -destination platform=macOS build
+
+Resolve Package Graph
+2026-11-02 01:38:45.358 xcodebuild[40118:44955631] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+
+
+Resolved source packages:
+  Demo: /tmp/sqfx/sw
+
+--- xcodebuild: WARNING: Using the first of multiple matching destinations:
+{ platform:macOS, arch:arm64, id:00006040-0002510A0E92801C, name:My Mac }
+{ platform:macOS, arch:x86_64, id:00006040-0002510A0E92801C, name:My Mac }
+{ platform:macOS, arch:arm64, variant:Mac Catalyst, id:00006040-0002510A0E92801C, name:My Mac }
+{ platform:macOS, arch:x86_64, variant:Mac Catalyst, id:00006040-0002510A0E92801C, name:My Mac }
+{ platform:macOS, arch:arm64, variant:DriverKit, id:00006040-0002510A0E92801C, name:My Mac }
+{ platform:macOS, arch:arm64, variant:Designed for [iPad,iPhone], id:00006040-0002510A0E92801C, name:My Mac }
+{ platform:macOS, arch:arm64_32, variant:Designed for [iPad,iPhone], id:00006040-0002510A0E92801C, name:My Mac }
+{ platform:macOS, arch:arm64e.x1, variant:Designed for [iPad,iPhone], id:00006040-0002510A0E92801C, name:My Mac }
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (2 targets)
+    Target 'Demo-product' in project 'Demo'
+        ➜ Explicit dependency on target 'Demo' in project 'Demo'
+    Target 'Demo' in project 'Demo' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.0.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+Build description signature: 754011911db580985d219bf94f37b8f1
+Build description path: /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/XCBuildData/754011911db580985d219bf94f37b8f1.xcbuilddata
+CreateBuildDirectory /Users/dev/Library/Developer/Xcode/DerivedData/ModuleCache.noindex
+    cd /tmp/sqfx/sw/.swiftpm/xcode
+    builtin-create-build-directory /Users/dev/Library/Developer/Xcode/DerivedData/ModuleCache.noindex
+
+CreateBuildDirectory /Users/dev/Library/Developer/Xcode/DerivedData/SDKExplicitPrecompiledModules
+    cd /tmp/sqfx/sw/.swiftpm/xcode
+    builtin-create-build-directory /Users/dev/Library/Developer/Xcode/DerivedData/SDKExplicitPrecompiledModules
+
+CreateBuildDirectory /Users/dev/Library/Developer/Xcode/DerivedData/CompilationCache.noindex
+    cd /tmp/sqfx/sw/.swiftpm/xcode
+    builtin-create-build-directory /Users/dev/Library/Developer/Xcode/DerivedData/CompilationCache.noindex
+
+CreateBuildDirectory /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Products
+    cd /tmp/sqfx/sw/.swiftpm/xcode
+    builtin-create-build-directory /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Products
+
+CreateBuildDirectory /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex
+    cd /tmp/sqfx/sw/.swiftpm/xcode
+    builtin-create-build-directory /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex
+
+ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.0.sdk /Users/dev/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/macosx27.0-26A425-e829b21a6f8c9b70876ba0858053c0447231f6df4def33e022ae2eb8f782df1a.sdkstatcache
+    cd /tmp/sqfx/sw/.swiftpm/xcode
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.0.sdk -o /Users/dev/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/macosx27.0-26A425-e829b21a6f8c9b70876ba0858053c0447231f6df4def33e022ae2eb8f782df1a.sdkstatcache
+
+CreateBuildDirectory /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules
+    cd /tmp/sqfx/sw/.swiftpm/xcode
+    builtin-create-build-directory /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules
+
+CreateBuildDirectory /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/PrecompiledHeaders
+    cd /tmp/sqfx/sw/.swiftpm/xcode
+    builtin-create-build-directory /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/PrecompiledHeaders
+
+CreateBuildDirectory /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/ExplicitPrecompiledModules
+    cd /tmp/sqfx/sw/.swiftpm/xcode
+    builtin-create-build-directory /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/ExplicitPrecompiledModules
+
+CreateBuildDirectory /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/EagerLinkingTBDs/Debug
+    cd /tmp/sqfx/sw/.swiftpm/xcode
+    builtin-create-build-directory /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/EagerLinkingTBDs/Debug
+
+CreateBuildDirectory /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Products/Debug
+    cd /tmp/sqfx/sw/.swiftpm/xcode
+    builtin-create-build-directory /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Products/Debug
+
+CreateBuildDirectory /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Products/Debug/PackageFrameworks
+    cd /tmp/sqfx/sw/.swiftpm/xcode
+    builtin-create-build-directory /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Products/Debug/PackageFrameworks
+
+WriteAuxiliaryFile /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Demo.modulemap (in target 'Demo' from project 'Demo')
+    cd /tmp/sqfx/sw
+    write-file /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Demo.modulemap
+
+WriteAuxiliaryFile /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo-OutputFileMap.json (in target 'Demo' from project 'Demo')
+    cd /tmp/sqfx/sw
+    write-file /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo-OutputFileMap.json
+
+WriteAuxiliaryFile /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo.SwiftConstValuesFileList (in target 'Demo' from project 'Demo')
+    cd /tmp/sqfx/sw
+    write-file /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo.SwiftConstValuesFileList
+
+WriteAuxiliaryFile /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo.LinkFileList (in target 'Demo' from project 'Demo')
+    cd /tmp/sqfx/sw
+    write-file /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo.LinkFileList
+
+WriteAuxiliaryFile /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo_const_extract_protocols.json (in target 'Demo' from project 'Demo')
+    cd /tmp/sqfx/sw
+    write-file /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo_const_extract_protocols.json
+
+WriteAuxiliaryFile /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Demo.DependencyStaticMetadataFileList (in target 'Demo' from project 'Demo')
+    cd /tmp/sqfx/sw
+    write-file /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Demo.DependencyStaticMetadataFileList
+
+WriteAuxiliaryFile /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Demo.DependencyMetadataFileList (in target 'Demo' from project 'Demo')
+    cd /tmp/sqfx/sw
+    write-file /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Demo.DependencyMetadataFileList
+
+WriteAuxiliaryFile /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo.SwiftFileList (in target 'Demo' from project 'Demo')
+    cd /tmp/sqfx/sw
+    write-file /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo.SwiftFileList
+
+Copy /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/GeneratedModuleMaps/Demo.modulemap /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Demo.modulemap (in target 'Demo' from project 'Demo')
+    cd /tmp/sqfx/sw
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Demo.modulemap /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/GeneratedModuleMaps
+
+SwiftDriver Demo normal arm64 com.apple.xcode.tools.swift.compiler (in target 'Demo' from project 'Demo')
+    cd /tmp/sqfx/sw/.swiftpm/xcode
+    builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -parse-as-library -module-name Demo -Onone @/Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo.SwiftFileList -DSWIFT_PACKAGE -DDEBUG -DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE -DXcode -enable-upcoming-feature ApproachableConcurrency -plugin-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.0.sdk -target arm64-apple-macos12.0 -g -module-cache-path /Users/dev/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -profile-coverage-mapping -profile-generate -enable-testing -index-store-path /Users/dev/Library/Developer/Xcode/DerivedData/Demo-eclklshjyvmlfthccfpfnkkbsinw/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 6 -I /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Products/Debug -Isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib -F /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Products/Debug -F /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks -c -j14 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/dev/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/macosx27.0-26A425-e829b21a6f8c9b70876ba0858053c0447231f6df4def33e022ae2eb8f782df1a.sdkstatcache -output-file-map /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo-OutputFileMap.json -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/dev/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/dev/Library/Developer/Xcode/DerivedData/SDKExplicitPrecompiledModules -emit-dependencies -emit-module -emit-module-path /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo.swiftmodule -serialize-diagnostics -dependency-scan-serialize-diagnostics-path /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo-dependency-scan.dia -validate-clang-modules-once -clang-build-session-file /Users/dev/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -fmodules-prune-interval\=86400 -Xcc -fmodules-prune-after\=345600 -package-name sw -emit-const-values -const-gather-protocols-list /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo_const_extract_protocols.json -Xcc -I/Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Products/Debug/include -Xcc -I/Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/DerivedSources-normal/arm64 -Xcc -I/Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/DerivedSources/arm64 -Xcc -I/Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/DerivedSources -Xcc -DSWIFT_PACKAGE -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo-Swift.h -working-directory /tmp/sqfx/sw/.swiftpm/xcode -experimental-emit-module-separately -disable-cmo
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/dev/Library/Developer/Xcode/DerivedData/SDKExplicitPrecompiledModules/_SwiftConcurrencyShims-F1E0RTO68RIY1WOC5NST8XRTY.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/dev/Library/Developer/Xcode/DerivedData/SDKExplicitPrecompiledModules/SwiftShims-99J4302OFX6ZG3EX20YJ921UR.pcm
+
+SwiftEmitModule normal arm64 Emitting\ module\ for\ Demo (in target 'Demo' from project 'Demo')
+
+SwiftCompile normal arm64 (in target 'Demo' from project 'Demo')
+    cd /tmp/sqfx/sw/.swiftpm/xcode
+    
+
+SwiftCompile normal arm64 Compiling\ F2.swift /private/tmp/sqfx/sw/Sources/Demo/F2.swift (in target 'Demo' from project 'Demo')
+
+SwiftCompile normal arm64 /private/tmp/sqfx/sw/Sources/Demo/F2.swift (in target 'Demo' from project 'Demo')
+    cd /tmp/sqfx/sw/.swiftpm/xcode
+    builtin-SwiftPerFileCompile F2.swift
+
+/private/tmp/sqfx/sw/Sources/Demo/F2.swift:1:31: warning: variable 'k' was never mutated; consider changing to 'let' constant [#VariableNeverMutated]
+1 | public func f2() -> Int { var k = 2; return k }
+  |                               `- warning: variable 'k' was never mutated; consider changing to 'let' constant [#VariableNeverMutated]
+2 | 
+
+[#VariableNeverMutated]: <https://docs.swift.org/compiler/documentation/diagnostics/variable-never-mutated>
+SwiftCompile normal arm64 Compiling\ F3.swift /private/tmp/sqfx/sw/Sources/Demo/F3.swift (in target 'Demo' from project 'Demo')
+/private/tmp/sqfx/sw/Sources/Demo/F3.swift:1:31: warning: variable 'k' was never mutated; consider changing to 'let' constant [#VariableNeverMutated]
+1 | public func f3() -> Int { var k = 3; return k }
+  |                               `- warning: variable 'k' was never mutated; consider changing to 'let' constant [#VariableNeverMutated]
+2 | 
+
+[#VariableNeverMutated]: <https://docs.swift.org/compiler/documentation/diagnostics/variable-never-mutated>
+
+SwiftCompile normal arm64 /private/tmp/sqfx/sw/Sources/Demo/F3.swift (in target 'Demo' from project 'Demo')
+    cd /tmp/sqfx/sw/.swiftpm/xcode
+    builtin-SwiftPerFileCompile F3.swift
+
+SwiftCompile normal arm64 Compiling\ Demo.swift /private/tmp/sqfx/sw/Sources/Demo/Demo.swift (in target 'Demo' from project 'Demo')
+/private/tmp/sqfx/sw/Sources/Demo/Demo.swift:1:50: warning: initialization of immutable value 'unused' was never used; consider replacing with assignment to '_' or removing it [#NoUsage]
+1 | public func add(_ a: Int, _ b: Int) -> Int { let unused = 3; var v = a; return v + b }
+  |                                                  `- warning: initialization of immutable value 'unused' was never used; consider replacing with assignment to '_' or removing it [#NoUsage]
+2 | public func old() -> String { return "x" }
+3 | 
+
+/private/tmp/sqfx/sw/Sources/Demo/Demo.swift:1:66: warning: variable 'v' was never mutated; consider changing to 'let' constant [#VariableNeverMutated]
+1 | public func add(_ a: Int, _ b: Int) -> Int { let unused = 3; var v = a; return v + b }
+  |                                                                  `- warning: variable 'v' was never mutated; consider changing to 'let' constant [#VariableNeverMutated]
+2 | public func old() -> String { return "x" }
+3 | 
+
+[#NoUsage]: <https://docs.swift.org/compiler/documentation/diagnostics/no-usage>
+[#VariableNeverMutated]: <https://docs.swift.org/compiler/documentation/diagnostics/variable-never-mutated>
+
+SwiftCompile normal arm64 /private/tmp/sqfx/sw/Sources/Demo/Demo.swift (in target 'Demo' from project 'Demo')
+    cd /tmp/sqfx/sw/.swiftpm/xcode
+    builtin-SwiftPerFileCompile Demo.swift
+
+SwiftCompile normal arm64 Compiling\ F5.swift /private/tmp/sqfx/sw/Sources/Demo/F5.swift (in target 'Demo' from project 'Demo')
+/private/tmp/sqfx/sw/Sources/Demo/F5.swift:1:31: warning: variable 'k' was never mutated; consider changing to 'let' constant [#VariableNeverMutated]
+1 | public func f5() -> Int { var k = 5; return k }
+  |                               `- warning: variable 'k' was never mutated; consider changing to 'let' constant [#VariableNeverMutated]
+2 | 
+
+[#VariableNeverMutated]: <https://docs.swift.org/compiler/documentation/diagnostics/variable-never-mutated>
+
+SwiftCompile normal arm64 /private/tmp/sqfx/sw/Sources/Demo/F5.swift (in target 'Demo' from project 'Demo')
+    cd /tmp/sqfx/sw/.swiftpm/xcode
+    builtin-SwiftPerFileCompile F5.swift
+
+SwiftCompile normal arm64 Compiling\ F6.swift /private/tmp/sqfx/sw/Sources/Demo/F6.swift (in target 'Demo' from project 'Demo')
+
+SwiftCompile normal arm64 /private/tmp/sqfx/sw/Sources/Demo/F6.swift (in target 'Demo' from project 'Demo')
+    cd /tmp/sqfx/sw/.swiftpm/xcode
+    builtin-SwiftPerFileCompile F6.swift
+
+/private/tmp/sqfx/sw/Sources/Demo/F6.swift:1:31: warning: variable 'k' was never mutated; consider changing to 'let' constant [#VariableNeverMutated]
+1 | public func f6() -> Int { var k = 6; return k }
+  |                               `- warning: variable 'k' was never mutated; consider changing to 'let' constant [#VariableNeverMutated]
+2 | 
+
+[#VariableNeverMutated]: <https://docs.swift.org/compiler/documentation/diagnostics/variable-never-mutated>
+SwiftCompile normal arm64 Compiling\ F1.swift /private/tmp/sqfx/sw/Sources/Demo/F1.swift (in target 'Demo' from project 'Demo')
+/private/tmp/sqfx/sw/Sources/Demo/F1.swift:1:31: warning: variable 'k' was never mutated; consider changing to 'let' constant [#VariableNeverMutated]
+1 | public func f1() -> Int { var k = 1; return k }
+  |                               `- warning: variable 'k' was never mutated; consider changing to 'let' constant [#VariableNeverMutated]
+2 | 
+
+[#VariableNeverMutated]: <https://docs.swift.org/compiler/documentation/diagnostics/variable-never-mutated>
+
+SwiftCompile normal arm64 /private/tmp/sqfx/sw/Sources/Demo/F1.swift (in target 'Demo' from project 'Demo')
+    cd /tmp/sqfx/sw/.swiftpm/xcode
+    builtin-SwiftPerFileCompile F1.swift
+
+SwiftCompile normal arm64 Compiling\ F4.swift /private/tmp/sqfx/sw/Sources/Demo/F4.swift (in target 'Demo' from project 'Demo')
+
+SwiftCompile normal arm64 /private/tmp/sqfx/sw/Sources/Demo/F4.swift (in target 'Demo' from project 'Demo')
+    cd /tmp/sqfx/sw/.swiftpm/xcode
+    builtin-SwiftPerFileCompile F4.swift
+
+/private/tmp/sqfx/sw/Sources/Demo/F4.swift:1:31: warning: variable 'k' was never mutated; consider changing to 'let' constant [#VariableNeverMutated]
+1 | public func f4() -> Int { var k = 4; return k }
+  |                               `- warning: variable 'k' was never mutated; consider changing to 'let' constant [#VariableNeverMutated]
+2 | 
+
+[#VariableNeverMutated]: <https://docs.swift.org/compiler/documentation/diagnostics/variable-never-mutated>
+SwiftDriverJobDiscovery normal arm64 Emitting module for Demo (in target 'Demo' from project 'Demo')
+
+SwiftDriver\ Compilation\ Requirements Demo normal arm64 com.apple.xcode.tools.swift.compiler (in target 'Demo' from project 'Demo')
+    cd /tmp/sqfx/sw/.swiftpm/xcode
+    builtin-Swift-Compilation-Requirements -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -parse-as-library -module-name Demo -Onone @/Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo.SwiftFileList -DSWIFT_PACKAGE -DDEBUG -DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE -DXcode -enable-upcoming-feature ApproachableConcurrency -plugin-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.0.sdk -target arm64-apple-macos12.0 -g -module-cache-path /Users/dev/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -profile-coverage-mapping -profile-generate -enable-testing -index-store-path /Users/dev/Library/Developer/Xcode/DerivedData/Demo-eclklshjyvmlfthccfpfnkkbsinw/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 6 -I /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Products/Debug -Isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib -F /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Products/Debug -F /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks -c -j14 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/dev/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/macosx27.0-26A425-e829b21a6f8c9b70876ba0858053c0447231f6df4def33e022ae2eb8f782df1a.sdkstatcache -output-file-map /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo-OutputFileMap.json -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/dev/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/dev/Library/Developer/Xcode/DerivedData/SDKExplicitPrecompiledModules -emit-dependencies -emit-module -emit-module-path /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo.swiftmodule -serialize-diagnostics -dependency-scan-serialize-diagnostics-path /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo-dependency-scan.dia -validate-clang-modules-once -clang-build-session-file /Users/dev/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -fmodules-prune-interval\=86400 -Xcc -fmodules-prune-after\=345600 -package-name sw -emit-const-values -const-gather-protocols-list /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo_const_extract_protocols.json -Xcc -I/Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Products/Debug/include -Xcc -I/Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/DerivedSources-normal/arm64 -Xcc -I/Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/DerivedSources/arm64 -Xcc -I/Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/DerivedSources -Xcc -DSWIFT_PACKAGE -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo-Swift.h -working-directory /tmp/sqfx/sw/.swiftpm/xcode -experimental-emit-module-separately -disable-cmo
+
+SwiftMergeGeneratedHeaders /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/GeneratedModuleMaps/Demo-Swift.h /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo-Swift.h (in target 'Demo' from project 'Demo')
+    cd /tmp/sqfx/sw
+    builtin-swiftHeaderTool -arch arm64 /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo-Swift.h -o /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/GeneratedModuleMaps/Demo-Swift.h
+
+Copy /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Products/Debug/Demo.swiftmodule/arm64-apple-macos.swiftmodule /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo.swiftmodule (in target 'Demo' from project 'Demo')
+    cd /tmp/sqfx/sw
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo.swiftmodule /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Products/Debug/Demo.swiftmodule/arm64-apple-macos.swiftmodule
+
+Copy /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Products/Debug/Demo.swiftmodule/arm64-apple-macos.abi.json /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo.abi.json (in target 'Demo' from project 'Demo')
+    cd /tmp/sqfx/sw
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo.abi.json /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Products/Debug/Demo.swiftmodule/arm64-apple-macos.abi.json
+
+Copy /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Products/Debug/Demo.swiftmodule/arm64-apple-macos.swiftdoc /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo.swiftdoc (in target 'Demo' from project 'Demo')
+    cd /tmp/sqfx/sw
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo.swiftdoc /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Products/Debug/Demo.swiftmodule/arm64-apple-macos.swiftdoc
+
+Copy /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Products/Debug/Demo.swiftmodule/Project/arm64-apple-macos.swiftsourceinfo /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo.swiftsourceinfo (in target 'Demo' from project 'Demo')
+    cd /tmp/sqfx/sw
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo.swiftsourceinfo /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Products/Debug/Demo.swiftmodule/Project/arm64-apple-macos.swiftsourceinfo
+
+SwiftDriverJobDiscovery normal arm64 Compiling F5.swift (in target 'Demo' from project 'Demo')
+
+SwiftDriverJobDiscovery normal arm64 Compiling Demo.swift (in target 'Demo' from project 'Demo')
+
+SwiftDriverJobDiscovery normal arm64 Compiling F3.swift (in target 'Demo' from project 'Demo')
+
+SwiftDriverJobDiscovery normal arm64 Compiling F2.swift (in target 'Demo' from project 'Demo')
+
+SwiftDriverJobDiscovery normal arm64 Compiling F1.swift (in target 'Demo' from project 'Demo')
+
+SwiftDriverJobDiscovery normal arm64 Compiling F6.swift (in target 'Demo' from project 'Demo')
+
+SwiftDriverJobDiscovery normal arm64 Compiling F4.swift (in target 'Demo' from project 'Demo')
+
+SwiftDriver\ Compilation Demo normal arm64 com.apple.xcode.tools.swift.compiler (in target 'Demo' from project 'Demo')
+    cd /tmp/sqfx/sw/.swiftpm/xcode
+    builtin-Swift-Compilation -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -parse-as-library -module-name Demo -Onone @/Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo.SwiftFileList -DSWIFT_PACKAGE -DDEBUG -DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE -DXcode -enable-upcoming-feature ApproachableConcurrency -plugin-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.0.sdk -target arm64-apple-macos12.0 -g -module-cache-path /Users/dev/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -profile-coverage-mapping -profile-generate -enable-testing -index-store-path /Users/dev/Library/Developer/Xcode/DerivedData/Demo-eclklshjyvmlfthccfpfnkkbsinw/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 6 -I /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Products/Debug -Isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib -F /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Products/Debug -F /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks -c -j14 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/dev/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/macosx27.0-26A425-e829b21a6f8c9b70876ba0858053c0447231f6df4def33e022ae2eb8f782df1a.sdkstatcache -output-file-map /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo-OutputFileMap.json -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/dev/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/dev/Library/Developer/Xcode/DerivedData/SDKExplicitPrecompiledModules -emit-dependencies -emit-module -emit-module-path /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo.swiftmodule -serialize-diagnostics -dependency-scan-serialize-diagnostics-path /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo-dependency-scan.dia -validate-clang-modules-once -clang-build-session-file /Users/dev/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -fmodules-prune-interval\=86400 -Xcc -fmodules-prune-after\=345600 -package-name sw -emit-const-values -const-gather-protocols-list /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo_const_extract_protocols.json -Xcc -I/Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Products/Debug/include -Xcc -I/Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/DerivedSources-normal/arm64 -Xcc -I/Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/DerivedSources/arm64 -Xcc -I/Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/DerivedSources -Xcc -DSWIFT_PACKAGE -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo-Swift.h -working-directory /tmp/sqfx/sw/.swiftpm/xcode -experimental-emit-module-separately -disable-cmo
+
+Ld /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Products/Debug/Demo.o normal (in target 'Demo' from project 'Demo')
+    cd /tmp/sqfx/sw
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-macos12.0 -r -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.0.sdk -O0 -Xlinker -no_warn_duplicate_libraries -F/Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/EagerLinkingTBDs/Debug -F/Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Products/Debug -iframework /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks -filelist /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo.LinkFileList -nostdlib -Xlinker -object_path_lto -Xlinker /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo_lto.o -Xlinker -no_deduplicate -Xlinker -debug_variant -Xlinker -dependency_info -Xlinker /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo_dependency_info.dat -fobjc-link-runtime -L/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx -L/usr/lib/swift -Xlinker -add_ast_path -Xlinker /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo.swiftmodule -o /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Products/Debug/Demo.o
+
+ExtractAppIntentsMetadata (in target 'Demo' from project 'Demo')
+    cd /tmp/sqfx/sw
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v27.1.266.1.8iRky3/Metal.xctoolchain --module-name Demo --sdk-root /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.0.sdk --xcode-version 27A9275 --platform-family macOS --deployment-target 12.0 --bundle-identifier sw.Demo --output /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Products/Debug/Demo.appintents --target-triple arm64-apple-macos12.0 --binary-file /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Products/Debug/Demo.o --dependency-file /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo_dependency_info.dat --stringsdata-file /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo.SwiftFileList --metadata-file-list /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Demo.DependencyMetadataFileList --static-metadata-file-list /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Demo.DependencyStaticMetadataFileList --swift-const-vals-list /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo.SwiftConstValuesFileList --force --compile-time-extraction --deployment-aware-processing --no-app-shortcuts-localization
+2026-11-02 01:38:48.031 appintentsmetadataprocessor[40162:44955929] Starting appintentsmetadataprocessor export
+2026-11-02 01:38:48.094 appintentsmetadataprocessor[40162:44955929] Extracted no relevant App Intents symbols, skipping writing output
+
+PruneExplicitPrecompiledModules /Users/dev/Library/Developer/Xcode/DerivedData/SDKExplicitPrecompiledModules
+
+PruneExplicitPrecompiledModules /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/ExplicitPrecompiledModules
+
+PruneExplicitPrecompiledModules /Users/dev/Library/Developer/Xcode/DerivedData/sw-eclklshjyvmlfthccfpfnkkbsinw/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules
+
+** BUILD SUCCEEDED **
+

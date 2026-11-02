@@ -1,0 +1,57 @@
+Building for debugging...
+[1 / 21]
+[2 / 13] DemoTests-product
+[4 / 15] DemoTests-product
+[7 / 13] DemoTests-product
+[9 / 13] DemoTests-product
+Build complete! (3,02 sec)
+Test Suite 'All tests' started at 2026-11-02 01:38:36.071.
+Test Suite 'DemoTests.xctest' started at 2026-11-02 01:38:36.079.
+Test Suite 'OldTests' started at 2026-11-02 01:38:36.079.
+Test Case '-[DemoTests.OldTests testA]' started.
+Test Case '-[DemoTests.OldTests testA]' passed (0.001 seconds).
+Test Case '-[DemoTests.OldTests testB]' started.
+/private/tmp/sqfx/sw/Tests/DemoTests/DemoTests.swift:9: error: -[DemoTests.OldTests testB] : XCTAssertEqual failed: ("3") is not equal to ("4")
+Test Case '-[DemoTests.OldTests testB]' failed (0.078 seconds).
+Test Case '-[DemoTests.OldTests testC]' started.
+Test Case '-[DemoTests.OldTests testC]' passed (0.000 seconds).
+Test Suite 'OldTests' failed at 2026-11-02 01:38:36.158.
+	 Executed 3 tests, with 1 failure (0 unexpected) in 0.079 (0.080) seconds
+Test Suite 'DemoTests.xctest' failed at 2026-11-02 01:38:36.158.
+	 Executed 3 tests, with 1 failure (0 unexpected) in 0.079 (0.080) seconds
+Test Suite 'All tests' failed at 2026-11-02 01:38:36.158.
+	 Executed 3 tests, with 1 failure (0 unexpected) in 0.079 (0.088) seconds
+◇ Test run started.
+↳ Testing Library Version: 2084
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Test adds(i:) started.
+◇ Test fails() started.
+◇ Test case passing 1 argument i → 0 to adds(i:) started.
+◇ Test case passing 1 argument i → 1 to adds(i:) started.
+◇ Test case passing 1 argument i → 2 to adds(i:) started.
+◇ Test case passing 1 argument i → 3 to adds(i:) started.
+◇ Test case passing 1 argument i → 5 to adds(i:) started.
+◇ Test case passing 1 argument i → 8 to adds(i:) started.
+◇ Test case passing 1 argument i → 4 to adds(i:) started.
+◇ Test case passing 1 argument i → 7 to adds(i:) started.
+◇ Test case passing 1 argument i → 10 to adds(i:) started.
+◇ Test case passing 1 argument i → 13 to adds(i:) started.
+◇ Test case passing 1 argument i → 12 to adds(i:) started.
+◇ Test case passing 1 argument i → 11 to adds(i:) started.
+◇ Test case passing 1 argument i → 16 to adds(i:) started.
+◇ Test case passing 1 argument i → 9 to adds(i:) started.
+◇ Test case passing 1 argument i → 6 to adds(i:) started.
+◇ Test case passing 1 argument i → 18 to adds(i:) started.
+◇ Test case passing 1 argument i → 15 to adds(i:) started.
+◇ Test case passing 1 argument i → 19 to adds(i:) started.
+◇ Test case passing 1 argument i → 14 to adds(i:) started.
+◇ Test case passing 1 argument i → 17 to adds(i:) started.
+✔ Test adds(i:) with 20 test cases passed after 0.001 seconds.
+✘ Test fails() recorded an issue at DemoTests.swift:6:22: Expectation failed: add(1, 1) == 3
+↳ add(1, 1) == 3 → false
+↳   add(1, 1) → 2
+✘ Test fails() failed after 0.001 seconds with 1 issue.
+✘ Test run with 2 tests in 0 suites failed after 0.001 seconds with 1 issue.
+Note: Some test targets reported failures:
+  - DemoTests (XCTest)
+  - DemoTests (Swift Testing)

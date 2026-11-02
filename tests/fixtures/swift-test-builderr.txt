@@ -1,0 +1,53 @@
+Building for debugging...
+[Planning deferred tasks]
+[15 / 26] DemoTests-product
+[24 / 96]
+[30 / 96]
+[36 / 96]
+[37 / 96]
+[43 / 96]
+[47 / 96]
+[54 / 96]
+[57 / 96]
+[59 / 96]
+[60 / 96]
+[71 / 96]
+[72 / 96]
+[76 / 96]
+[77 / 96]
+[79 / 96]
+[80 / 96]
+[82 / 96]
+[85 / 96] DemoTests-product
+[90 / 96] DemoTests-product
+error: SwiftCompile normal arm64 /private/tmp/sqfx/sw/Tests/DemoTests/DemoTests.swift failed with a nonzero exit code. Command line:     cd /private/tmp/sqfx
+    builtin-SwiftPerFileCompile DemoTests.swift
+/private/tmp/sqfx/sw/Tests/DemoTests/DemoTests.swift:8:35: [1;31merror: [1;39muse of 'add' refers to instance method rather than global function 'add' in module 'Demo'[0;0m
+ [0;36m6 |[0;0m @Test func fails() { #expect(add(1, 1) == 3) }
+ [0;36m7 |[0;0m final class OldTests: XCTestCase {
+ [0;36m8 |[0;0m     func testA() { XCTAssertEqual(add(1, 2), 3) }
+   [0;36m|[0;0m                                   |- [1;31merror: [1;39muse of 'add' refers to instance method rather than global function 'add' in module 'Demo'[0;0m
+   [0;36m|[0;0m                                   `- [1;39mnote: [1;39muse 'Demo.' to reference the global function in module 'Demo'[0;0m
+ [0;36m9 |[0;0m     func testB() { XCTAssertEqual(add(1, 2), 4) }
+[0;36m10 |[0;0m     func testC() { XCTAssertTrue(true) }
+
+Demo.add:1:13: [1;39mnote: [1;39m'add' declared here[0;0m
+[0;36m1 |[0;0m public func add(_ a: Int, _ b: Int) -> Int
+  [0;36m|[0;0m             `- [1;39mnote: [1;39m'add' declared here[0;0m
+
+/private/tmp/sqfx/sw/Tests/DemoTests/DemoTests.swift:9:35: [1;31merror: [1;39muse of 'add' refers to instance method rather than global function 'add' in module 'Demo'[0;0m
+ [0;36m7 |[0;0m final class OldTests: XCTestCase {
+ [0;36m8 |[0;0m     func testA() { XCTAssertEqual(add(1, 2), 3) }
+ [0;36m9 |[0;0m     func testB() { XCTAssertEqual(add(1, 2), 4) }
+   [0;36m|[0;0m                                   |- [1;31merror: [1;39muse of 'add' refers to instance method rather than global function 'add' in module 'Demo'[0;0m
+   [0;36m|[0;0m                                   `- [1;39mnote: [1;39muse 'Demo.' to reference the global function in module 'Demo'[0;0m
+[0;36m10 |[0;0m     func testC() { XCTAssertTrue(true) }
+[0;36m11 |[0;0m }
+
+Demo.add:1:13: [1;39mnote: [1;39m'add' declared here[0;0m
+[0;36m1 |[0;0m public func add(_ a: Int, _ b: Int) -> Int
+  [0;36m|[0;0m             `- [1;39mnote: [1;39m'add' declared here[0;0m
+Failed frontend command:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-frontend -frontend -c /private/tmp/sqfx/sw/.build/out/Intermediates.noindex/Demo.build/Debug/DemoTests-p.build/DerivedSources/test_entry_point.swift -primary-file /private/tmp/sqfx/sw/Tests/DemoTests/DemoTests.swift -emit-dependencies-path /private/tmp/sqfx/sw/.build/out/Intermediates.noindex/Demo.build/Debug/DemoTests-p.build/Objects-normal/arm64/DemoTests.d -emit-const-values-path /private/tmp/sqfx/sw/.build/out/Intermediates.noindex/Demo.build/Debug/DemoTests-p.build/Objects-normal/arm64/DemoTests.swiftconstvalues -emit-reference-dependencies-path /private/tmp/sqfx/sw/.build/out/Intermediates.noindex/Demo.build/Debug/DemoTests-p.build/Objects-normal/arm64/DemoTests.swiftdeps -serialize-diagnostics-path /private/tmp/sqfx/sw/.build/out/Intermediates.noindex/Demo.build/Debug/DemoTests-p.build/Objects-normal/arm64/DemoTests.dia -target arm64-apple-macos14.0 -module-can-import-version Testing 2084 0 -module-can-import-version XCTest 25229 0 -disable-cross-import-overlay-search -swift-module-cross-import Testing /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks/Testing.framework/Modules/Testing.swiftcrossimport/AppKit.swiftoverlay -swift-module-cross-import Testing /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks/Testing.framework/Modules/Testing.swiftcrossimport/CoreGraphics.swiftoverlay -swift-module-cross-import Testing /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks/Testing.framework/Modules/Testing.swiftcrossimport/CoreImage.swiftoverlay -swift-module-cross-import Testing /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks/Testing.framework/Modules/Testing.swiftcrossimport/CoreTransferable.swiftoverlay -swift-module-cross-import Testing /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks/Testing.framework/Modules/Testing.swiftcrossimport/Foundation.swiftoverlay -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/swift/host/plugins/libFoundationMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/bin/swift-plugin-server\#FoundationMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/swift/host/plugins/libObservationMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/bin/swift-plugin-server\#ObservationMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/swift/host/plugins/libPreviewsMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/bin/swift-plugin-server\#PreviewsMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/swift/host/plugins/libSwiftMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/bin/swift-plugin-server\#SwiftMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib/swift/host/plugins/libSwiftUIMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/bin/swift-plugin-server\#SwiftUIMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing/libTestingMacros.dylib\#\#TestingMacros -disable-implicit-swift-modules -Xcc -fno-implicit-modules -Xcc -fno-implicit-module-maps -explicit-swift-module-map-file /private/tmp/sqfx/sw/.build/out/Intermediates.noindex/Demo.build/Debug/DemoTests-p.build/Objects-normal/arm64/DemoTests-dependencies-1.json -Xllvm -aarch64-use-tbi -enable-objc-interop -stack-check -sdk /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX27.0.sdk -I /private/tmp/sqfx/sw/.build/out/Products/Debug -Isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib -F /private/tmp/sqfx/sw/.build/out/Products/Debug/PackageFrameworks -F /private/tmp/sqfx/sw/.build/out/Products/Debug -F /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks -module-cache-path /private/tmp/sqfx/sw/.build/out/Intermediates.noindex/SwiftExplicitPrecompiledModules -color-diagnostics -Xcc -fcolor-diagnostics -enable-testing -g -debug-info-format\=dwarf -dwarf-version\=4 -swift-version 6 -Onone -D SWIFT_PACKAGE -D DEBUG -D Xcode -serialize-debugging-options -enable-upcoming-feature ApproachableConcurrency -enable-experimental-feature DebugDescriptionMacro -empty-abi-descriptor -validate-clang-modules-once -clang-build-session-file /private/tmp/sqfx/sw/.build/out/ModuleCache.noindex/Session.modulevalidation -Xcc -working-directory -Xcc /private/tmp/sqfx -enable-anonymous-context-mangled-names -file-compilation-dir /private/tmp/sqfx -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -Xcc -ivfsstatcache -Xcc /private/tmp/sqfx/sw/.build/out/SDKStatCaches.noindex/macosx27.0-26A425-80c5bbf1d171475443272936d42f90a37231f6df4def33e022ae2eb8f782df1a.sdkstatcache -Xcc -fmodules-prune-interval\=86400 -Xcc -fmodules-prune-after\=345600 -Xcc -I/private/tmp/sqfx/sw/.build/out/Products/Debug/include -Xcc -I/private/tmp/sqfx/sw/.build/out/Intermediates.noindex/Demo.build/Debug/DemoTests-p.build/DerivedSources-normal/arm64 -Xcc -I/private/tmp/sqfx/sw/.build/out/Intermediates.noindex/Demo.build/Debug/DemoTests-p.build/DerivedSources/arm64 -Xcc -I/private/tmp/sqfx/sw/.build/out/Intermediates.noindex/Demo.build/Debug/DemoTests-p.build/DerivedSources -Xcc -DSWIFT_PACKAGE -Xcc -DDEBUG\=1 -no-auto-bridging-header-chaining -module-name DemoTests -package-name sw -const-gather-protocols-file /private/tmp/sqfx/sw/.build/out/Intermediates.noindex/Demo.build/Debug/DemoTests-p.build/Objects-normal/arm64/DemoTests_const_extract_protocols.json -disable-clang-spi -clang-target arm64-apple-macos27.0 -target-sdk-version 27.0 -target-sdk-name macosx27.0 -in-process-plugin-server-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/libSwiftInProcPluginServer.dylib -parse-as-library -o /private/tmp/sqfx/sw/.build/out/Intermediates.noindex/Demo.build/Debug/DemoTests-p.build/Objects-normal/arm64/DemoTests.o -debug-module-path /private/tmp/sqfx/sw/.build/out/Intermediates.noindex/Demo.build/Debug/DemoTests-p.build/Objects-normal/arm64/DemoTests.swiftmodule -index-unit-output-path /Demo.build/Debug/DemoTests-p.build/Objects-normal/arm64/DemoTests.o -index-store-path /private/tmp/sqfx/sw/.build/out -index-system-modules
+error: Build failed
+error: fatalError

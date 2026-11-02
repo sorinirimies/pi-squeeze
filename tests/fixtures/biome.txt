@@ -1,0 +1,303 @@
+src/m2.js:1:17 lint/correctness/noUnusedVariables  FIXABLE  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! This function add is unused.
+  
+  > 1 │ export function add(a, b) { return a + b }
+      │                 ^^^
+    2 │ export function unused2(x) { var y = 1; if (x == null) { debugger; } return eval("x") }
+    3 │ 
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+  i Unsafe fix: If this is intentional, prepend add with an underscore.
+  
+    1   │ - export·function·add(a,·b)·{·return·a·+·b·}
+      1 │ + export·function·_add(a,·b)·{·return·a·+·b·}
+    2 2 │   export function unused2(x) { var y = 1; if (x == null) { debugger; } return eval("x") }
+    3 3 │   
+  
+
+src/m2.js:2:17 lint/correctness/noUnusedVariables  FIXABLE  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! This function unused2 is unused.
+  
+    1 │ export function add(a, b) { return a + b }
+  > 2 │ export function unused2(x) { var y = 1; if (x == null) { debugger; } return eval("x") }
+      │                 ^^^^^^^
+    3 │ 
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+  i Unsafe fix: If this is intentional, prepend unused2 with an underscore.
+  
+    1 1 │   export function add(a, b) { return a + b }
+    2   │ - export·function·unused2(x)·{·var·y·=·1;·if·(x·==·null)·{·debugger;·}·return·eval("x")·}
+      2 │ + export·function·_unused2(x)·{·var·y·=·1;·if·(x·==·null)·{·debugger;·}·return·eval("x")·}
+    3 3 │   
+  
+
+src/m2.js:2:34 lint/correctness/noUnusedVariables  FIXABLE  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! This variable y is unused.
+  
+    1 │ export function add(a, b) { return a + b }
+  > 2 │ export function unused2(x) { var y = 1; if (x == null) { debugger; } return eval("x") }
+      │                                  ^
+    3 │ 
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+  i Unsafe fix: If this is intentional, prepend y with an underscore.
+  
+    1 1 │   export function add(a, b) { return a + b }
+    2   │ - export·function·unused2(x)·{·var·y·=·1;·if·(x·==·null)·{·debugger;·}·return·eval("x")·}
+      2 │ + export·function·unused2(x)·{·var·_y·=·1;·if·(x·==·null)·{·debugger;·}·return·eval("x")·}
+    3 3 │   
+  
+
+src/m4.js:1:17 lint/correctness/noUnusedVariables  FIXABLE  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! This function add is unused.
+  
+  > 1 │ export function add(a, b) { return a + b }
+      │                 ^^^
+    2 │ export function unused4(x) { var y = 1; if (x == null) { debugger; } return eval("x") }
+    3 │ 
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+  i Unsafe fix: If this is intentional, prepend add with an underscore.
+  
+    1   │ - export·function·add(a,·b)·{·return·a·+·b·}
+      1 │ + export·function·_add(a,·b)·{·return·a·+·b·}
+    2 2 │   export function unused4(x) { var y = 1; if (x == null) { debugger; } return eval("x") }
+    3 3 │   
+  
+
+src/m4.js:2:17 lint/correctness/noUnusedVariables  FIXABLE  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! This function unused4 is unused.
+  
+    1 │ export function add(a, b) { return a + b }
+  > 2 │ export function unused4(x) { var y = 1; if (x == null) { debugger; } return eval("x") }
+      │                 ^^^^^^^
+    3 │ 
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+  i Unsafe fix: If this is intentional, prepend unused4 with an underscore.
+  
+    1 1 │   export function add(a, b) { return a + b }
+    2   │ - export·function·unused4(x)·{·var·y·=·1;·if·(x·==·null)·{·debugger;·}·return·eval("x")·}
+      2 │ + export·function·_unused4(x)·{·var·y·=·1;·if·(x·==·null)·{·debugger;·}·return·eval("x")·}
+    3 3 │   
+  
+
+src/m.test.js:1:1 parse ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Illegal use of an import declaration outside of a module
+  
+  > 1 │ import { add } from "./m.js";
+      │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    2 │ import { describe, test, expect } from "vitest";
+    3 │ describe("math", () => {
+  
+  i not allowed inside scripts
+  
+
+src/m.test.js:2:1 parse ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Illegal use of an import declaration outside of a module
+  
+    1 │ import { add } from "./m.js";
+  > 2 │ import { describe, test, expect } from "vitest";
+      │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    3 │ describe("math", () => {
+    4 │   for (let i = 0; i < 25; i++) test(`adds ${i}`, () => expect(add(i, 1)).toBe(i + 1));
+  
+  i not allowed inside scripts
+  
+
+src/m2.js:1:1 parse ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Illegal use of an export declaration outside of a module
+  
+  > 1 │ export function add(a, b) { return a + b }
+      │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    2 │ export function unused2(x) { var y = 1; if (x == null) { debugger; } return eval("x") }
+    3 │ 
+  
+  i not allowed inside scripts
+  
+
+src/m2.js:2:1 parse ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Illegal use of an export declaration outside of a module
+  
+    1 │ export function add(a, b) { return a + b }
+  > 2 │ export function unused2(x) { var y = 1; if (x == null) { debugger; } return eval("x") }
+      │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    3 │ 
+  
+  i not allowed inside scripts
+  
+
+src/m2.js:1:8 lint/correctness/noInnerDeclarations ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × This function should be declared at the root of the script.
+  
+  > 1 │ export function add(a, b) { return a + b }
+      │        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    2 │ export function unused2(x) { var y = 1; if (x == null) { debugger; } return eval("x") }
+    3 │ 
+  
+  i The function is accessible in the whole body of the script.
+    To avoid confusion, it should be declared at the root of the script.
+  
+
+src/m2.js:2:8 lint/correctness/noInnerDeclarations ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × This function should be declared at the root of the script.
+  
+    1 │ export function add(a, b) { return a + b }
+  > 2 │ export function unused2(x) { var y = 1; if (x == null) { debugger; } return eval("x") }
+      │        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    3 │ 
+  
+  i The function is accessible in the whole body of the script.
+    To avoid confusion, it should be declared at the root of the script.
+  
+
+src/m2.js:2:58 lint/suspicious/noDebugger  FIXABLE  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × This is an unexpected use of the debugger statement.
+  
+    1 │ export function add(a, b) { return a + b }
+  > 2 │ export function unused2(x) { var y = 1; if (x == null) { debugger; } return eval("x") }
+      │                                                          ^^^^^^^^^
+    3 │ 
+  
+  i A debugger statement pauses the program when a debugger is open. It is meant for debugging only, and it should not be left in code that is shipped.
+  
+  i Unsafe fix: Remove debugger statement
+  
+    2 │ export·function·unused2(x)·{·var·y·=·1;·if·(x·==·null)·{·debugger;·}·return·eval("x")·}
+      │                                                          ----------                    
+
+src/m2.js:2:77 lint/security/noGlobalEval ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Do not use eval().
+  
+    1 │ export function add(a, b) { return a + b }
+  > 2 │ export function unused2(x) { var y = 1; if (x == null) { debugger; } return eval("x") }
+      │                                                                             ^^^^
+    3 │ 
+  
+  i eval() runs code from a string. This exposes the program to security risks, such as code injection, and can cause performance issues.
+  
+  i See the MDN web docs for more details.
+  
+  i Refactor the code so that it doesn't need to call eval().
+  
+
+src/m4.js:1:1 parse ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Illegal use of an export declaration outside of a module
+  
+  > 1 │ export function add(a, b) { return a + b }
+      │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    2 │ export function unused4(x) { var y = 1; if (x == null) { debugger; } return eval("x") }
+    3 │ 
+  
+  i not allowed inside scripts
+  
+
+src/m4.js:2:1 parse ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Illegal use of an export declaration outside of a module
+  
+    1 │ export function add(a, b) { return a + b }
+  > 2 │ export function unused4(x) { var y = 1; if (x == null) { debugger; } return eval("x") }
+      │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    3 │ 
+  
+  i not allowed inside scripts
+  
+
+src/m4.js:1:8 lint/correctness/noInnerDeclarations ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × This function should be declared at the root of the script.
+  
+  > 1 │ export function add(a, b) { return a + b }
+      │        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    2 │ export function unused4(x) { var y = 1; if (x == null) { debugger; } return eval("x") }
+    3 │ 
+  
+  i The function is accessible in the whole body of the script.
+    To avoid confusion, it should be declared at the root of the script.
+  
+
+src/m4.js:2:8 lint/correctness/noInnerDeclarations ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × This function should be declared at the root of the script.
+  
+    1 │ export function add(a, b) { return a + b }
+  > 2 │ export function unused4(x) { var y = 1; if (x == null) { debugger; } return eval("x") }
+      │        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    3 │ 
+  
+  i The function is accessible in the whole body of the script.
+    To avoid confusion, it should be declared at the root of the script.
+  
+
+src/m4.js:2:58 lint/suspicious/noDebugger  FIXABLE  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × This is an unexpected use of the debugger statement.
+  
+    1 │ export function add(a, b) { return a + b }
+  > 2 │ export function unused4(x) { var y = 1; if (x == null) { debugger; } return eval("x") }
+      │                                                          ^^^^^^^^^
+    3 │ 
+  
+  i A debugger statement pauses the program when a debugger is open. It is meant for debugging only, and it should not be left in code that is shipped.
+  
+  i Unsafe fix: Remove debugger statement
+  
+    2 │ export·function·unused4(x)·{·var·y·=·1;·if·(x·==·null)·{·debugger;·}·return·eval("x")·}
+      │                                                          ----------                    
+
+src/n.test.js:1:1 parse ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Illegal use of an import declaration outside of a module
+  
+  > 1 │ import { add } from "./m.js";
+      │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    2 │ import { test, expect } from "vitest";
+    3 │ test("n ok", () => expect(add(2, 2)).toBe(4));
+  
+  i not allowed inside scripts
+  
+
+src/n.test.js:2:1 parse ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Illegal use of an import declaration outside of a module
+  
+    1 │ import { add } from "./m.js";
+  > 2 │ import { test, expect } from "vitest";
+      │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    3 │ test("n ok", () => expect(add(2, 2)).toBe(4));
+    4 │ 
+  
+  i not allowed inside scripts
+  
+
+The number of diagnostics exceeds the limit allowed. Use --max-diagnostics to increase it.
+Diagnostics not shown: 29.
+Checked 7 files in 6ms. No fixes applied.
+Found 34 errors.
+Found 15 warnings.
+lint ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Some errors were emitted while running checks.
+  
+

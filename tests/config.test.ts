@@ -15,7 +15,7 @@ describe("sanitizeConfig", () => {
 			enabled: false,
 			showStatus: false,
 			rtk: true,
-			kinds: { search: true, paths: false, listing: true, diff: true, tests: true, git: true, build: true, tree: true, generic: true },
+			kinds: { search: true, paths: false, listing: true, diff: true, tests: true, git: true, build: true, lint: true, install: true, logs: true, tree: true, generic: true },
 			minChars: 100,
 			lineChars: 4000,
 			perGroup: 1,
@@ -86,6 +86,6 @@ describe("config file", () => {
 
 describe("optionsOf", () => {
 	test("maps the settings to compaction options", () => {
-		expect(optionsOf(DEFAULT_CONFIG)).toEqual({ limits: { lineChars: 240, perGroup: 15, total: 250 }, minChars: 400, kinds: { search: true, paths: true, listing: true, diff: true, tests: true, git: true, build: true, tree: true, generic: true } });
+		expect(optionsOf(DEFAULT_CONFIG)).toEqual({ limits: { lineChars: 240, perGroup: 15, total: 250 }, minChars: 400, kinds: { search: true, paths: true, listing: true, diff: true, tests: true, git: true, build: true, lint: true, install: true, logs: true, tree: true, generic: true } });
 	});
 });

@@ -1,0 +1,7 @@
+Requirement already satisfied: requests==2.31.0 in ./v/lib/python3.9/site-packages (2.31.0)
+Requirement already satisfied: charset-normalizer<4,>=2 in ./v/lib/python3.9/site-packages (from requests==2.31.0) (3.5.2)
+Requirement already satisfied: idna<4,>=2.5 in ./v/lib/python3.9/site-packages (from requests==2.31.0) (3.20)
+Requirement already satisfied: urllib3<3,>=1.21.1 in ./v/lib/python3.9/site-packages (from requests==2.31.0) (2.6.3)
+Requirement already satisfied: certifi>=2017.4.17 in ./v/lib/python3.9/site-packages (from requests==2.31.0) (2026.10.23)
+WARNING: You are using pip version 21.2.4; however, version 26.0.1 is available.
+You should consider upgrading via the '/private/tmp/sqfx/v/bin/python3 -m pip install --upgrade pip' command.

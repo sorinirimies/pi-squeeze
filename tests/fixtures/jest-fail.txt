@@ -1,0 +1,25 @@
+FAIL j/a.test.cjs
+  ● math › fails
+
+    expect(received).toEqual(expected) // deep equality
+
+    Expected: 3
+    Received: 2
+
+      2 | describe("math", () => {
+      3 |   for (let i = 0; i < 25; i++) test(`adds ${i}`, () => expect(add(i, 1)).toBe(i + 1));
+    > 4 |   test("fails", () => expect(add(1, 1)).toEqual(3));
+        |                                         ^
+      5 |   test.skip("skipped", () => {});
+      6 | });
+      7 |
+
+      at Object.<anonymous> (a.test.cjs:4:41)
+
+A worker process has failed to exit gracefully and has been force exited. This is likely caused by tests leaking due to improper teardown. Try running with --detectOpenHandles to find leaks. Active timers can also cause this, ensure that .unref() was called on them.
+
+Test Suites: 1 failed, 1 passed, 2 total
+Tests:       1 failed, 1 skipped, 26 passed, 28 total
+Snapshots:   0 total
+Time:        1.679 s
+Ran all test suites.

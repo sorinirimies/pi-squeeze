@@ -1,0 +1,77 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.10, pytest-9.2.0, pluggy-1.7.0 -- /Users/dev/.cache/uv/archive-v0/oIY3BXLHb-FhIGVR/bin/python
+cachedir: .pytest_cache
+rootdir: /private/tmp/sqfx/py
+collecting ... collected 35 items
+
+test_a.py::test_many[0] PASSED                                           [  2%]
+test_a.py::test_many[1] PASSED                                           [  5%]
+test_a.py::test_many[2] PASSED                                           [  8%]
+test_a.py::test_many[3] PASSED                                           [ 11%]
+test_a.py::test_many[4] PASSED                                           [ 14%]
+test_a.py::test_many[5] PASSED                                           [ 17%]
+test_a.py::test_many[6] PASSED                                           [ 20%]
+test_a.py::test_many[7] PASSED                                           [ 22%]
+test_a.py::test_many[8] PASSED                                           [ 25%]
+test_a.py::test_many[9] PASSED                                           [ 28%]
+test_a.py::test_many[10] PASSED                                          [ 31%]
+test_a.py::test_many[11] PASSED                                          [ 34%]
+test_a.py::test_many[12] PASSED                                          [ 37%]
+test_a.py::test_many[13] PASSED                                          [ 40%]
+test_a.py::test_many[14] PASSED                                          [ 42%]
+test_a.py::test_many[15] PASSED                                          [ 45%]
+test_a.py::test_many[16] PASSED                                          [ 48%]
+test_a.py::test_many[17] PASSED                                          [ 51%]
+test_a.py::test_many[18] PASSED                                          [ 54%]
+test_a.py::test_many[19] PASSED                                          [ 57%]
+test_a.py::test_many[20] PASSED                                          [ 60%]
+test_a.py::test_many[21] PASSED                                          [ 62%]
+test_a.py::test_many[22] PASSED                                          [ 65%]
+test_a.py::test_many[23] PASSED                                          [ 68%]
+test_a.py::test_many[24] PASSED                                          [ 71%]
+test_a.py::test_many[25] PASSED                                          [ 74%]
+test_a.py::test_many[26] PASSED                                          [ 77%]
+test_a.py::test_many[27] PASSED                                          [ 80%]
+test_a.py::test_many[28] PASSED                                          [ 82%]
+test_a.py::test_many[29] PASSED                                          [ 85%]
+test_a.py::test_fail FAILED                                              [ 88%]
+test_a.py::test_err FAILED                                               [ 91%]
+test_a.py::test_skip SKIPPED (later)                                     [ 94%]
+test_b.py::test_ok PASSED                                                [ 97%]
+test_b.py::test_ok2 PASSED                                               [100%]
+
+=================================== FAILURES ===================================
+__________________________________ test_fail ___________________________________
+
+    def test_fail():
+        d={"a":1,"b":[1,2,3]}
+>       assert d=={"a":1,"b":[1,2,4]}
+E       AssertionError: assert {'a': 1, 'b': [1, 2, 3]} == {'a': 1, 'b': [1, 2, 4]}
+E         
+E         Omitting 1 identical items, use -vv to show
+E         Differing items:
+E         {'b': [1, 2, 3]} != {'b': [1, 2, 4]}
+E         
+E         Full diff: (-: missing in left side, +: extra in left side)
+E           {...
+E         
+E         ...Full output truncated, use '-vv' to show
+
+test_a.py:7: AssertionError
+___________________________________ test_err ___________________________________
+
+>   def test_err(): raise ValueError("boom")
+                    ^^^^^^^^^^^^^^^^^^^^^^^^
+E   ValueError: boom
+
+test_a.py:8: ValueError
+=============================== warnings summary ===============================
+test_b.py::test_ok
+  /private/tmp/sqfx/py/test_b.py:2: DeprecationWarning: old api
+    def test_ok(): warnings.warn("old api", DeprecationWarning); assert True
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED test_a.py::test_fail - AssertionError: assert {'a': 1, 'b': [1, 2, 3]}...
+FAILED test_a.py::test_err - ValueError: boom
+============== 2 failed, 32 passed, 1 skipped, 1 warning in 0.03s ==============

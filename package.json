@@ -1,7 +1,7 @@
 {
   "name": "pi-squeeze",
   "version": "0.1.0",
-  "description": "Shrinks bash output before it reaches the agent's context: native compactors for git, cargo, rg, ls, test and build output, plus rtk when installed. Full output stays one temp file away.",
+  "description": "Shrinks bash output before it reaches the agent's context: native compactors for git, search, listings, tests, builds (cargo, gradle, Xcode, tsc, docker), linters, package installs and logs, plus rtk when installed. Full output stays one temp file away.",
   "keywords": ["pi-package", "pi-extension", "pi", "tokens", "context", "compaction", "rtk"],
   "license": "MIT",
   "author": "Sorin Albu-Irimies",

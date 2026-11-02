@@ -1,11 +1,18 @@
 /** Chooses the compactor for a bash command and applies the safety rules. */
-import { hasFlag, parse } from "./command.ts";
+import { hasFlag, type Invocation, parse } from "./command.ts";
 import { DEFAULT_LIMITS, type Limits, type Squeezed } from "./elide.ts";
+import { compactPackages } from "./adb.ts";
 import { compactAudit } from "./audit.ts";
 import { compactBlame } from "./blame.ts";
 import { compactDiff } from "./diff.ts";
+import { compactDockerBuild } from "./docker.ts";
 import { compactDust } from "./dust.ts";
-import { compactGradle } from "./gradle.ts";
+import { compactGradle, compactGradleDeps } from "./gradle.ts";
+import { compactInstall } from "./install.ts";
+import { compactJest } from "./jest.ts";
+import { compactLint, compactLintSniffed } from "./lint.ts";
+import { compactLogs } from "./logs.ts";
+import { compactPytest } from "./pytest.ts";
 import { compactGeneric, isContent } from "./generic.ts";
 import { compactLog, compactShow } from "./gitlog.ts";
 import { compactStatus } from "./gitstatus.ts";
@@ -17,8 +24,9 @@ import { compactBunTest, compactGoTest } from "./runners.ts";
 import { compactTests } from "./tests.ts";
 import { compactTree } from "./tree.ts";
 import { compactTsc } from "./tsc.ts";
+import { compactXcode, compactXcodeSniffed } from "./xcode.ts";
 
-export const KINDS = ["search", "paths", "listing", "diff", "tests", "git", "build", "tree", "generic"] as const;
+export const KINDS = ["search", "paths", "listing", "diff", "tests", "git", "build", "lint", "install", "logs", "tree", "generic"] as const;
 export type Kind = (typeof KINDS)[number];
 
 export type Result = { text: string; kind: Kind; truncated: boolean; before: number; after: number };
@@ -31,14 +39,14 @@ export type Options = {
 	maxRatio?: number;
 	/** Compactors that may run; a missing entry means on. */
 	kinds?: Partial<Record<Kind, boolean>>;
-	/** The command failed: only test and build output is worth compacting then (the errors are the point). */
+	/** The command failed: only test, build, lint and install output is worth compacting then (the errors are the point). */
 	failed?: boolean;
 	/** Is `path` (relative to the command's directory) an existing file? Lets search output without line numbers be grouped. */
 	isFile?: (path: string) => boolean;
 };
 
 
-const SEARCH = new Set(["rg", "grep", "egrep", "ugrep"]);
+const SEARCH = new Set(["rg", "grep", "egrep", "ugrep", "ack"]);
 const PATHS = new Set(["fd", "fdfind", "find"]);
 const LISTING = new Set(["lsd", "eza", "exa", "ls"]);
 const LIST_ONLY = { long: ["--files", "--files-with-matches", "--files-without-match"], short: ["l"] };
@@ -88,10 +96,14 @@ function pickCargo(all: string[]): ReturnType<typeof pick> {
 const SNIFFERS: { kind: Kind; run: (out: string, l: Limits) => Squeezed | undefined }[] = [
 	{ kind: "tests", run: compactBunTest },
 	{ kind: "tests", run: compactGoTest },
+	{ kind: "tests", run: compactPytest },
+	{ kind: "tests", run: compactJest },
 	{ kind: "build", run: compactGradle },
+	{ kind: "build", run: compactXcodeSniffed },
 	{ kind: "build", run: compactTsc },
 	{ kind: "build", run: compactRustc },
 	{ kind: "build", run: compactAudit },
+	{ kind: "lint", run: compactLintSniffed },
 ];
 
 /** `git` options before the subcommand that do not change its output: `-C dir`, `-c k=v`, `--no-pager`, ... */
@@ -144,9 +156,90 @@ function plainSearch(args: string[], isFile: ((path: string) => boolean) | undef
 	return { kind: "search", run: (out, l) => compactRgPlain(out, l, isFile) };
 }
 
+/** `npx tool`, `uv run tool`, `python -m tool`, `xcrun tool`…: the tool is what prints. */
+function unwrap({ program, args }: Invocation): Invocation {
+	const next = (rest: string[]): Invocation | undefined => {
+		const i = rest.findIndex((a) => !a.startsWith("-"));
+		return i < 0 ? undefined : { program: rest[i]!.split("/").pop()!, args: rest.slice(i + 1) };
+	};
+	let inner: Invocation | undefined;
+	if (["npx", "bunx", "pnpx", "uvx"].includes(program)) inner = next(args);
+	else if (["uv", "poetry", "pipenv", "pdm", "hatch"].includes(program) && args[0] === "run") inner = next(args.slice(1));
+	else if ((program === "pnpm" || program === "yarn") && (args[0] === "exec" || args[0] === "dlx")) inner = next(args.slice(1));
+	else if (/^python[\d.]*$/.test(program) && args[0] === "-m" && args[1]) inner = { program: args[1], args: args.slice(2) };
+	else if (program === "xcrun" && args[0] && !args[0].startsWith("-")) inner = { program: args[0], args: args.slice(1) };
+	return inner ? unwrap(inner) : { program, args };
+}
+
+/** `cmd | tail -50` / `cmd | head -n 20`: still `cmd`'s format, only fewer lines of it. */
+export function unpipe(command: string): string {
+	return command.replace(/\s*\|\s*(?:tail|head)(?:\s+(?:-n\s*\d+|-\d+|--lines=\d+))?\s*$/, "");
+}
+
+const INSTALL: Record<string, string[]> = {
+	npm: ["install", "i", "ci", "add", "update", "up"],
+	pnpm: ["install", "i", "add", "update", "up"],
+	yarn: ["install", "add", "upgrade"],
+	bun: ["install", "i", "add", "update"],
+	pip: ["install", "download"],
+	pip3: ["install", "download"],
+	pod: ["install", "update"],
+	bundle: ["install", "update"],
+	gem: ["install", "update"],
+};
+
+/** Linters whose output `compactLint` reads (with their subcommand where they have one). */
+const LINTERS: Record<string, string[] | undefined> = {
+	eslint: undefined,
+	biome: ["lint", "check", "ci"],
+	ruff: ["check"],
+	flake8: undefined,
+	mypy: undefined,
+	pylint: undefined,
+	ktlint: undefined,
+	detekt: undefined,
+	"detekt-cli": undefined,
+	swiftlint: ["lint"],
+	shellcheck: undefined,
+	flutter: ["analyze"],
+	dart: ["analyze"],
+};
+
+const LOG_COMMANDS = (program: string, args: string[]): boolean =>
+	((program === "docker" || program === "podman") && (args[0] === "logs" || (args[0] === "compose" && args[1] === "logs"))) ||
+	(program === "docker-compose" && args[0] === "logs") ||
+	(program === "kubectl" && args[0] === "logs") ||
+	(program === "adb" && args[0] === "logcat") ||
+	["journalctl", "stern", "pidcat"].includes(program);
+
+/** Package managers, linters, test runners, logs, docker and Xcode. */
+function pickTool({ program, args }: Invocation): ReturnType<typeof pick> {
+	const sub = args[0] ?? "";
+	const machine = args.some((a) => /json|sarif|junit|checkstyle|xml|github|gitlab|codeclimate|teamcity|tap\b/i.test(a));
+	if (machine) return undefined;
+	if (INSTALL[program]?.includes(sub) || (program === "yarn" && !sub) || (program === "uv" && (["add", "sync"].includes(sub) || (sub === "pip" && ["install", "sync"].includes(args[1] ?? "")))) || ((program === "flutter" || program === "dart") && sub === "pub" && args[1] === "get"))
+		return { kind: "install", run: compactInstall };
+	if (program in LINTERS) {
+		const subs = LINTERS[program];
+		// `ruff .` is `ruff check .` in older versions.
+		if (!subs || subs.includes(sub) || (program === "ruff" && sub.startsWith("-"))) return { kind: "lint", run: compactLint };
+		return undefined;
+	}
+	if (program === "pytest" || program === "py.test") return { kind: "tests", run: compactPytest };
+	if (program === "jest" || program === "vitest") return { kind: "tests", run: compactJest };
+	if (LOG_COMMANDS(program, args)) return hasFlag(args, ["--follow"], ["f"]) && program !== "adb" ? undefined : { kind: "logs", run: compactLogs };
+	if (program === "adb" && sub === "shell" && /^(pm|cmd package) list packages\b/.test(args.slice(1).join(" "))) return { kind: "listing", run: compactPackages };
+	if (((program === "docker" || program === "podman") && (sub === "build" || (sub === "buildx" && args[1] === "build") || (sub === "compose" && args[1] === "build"))) || (program === "docker-compose" && sub === "build"))
+		return { kind: "build", run: compactDockerBuild };
+	if (program === "xcodebuild") return { kind: args.includes("test") ? "tests" : "build", run: compactXcode };
+	if (program === "swift" && (sub === "build" || sub === "test")) return { kind: sub === "test" ? "tests" : "build", run: compactXcode };
+	return undefined;
+}
+
 function pick(command: string, isFile?: (path: string) => boolean): { kind: Kind; run: (out: string, l: Limits) => Squeezed | undefined } | undefined {
-	const inv = parse(command);
-	if (!inv) return undefined;
+	const parsed = parse(command);
+	if (!parsed) return undefined;
+	const inv = unwrap(parsed);
 	// Relative paths in the output are relative to the `cd`, which the file check does not know.
 	const local = /^\s*cd\s/.test(command) ? undefined : isFile;
 	const { program, args } = inv;
@@ -154,6 +247,8 @@ function pick(command: string, isFile?: (path: string) => boolean): { kind: Kind
 		const files = hasFlag(args, LIST_ONLY.long, program === "rg" ? LIST_ONLY.short : [...LIST_ONLY.short, "L"]);
 		if (files) return hasFlag(args, NOT_A_LIST.long, NOT_A_LIST.short) ? undefined : { kind: "paths", run: compactPaths };
 		if (hasFlag(args, NOT_PLAIN_SEARCH.long, NOT_PLAIN_SEARCH.short)) return undefined;
+		// ack: `-f` / `-g` list files; `-h` drops the path.
+		if (program === "ack" && hasFlag(args, ["--no-filename"], ["f", "g", "h"])) return hasFlag(args, [], ["f", "g"]) ? { kind: "paths", run: compactPaths } : undefined;
 		const plain = plainSearch(args, local);
 		return plain ?? { kind: "search", run: compactRg };
 	}
@@ -163,8 +258,8 @@ function pick(command: string, isFile?: (path: string) => boolean): { kind: Kind
 	}
 	if (program === "git") return pickGit(args);
 	if (program === "cargo") return pickCargo(args);
-	if (program === "tsc" || ((program === "npx" || program === "bunx") && args[0] === "tsc")) return { kind: "build", run: compactTsc };
-	if (program === "gradle" || program === "gradlew") return { kind: "build", run: compactGradle };
+	if (program === "tsc") return { kind: "build", run: compactTsc };
+	if (program === "gradle" || program === "gradlew") return args.some((a) => /(^|:)dependencies$/.test(a)) ? { kind: "tree", run: compactGradleDeps } : { kind: "build", run: compactGradle };
 	if (program === "go" && args[0] === "test") return hasFlag(args, ["-json", "--json"]) ? undefined : { kind: "tests", run: compactGoTest };
 	if (program === "bun" && args[0] === "test") return { kind: "tests", run: compactBunTest };
 	if (program === "tree" || ((program === "eza" || program === "exa" || program === "lsd") && hasFlag(args, ["--tree"], ["T"]))) return hasFlag(args, ["-J", "--json", "-H", "--html"]) ? undefined : { kind: "tree", run: compactTree };
@@ -175,18 +270,22 @@ function pick(command: string, isFile?: (path: string) => boolean): { kind: Kind
 		if (hasFlag(args, ["--inode", "--blocks", "--size", "--full-time", "--time-style", "--numeric-uid-gid", "--git", "--header", "--octal-permissions", "--total-size", "--context"], ["i", "s", "n", "g", "o", "H", "Z"])) return undefined;
 		return { kind: "listing", run: compactLsd };
 	}
-	return undefined;
+	return pickTool(inv);
 }
 
 /** True when a native compactor takes care of `command`'s output (whatever the switches say). */
-export const handles = (command: string): boolean => pick(command) !== undefined;
+export const handles = (command: string): boolean => pick(unpipe(command)) !== undefined;
+
+/** Kinds whose output is worth compacting when the command failed: there the failures are the point. */
+const FAILED_OK = new Set<Kind>(["tests", "build", "lint", "install"]);
 
 /** Compacts the output of `command`, or returns undefined to leave it exactly as it is. */
-export function compact(command: string, output: string, opts: Options = {}): Result | undefined {
+export function compact(full: string, output: string, opts: Options = {}): Result | undefined {
+	const command = unpipe(full);
 	const { limits = DEFAULT_LIMITS, minChars = 400, maxRatio = 0.9, kinds = {}, failed = false, isFile } = opts;
 	if (output.length < minChars) return undefined;
 	const small = (sq: Squeezed | undefined): sq is Squeezed => sq !== undefined && sq.text.length <= output.length * maxRatio;
-	const allowed = (kind: Kind) => kinds[kind] !== false && (!failed || kind === "tests" || kind === "build");
+	const allowed = (kind: Kind) => kinds[kind] !== false && (!failed || FAILED_OK.has(kind));
 	const done = (sq: Squeezed, kind: Kind): Result => ({ text: sq.text, kind, truncated: sq.truncated, before: output.length, after: sq.text.length });
 
 	const chosen = pick(command, isFile);
