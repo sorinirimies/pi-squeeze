@@ -6,7 +6,7 @@
 [![Audit](https://github.com/sorinirimies/pi-squeeze/actions/workflows/security.yml/badge.svg)](https://github.com/sorinirimies/pi-squeeze/actions/workflows/security.yml)
 [![Fuzz](https://github.com/sorinirimies/pi-squeeze/actions/workflows/fuzz.yml/badge.svg)](https://github.com/sorinirimies/pi-squeeze/actions/workflows/fuzz.yml)
 
-Squeezes tool output and steers commands to fast CLI tools, so the agent's context stays small: uses rtk when installed, native compactors otherwise.
+Shrinks bash output before it reaches the agent's context: native compactors for git, cargo, rg, ls, test and build output, plus rtk when installed. Full output stays one temp file away.
 
 A [pi](https://github.com/earendil-works/pi-coding-agent) extension.
 
