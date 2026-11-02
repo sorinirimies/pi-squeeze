@@ -63,8 +63,12 @@ fuzz iterations="5000": _check-bun
 audit: _check-bun
     bun audit
 
+# Licenses, sources and bans of every dependency (deps-policy.nuon)
+deps-policy: _check-bun
+    nu scripts/ci/deps_policy.nu
+
 # Security + fuzz locally, like the nightly workflows
-nightly-local: audit fuzz
+nightly-local: audit deps-policy fuzz
 
 # ── Dependencies ──────────────────────────────────────────────────────────────
 
