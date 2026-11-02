@@ -11,6 +11,7 @@ import { completions, parseCommand } from "./command/parse.ts";
 import { compact, KINDS } from "./core/compact.ts";
 import { type Config, DEFAULT_CONFIG, optionsOf, readConfig, saveConfig } from "./core/config.ts";
 import { rewrite } from "./core/rtk.ts";
+import { appendSaving } from "./core/savings.ts";
 import { fileIn, readFullOutput } from "./core/files.ts";
 import { saveFull } from "./core/save.ts";
 import { emptyStats, record, saved, summary, tokens } from "./core/stats.ts";
@@ -68,6 +69,17 @@ export default function (pi: ExtensionAPI) {
 		// Never more than pi would have shown.
 		if (!r || r.text.length >= shown.length) return;
 		record(stats, { ...r, before: shown.length });
+		if (config.logSavings) {
+			const chars = shown.length - r.after;
+			void appendSaving({
+				ts: new Date(Date.now()).toISOString(),
+				session: ctx.sessionManager?.getSessionId?.() ?? "",
+				cwd: ctx.cwd ?? "",
+				tokens: tokens(chars),
+				chars,
+				kind: r.kind,
+			});
+		}
 		showStatus(ctx);
 		const where = fullPath ?? (r.truncated ? saveFull(original) : undefined);
 		const text = where ? `${r.text}\n[squeeze: output shortened; full output: ${where}]` : r.text;

@@ -14,6 +14,7 @@ describe("sanitizeConfig", () => {
 		expect(sanitizeConfig({ enabled: false, showStatus: false, rtk: "x", kinds: { paths: false }, minChars: 5, lineChars: 99999, perGroup: 0, total: 7 })).toEqual({
 			enabled: false,
 			showStatus: false,
+			logSavings: true,
 			rtk: true,
 			kinds: { search: true, paths: false, listing: true, diff: true, tests: true, git: true, build: true, lint: true, install: true, logs: true, tree: true, generic: true },
 			minChars: 100,
@@ -23,6 +24,8 @@ describe("sanitizeConfig", () => {
 		});
 		expect(sanitizeConfig({ enabled: "yes", showStatus: 1, kinds: "x", minChars: "3" })).toEqual(DEFAULT_CONFIG);
 		expect(sanitizeConfig({ perGroup: 2.6 }).perGroup).toBe(3);
+		expect(sanitizeConfig({ logSavings: false }).logSavings).toBe(false);
+		expect(sanitizeConfig({ logSavings: "no" }).logSavings).toBe(true);
 	});
 
 	test("clampInt rejects NaN and infinity", () => {

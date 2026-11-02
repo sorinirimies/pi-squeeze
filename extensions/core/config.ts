@@ -14,6 +14,8 @@ export interface Config {
 	enabled: boolean;
 	/** Show the savings in the status line. */
 	showStatus: boolean;
+	/** Append each saving to <agent dir>/squeeze-savings.jsonl for usage trackers. */
+	logSavings: boolean;
 	/** Which compactors run. */
 	kinds: Record<Kind, boolean>;
 	/** Rewrite commands to their `rtk` form (git, cargo, docker, …) when the rtk binary is installed. */
@@ -31,6 +33,7 @@ export interface Config {
 export const DEFAULT_CONFIG: Config = {
 	enabled: true,
 	showStatus: true,
+	logSavings: true,
 	rtk: true,
 	kinds: Object.fromEntries(KINDS.map((k) => [k, true])) as Record<Kind, boolean>,
 	minChars: 400,
@@ -51,6 +54,7 @@ export function sanitizeConfig(raw: unknown): Config {
 	return {
 		enabled: bool(r.enabled, d.enabled),
 		showStatus: bool(r.showStatus, d.showStatus),
+		logSavings: bool(r.logSavings, d.logSavings),
 		rtk: bool(r.rtk, d.rtk),
 		kinds: Object.fromEntries(KINDS.map((kind) => [kind, bool(k[kind], d.kinds[kind])])) as Record<Kind, boolean>,
 		minChars: clampInt(r.minChars, 100, 1_000_000, d.minChars),

@@ -86,8 +86,21 @@ Safety rules:
 | `/squeeze min <chars>` | smallest output worth compacting (default 400) |
 
 Settings are remembered in `<pi agent dir>/squeeze.json` (`PI_CODING_AGENT_DIR`, else `~/.pi/agent`); it also holds
-`lineChars`, `perGroup` and `total`, the limits of a compacted result. `PI_SQUEEZE=off` disables it at start.
+`lineChars`, `perGroup` and `total`, the limits of a compacted result, and `logSavings` (below). `PI_SQUEEZE=off` disables it at start.
 The status line shows the tokens saved.
+
+## Savings log
+
+Each compacted output adds one line to `<pi agent dir>/squeeze-savings.jsonl`, so the savings can be tracked
+over time; the model never sees it:
+
+```json
+{"ts":"2026-01-02T09:15:00.000Z","session":"…","cwd":"/work/app","tokens":1840,"chars":7360,"kind":"build"}
+```
+
+[tokenburn](https://github.com/sorinirimies/tokenburn) and [pi-tokenburn](https://github.com/sorinirimies/pi-tokenburn)
+read it as the "pi squeeze" saving. When rtk ran the command, rtk logs its own part; this log holds only what
+pi-squeeze cut after it. `"logSavings": false` in `squeeze.json` turns it off.
 
 ## Development
 
