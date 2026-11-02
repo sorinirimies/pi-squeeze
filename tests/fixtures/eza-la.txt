@@ -1,4 +1,4 @@
-.rw-r--r--@    6 EBEMXC4  1 Jan  2020 a.txt
-.rw-r--r--@ 5.0k EBEMXC4  2 Nov 01:00 big.bin
-lrwxr-xr-x@    - EBEMXC4  2 Nov 01:00 link -> a.txt
-drwxr-xr-x@    - EBEMXC4  2 Nov 01:00 sub
+.rw-r--r--@    6 devuser  1 Jan  2020 a.txt
+.rw-r--r--@ 5.0k devuser  2 Nov 01:00 big.bin
+lrwxr-xr-x@    - devuser  2 Nov 01:00 link -> a.txt
+drwxr-xr-x@    - devuser  2 Nov 01:00 sub

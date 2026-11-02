@@ -90,7 +90,7 @@
    Compiling ratatui-macros v0.7.2
    Compiling ratatui v0.30.2
    Compiling tui-nuances v0.1.10
-   Compiling tui-spinner v0.5.1 (/Users/EBEMXC4/Projects/tui-spinner)
+   Compiling tui-spinner v0.5.1 (/home/dev/Projects/tui-spinner)
     Finished `test` profile [unoptimized + debuginfo] target(s) in 7.37s
      Running unittests src/lib.rs (target/debug/deps/tui_spinner-c83b66df6b8a7f3a)
 

@@ -162,7 +162,7 @@ describe("lsd", () => {
 	test("reduces a real lsd -la run and drops . and ..", () => {
 		const raw = fx("lsd-la.txt");
 		const r = compactLsd(raw)!;
-		expect(r.text).not.toContain("EBEMXC4");
+		expect(r.text).not.toContain("devuser");
 		expect(r.text).not.toMatch(/^\S+ +\.$/m);
 		expect(r.text).toContain("package.json");
 		expect(r.text).toMatch(/^d {2}\w{3} \d+ \d\d:\d\d {2}\.git$/m);

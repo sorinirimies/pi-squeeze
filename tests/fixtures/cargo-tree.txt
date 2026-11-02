@@ -1,4 +1,4 @@
-tui-spinner v0.5.1 (/Users/EBEMXC4/Projects/tui-spinner)
+tui-spinner v0.5.1 (/home/dev/Projects/tui-spinner)
 ├── ratatui v0.30.2
 │   ├── instability v0.3.14 (proc-macro)
 │   │   ├── darling v0.24.1
