@@ -23,7 +23,8 @@ It only touches output it fully understands, and otherwise passes it through unc
 
 | Command | Becomes |
 |---|---|
-| `rg -n` / `grep -n` | totals line, then matches grouped by file (path written once, indent trimmed, long lines and busy files cut) |
+| `rg -n` / `grep -rn` | totals line, then matches grouped by file (path written once, indent trimmed, long lines and busy files cut) |
+| `rg pattern dir` / `grep -r` (no `-n`) | the same, but only when every `path:` prefix is a file that exists in the session's directory (a colon in the text is never taken for a path) |
 | `fd`, `find` | paths grouped by directory |
 | `lsd -l`, `eza -l`, `ls -l` | type, size, short date and name (owner, group, permissions and the `total` line dropped) |
 | `git diff` | one header line per file (`path (new, +12 −0)`), `index`/mode/`---`/`+++` lines dropped, every changed line kept, context trimmed to 1 line, long files cut |

@@ -24,7 +24,7 @@ import { compactDiff } from "../extensions/core/diff.ts";
 import { compactTests } from "../extensions/core/tests.ts";
 import { compactLsd } from "../extensions/core/lsd.ts";
 import { compactPaths } from "../extensions/core/paths.ts";
-import { compactRg } from "../extensions/core/rg.ts";
+import { compactRg, compactRgPlain } from "../extensions/core/rg.ts";
 
 const ITERS = Number(process.env.FUZZ_ITERS ?? 400);
 const SEED = Number(process.env.FUZZ_SEED ?? Math.floor(Math.random() * 2 ** 31));
@@ -82,6 +82,7 @@ describe("fuzz", () => {
 	fuzz("compactors never throw, whatever the input", (r) => {
 		const d = doc(r);
 		compactRg(d);
+		compactRgPlain(d, { lineChars: 100, perGroup: 10, total: 50 }, () => r() < 0.9);
 		compactPaths(d);
 		compactLsd(d);
 		compactDiff(d);
@@ -158,6 +159,18 @@ describe("fuzz", () => {
 			expect(out.text).toContain(`${m[2]}: ${m[3]!.trim()}`);
 			expect(out.text).toContain(`${m[1]} (`);
 		}
+	});
+
+	fuzz("a search without line numbers keeps every line's text under its own file", (r) => {
+		const files = ["a.ts", "b/c.ts", "d.ts"];
+		const d = Array.from({ length: 1 + Math.floor(r() * 40) }, () => `${pick(r, files)}:${text(r, 20).replace(/\n/g, " ")}`).join("\n");
+		const out = compactRgPlain(d, { lineChars: 1000, perGroup: 1000, total: 1000 }, (p) => files.includes(p))!;
+		for (const l of d.split("\n")) {
+			const at = l.indexOf(":");
+			expect(out.text).toContain(`${l.slice(0, at)} (`);
+			expect(out.text).toContain(`  ${l.slice(at + 1).trim()}`);
+		}
+		expect(compactRgPlain(d, { lineChars: 1000, perGroup: 1000, total: 1000 }, (p) => p !== "d.ts" && files.includes(p)) === undefined).toBe(d.split("\n").some((l) => l.startsWith("d.ts:")));
 	});
 
 	fuzz("compact output never exceeds the cap by more than the marker", (r) => {

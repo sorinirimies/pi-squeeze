@@ -6,8 +6,11 @@
  *     12: const x = 1;
  *     13- context
  *
- * Strict: when any line is not in that format (`--heading`, `-c`, `-l`, `--json`, no
- * line numbers) it returns undefined and the output passes through unchanged.
+ * Without line numbers (`rg pattern dir`, `path:text`) the path cannot be told from text that
+ * has a colon, so `compactRgPlain` only groups when every path is a file that exists.
+ *
+ * Strict: when any line is not in that format (`--heading`, `-c`, `-l`, `--json`) it returns
+ * undefined and the output passes through unchanged.
  */
 import { cutLine, DEFAULT_LIMITS, type Limits, type Squeezed } from "./elide.ts";
 
@@ -52,9 +55,43 @@ export function parseRows(output: string): Row[] | undefined {
 	return rows;
 }
 
+/** At most this many distinct paths are looked up on disk. */
+const MAX_LOOKUPS = 500;
+
+/** `path:text` rows (no line numbers), or undefined unless every path is an existing file. */
+export function parsePlainRows(output: string, isFile: (path: string) => boolean): Row[] | undefined {
+	const lines = output.split("\n");
+	while (lines.length && lines.at(-1) === "") lines.pop();
+	if (!lines.length) return undefined;
+	const known = new Map<string, boolean>();
+	const rows: Row[] = [];
+	for (const raw of lines) {
+		const at = raw.indexOf(":");
+		if (at <= 0) return undefined;
+		const path = raw.slice(0, at);
+		let ok = known.get(path);
+		if (ok === undefined) {
+			if (known.size >= MAX_LOOKUPS) return undefined;
+			ok = isFile(path);
+			known.set(path, ok);
+		}
+		if (!ok) return undefined;
+		rows.push({ path, line: 0, sep: ":", text: raw.slice(at + 1) });
+	}
+	return rows;
+}
+
 export function compactRg(output: string, limits: Limits = DEFAULT_LIMITS): Squeezed | undefined {
 	const rows = parseRows(output);
-	if (!rows) return undefined;
+	return rows && render(rows, limits);
+}
+
+export function compactRgPlain(output: string, limits: Limits, isFile: (path: string) => boolean): Squeezed | undefined {
+	const rows = parsePlainRows(output, isFile);
+	return rows && render(rows, limits);
+}
+
+function render(rows: Row[], limits: Limits): Squeezed {
 	const groups = new Map<string, Row[]>();
 	for (const r of rows) {
 		const g = groups.get(r.path);
@@ -76,7 +113,7 @@ export function compactRg(output: string, limits: Limits = DEFAULT_LIMITS): Sque
 		let shown = 0;
 		for (const r of list) {
 			if (shown >= limits.perGroup) break;
-			out.push(`  ${r.line}${r.sep} ${cutLine(r.text.trim(), limits.lineChars)}`);
+			out.push(`  ${r.line ? `${r.line}${r.sep} ` : ""}${cutLine(r.text.trim(), limits.lineChars)}`);
 			shown++;
 		}
 		if (list.length > shown) {

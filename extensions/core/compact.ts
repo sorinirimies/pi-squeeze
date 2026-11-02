@@ -11,7 +11,7 @@ import { compactLog, compactShow } from "./gitlog.ts";
 import { compactStatus } from "./gitstatus.ts";
 import { compactLsd } from "./lsd.ts";
 import { compactPaths } from "./paths.ts";
-import { compactRg } from "./rg.ts";
+import { compactRg, compactRgPlain } from "./rg.ts";
 import { compactRustc } from "./rustc.ts";
 import { compactBunTest, compactGoTest } from "./runners.ts";
 import { compactTests } from "./tests.ts";
@@ -33,7 +33,10 @@ export type Options = {
 	kinds?: Partial<Record<Kind, boolean>>;
 	/** The command failed: only test and build output is worth compacting then (the errors are the point). */
 	failed?: boolean;
+	/** Is `path` (relative to the command's directory) an existing file? Lets search output without line numbers be grouped. */
+	isFile?: (path: string) => boolean;
 };
+
 
 const SEARCH = new Set(["rg", "grep", "egrep", "ugrep"]);
 const PATHS = new Set(["fd", "fdfind", "find"]);
@@ -127,15 +130,32 @@ function pickGit(all: string[]): ReturnType<typeof pick> {
 	}
 }
 
-function pick(command: string): { kind: Kind; run: (out: string, l: Limits) => Squeezed | undefined } | undefined {
+/** Flags that print context lines (`path-text`, which cannot be told apart from a path with a dash). */
+const CONTEXT = { long: ["--context", "--after-context", "--before-context"], short: /^-[A-Za-z]*[ABC]/ };
+
+/**
+ * `rg pattern dir` without -n: grouped only when the paths can be checked on disk, and not when the
+ * only path searched is itself a file (then there is no path prefix, and a colon in the text would pass for one).
+ */
+function plainSearch(args: string[], isFile: ((path: string) => boolean) | undefined): ReturnType<typeof pick> {
+	if (hasFlag(args, ["--line-number"], ["n"]) || hasFlag(args, CONTEXT.long) || args.some((a) => CONTEXT.short.test(a)) || !isFile) return undefined;
+	const operands = args.filter((a) => !a.startsWith("-")).slice(1);
+	if (operands.length === 1 && isFile(operands[0]!)) return undefined;
+	return { kind: "search", run: (out, l) => compactRgPlain(out, l, isFile) };
+}
+
+function pick(command: string, isFile?: (path: string) => boolean): { kind: Kind; run: (out: string, l: Limits) => Squeezed | undefined } | undefined {
 	const inv = parse(command);
 	if (!inv) return undefined;
+	// Relative paths in the output are relative to the `cd`, which the file check does not know.
+	const local = /^\s*cd\s/.test(command) ? undefined : isFile;
 	const { program, args } = inv;
 	if (SEARCH.has(program)) {
 		const files = hasFlag(args, LIST_ONLY.long, program === "rg" ? LIST_ONLY.short : [...LIST_ONLY.short, "L"]);
 		if (files) return hasFlag(args, NOT_A_LIST.long, NOT_A_LIST.short) ? undefined : { kind: "paths", run: compactPaths };
 		if (hasFlag(args, NOT_PLAIN_SEARCH.long, NOT_PLAIN_SEARCH.short)) return undefined;
-		return { kind: "search", run: compactRg };
+		const plain = plainSearch(args, local);
+		return plain ?? { kind: "search", run: compactRg };
 	}
 	if (PATHS.has(program)) {
 		if (program === "find" ? !plainFind(args) : hasFlag(args, NOT_PLAIN_PATHS.long, NOT_PLAIN_PATHS.short)) return undefined;
@@ -163,13 +183,13 @@ export const handles = (command: string): boolean => pick(command) !== undefined
 
 /** Compacts the output of `command`, or returns undefined to leave it exactly as it is. */
 export function compact(command: string, output: string, opts: Options = {}): Result | undefined {
-	const { limits = DEFAULT_LIMITS, minChars = 400, maxRatio = 0.9, kinds = {}, failed = false } = opts;
+	const { limits = DEFAULT_LIMITS, minChars = 400, maxRatio = 0.9, kinds = {}, failed = false, isFile } = opts;
 	if (output.length < minChars) return undefined;
 	const small = (sq: Squeezed | undefined): sq is Squeezed => sq !== undefined && sq.text.length <= output.length * maxRatio;
 	const allowed = (kind: Kind) => kinds[kind] !== false && (!failed || kind === "tests" || kind === "build");
 	const done = (sq: Squeezed, kind: Kind): Result => ({ text: sq.text, kind, truncated: sq.truncated, before: output.length, after: sq.text.length });
 
-	const chosen = pick(command);
+	const chosen = pick(command, isFile);
 	if (chosen && allowed(chosen.kind)) {
 		const sq = chosen.run(output, limits);
 		if (small(sq)) return done(sq, chosen.kind);

@@ -10,6 +10,7 @@ import { completions, parseCommand } from "./command/parse.ts";
 import { compact, KINDS } from "./core/compact.ts";
 import { type Config, DEFAULT_CONFIG, optionsOf, readConfig, saveConfig } from "./core/config.ts";
 import { rewrite } from "./core/rtk.ts";
+import { fileIn } from "./core/files.ts";
 import { saveFull } from "./core/save.ts";
 import { emptyStats, record, saved, summary, tokens } from "./core/stats.ts";
 
@@ -54,7 +55,7 @@ export default function (pi: ExtensionAPI) {
 		if (blocks.length !== 1 || blocks[0]!.type !== "text") return;
 		const original = blocks[0]!.text;
 
-		const r = compact(command, original, { ...optionsOf(config), failed: event.isError });
+		const r = compact(command, original, { ...optionsOf(config), failed: event.isError, isFile: fileIn(ctx.cwd) });
 		if (!r) return;
 		record(stats, r);
 		showStatus(ctx);
