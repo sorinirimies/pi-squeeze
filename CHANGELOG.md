@@ -3,6 +3,21 @@
 Generated from [Conventional Commits](https://www.conventionalcommits.org) by
 [git-cliff](https://git-cliff.org). Do not edit by hand.
 
+## [0.3.1](https://github.com/sorinirimies/pi-squeeze/releases/tag/v0.3.1) — 2026-11-09
+
+
+### 🐛 Fixes
+
+- **ci:** Nightly commit step accepts bool arg from nu ([`4989726`](https://github.com/sorinirimies/pi-squeeze/commit/49897267d1ab2a66123b2e9da43c8a5f75f4e6ce))
+
+### 🔧 Build & CI
+
+- Dependency policy (licenses, sources, bans) in the gate and security workflow ([`cd8c8b8`](https://github.com/sorinirimies/pi-squeeze/commit/cd8c8b836ec1ab970526450dc5760eb6b382d754))
+- Scan the git history for secrets with gitleaks ([`4aa0eb1`](https://github.com/sorinirimies/pi-squeeze/commit/4aa0eb18a9d7593f6f8aeb833ce961d05b02760a))
+
+### 🧹 Chores
+
+- Nightly dev-tooling lockfile update 2026-11-09 (not released) ([`7d29f00`](https://github.com/sorinirimies/pi-squeeze/commit/7d29f0071f56b96d60a0d04b9ebe16f6e0bfd43e))
 ## [0.3.0](https://github.com/sorinirimies/pi-squeeze/releases/tag/v0.3.0) — 2026-11-02
 
 
