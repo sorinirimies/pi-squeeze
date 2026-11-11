@@ -3,7 +3,7 @@
 
 use std/assert
 use runner.nu *
-use ../ci/quality_gate.nu [required_files, forbidden]
+use ../ci/quality_gate.nu [required_files, forbidden, pack_files]
 
 def "test quality_gate: required files are the extensions plus docs" [] {
     let req = (required_files { pi: { extensions: ["./extensions/a.ts", "./extensions/b.ts"] } })
@@ -29,3 +29,9 @@ def "test quality_gate: a clean file list has nothing forbidden" [] {
 }
 
 def main [] { run-tests }
+
+def "test quality_gate: pack files from old list and new record npm output" [] {
+    let files = [{path: "a.ts"} {path: "README.md"}]
+    assert equal (pack_files [{name: "x", files: $files}]) ["a.ts" "README.md"]
+    assert equal (pack_files {x: {name: "x", files: $files}}) ["a.ts" "README.md"]
+}

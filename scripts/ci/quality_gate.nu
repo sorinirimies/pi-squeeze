@@ -22,6 +22,12 @@ export def required_files [pkg: record]: nothing -> list {
 # Paths that must never ship.
 const NEVER_SHIP = ["tests/" "scripts/" "examples/" ".github/" ".gitea/" "node_modules/"]
 
+# File paths of `npm pack --dry-run --json`: a list of packages (npm <= 11) or a record keyed by name (npm 12+)
+export def pack_files [pack: any]: nothing -> list {
+    let first = if ($pack | describe | str starts-with "record") { $pack | values | first } else { $pack | first }
+    $first | get files | get path
+}
+
 export def forbidden [paths: list]: nothing -> list {
     $paths | where {|p| $NEVER_SHIP | any {|prefix| $p | str starts-with $prefix } }
 }
@@ -60,7 +66,7 @@ def main [--skip-typecheck, --skip-test, --skip-pack, --skip-deps, --skip-nu] {
             print $res.stderr
             $ok = false
         } else {
-            let files = ($res.stdout | from json | get 0.files | get path)
+            let files = (pack_files ($res.stdout | from json))
             let missing = (required_files (open package.json) | where {|f| $f not-in $files })
             let bad = (forbidden $files)
             if ($missing | is-not-empty) {
