@@ -11,10 +11,13 @@ describe("sanitizeConfig", () => {
 	});
 
 	test("keeps valid values, defaults and clamps the rest", () => {
-		expect(sanitizeConfig({ enabled: false, showStatus: false, rtk: "x", kinds: { paths: false }, minChars: 5, lineChars: 99999, perGroup: 0, total: 7 })).toEqual({
+		expect(sanitizeConfig({ enabled: false, showStatus: false, rtk: "x", kinds: { paths: false }, minChars: 5, lineChars: 99999, perGroup: 0, total: 7, logMissed: false, missedChars: 1, maxRatio: 0.1 })).toEqual({
 			enabled: false,
 			showStatus: false,
 			logSavings: true,
+			logMissed: false,
+			missedChars: 400,
+			maxRatio: 0.5,
 			rtk: true,
 			kinds: { search: true, paths: false, listing: true, diff: true, tests: true, git: true, build: true, lint: true, install: true, logs: true, tree: true, generic: true },
 			minChars: 100,
@@ -26,6 +29,9 @@ describe("sanitizeConfig", () => {
 		expect(sanitizeConfig({ perGroup: 2.6 }).perGroup).toBe(3);
 		expect(sanitizeConfig({ logSavings: false }).logSavings).toBe(false);
 		expect(sanitizeConfig({ logSavings: "no" }).logSavings).toBe(true);
+		expect(sanitizeConfig({ maxRatio: 2 }).maxRatio).toBe(1);
+		expect(sanitizeConfig({ maxRatio: 0.7 }).maxRatio).toBe(0.7);
+		expect(sanitizeConfig({ maxRatio: "x" }).maxRatio).toBe(0.9);
 	});
 
 	test("clampInt rejects NaN and infinity", () => {
@@ -89,6 +95,6 @@ describe("config file", () => {
 
 describe("optionsOf", () => {
 	test("maps the settings to compaction options", () => {
-		expect(optionsOf(DEFAULT_CONFIG)).toEqual({ limits: { lineChars: 240, perGroup: 15, total: 250 }, minChars: 400, kinds: { search: true, paths: true, listing: true, diff: true, tests: true, git: true, build: true, lint: true, install: true, logs: true, tree: true, generic: true } });
+		expect(optionsOf(DEFAULT_CONFIG)).toEqual({ limits: { lineChars: 240, perGroup: 15, total: 250 }, minChars: 400, maxRatio: 0.9, kinds: { search: true, paths: true, listing: true, diff: true, tests: true, git: true, build: true, lint: true, install: true, logs: true, tree: true, generic: true } });
 	});
 });

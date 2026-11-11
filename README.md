@@ -62,6 +62,7 @@ It only touches output it fully understands, and otherwise passes it through unc
 | `… \| tail -50`, `… \| head -n 20` | the command before the pipe picks the compactor |
 | anything else | colour codes dropped, progress bars (`\r`) keep their last frame, 4+ identical lines become `line  [×N]`, 3+ blank lines become one. Never for `cat`, `head`, `jq`, `curl`… (content commands) |
 | `git`, `cargo`, `docker`… | rewritten through [rtk](https://github.com/rtk-ai/rtk) when it is installed (switch: `/squeeze rtk off`) |
+| `rtk rg …`, `rtk git diff`… | run plain again when a native compactor handles the command (typed by the model or rewritten by another extension), so the native compactor gets the output |
 
 Output with a marker of its own (a `tsc` error list, a gradle or Maven build, `javac` errors, a JVM stack trace, a `uiautomator` dump, a `bun test` run, rustc diagnostics) is recognised whatever ran it: `just check`, `npm run build`, `make test`, `… 2>&1`.
 A **failed** command is compacted too, but only for test and build output, where the errors are the point.
@@ -79,14 +80,15 @@ Safety rules:
 
 | Command | |
 |---|---|
-| `/squeeze` or `/squeeze status` | the settings and the tokens saved so far |
+| `/squeeze` or `/squeeze status` | the settings, this session's savings, and the all-time savings by compactor and command plus the biggest outputs no compactor took |
 | `/squeeze [on\|off]` | switch everything |
 | `/squeeze [search\|paths\|listing\|diff\|tests\|git\|build\|lint\|install\|logs\|tree\|generic] [on\|off]` | switch one compactor |
 | `/squeeze rtk [on\|off]` | rewrite git, cargo, docker… through [rtk](https://github.com/rtk-ai/rtk), when installed |
 | `/squeeze min <chars>` | smallest output worth compacting (default 400) |
 
 Settings are remembered in `<pi agent dir>/squeeze.json` (`PI_CODING_AGENT_DIR`, else `~/.pi/agent`); it also holds
-`lineChars`, `perGroup` and `total`, the limits of a compacted result, and `logSavings` (below). `PI_SQUEEZE=off` disables it at start.
+`lineChars`, `perGroup` and `total`, the limits of a compacted result, `maxRatio` (a result is used only when at most this share
+of the original, 0.5 to 1, default 0.9), and `logSavings`, `logMissed` and `missedChars` (below). `PI_SQUEEZE=off` disables it at start.
 The status line shows the tokens saved.
 
 ## Savings log
@@ -95,12 +97,18 @@ Each compacted output adds one line to `<pi agent dir>/squeeze-savings.jsonl`, s
 over time; the model never sees it:
 
 ```json
-{"ts":"2026-01-02T09:15:00.000Z","session":"…","cwd":"/work/app","tokens":1840,"chars":7360,"kind":"build"}
+{"ts":"2026-01-02T09:15:00.000Z","session":"…","cwd":"/work/app","tokens":1840,"chars":7360,"kind":"build","cmd":"cargo build"}
 ```
+
+`cmd` is the program and, for tools with subcommands, the subcommand: never arguments, paths or patterns.
 
 [tokenburn](https://github.com/sorinirimies/tokenburn) and [pi-tokenburn](https://github.com/sorinirimies/pi-tokenburn)
 read it as the "pi squeeze" saving. When rtk ran the command, rtk logs its own part; this log holds only what
 pi-squeeze cut after it. `"logSavings": false` in `squeeze.json` turns it off.
+
+Outputs of at least `missedChars` characters (default 2000) that no compactor shortened go to
+`<pi agent dir>/squeeze-missed.jsonl` as `{"ts","session","cwd","cmd","chars"}`: the commands worth a compactor next.
+Content commands (`cat`, `jq`, `head`…) are never logged. `"logMissed": false` turns it off.
 
 ## Development
 

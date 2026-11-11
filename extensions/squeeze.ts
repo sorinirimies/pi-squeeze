@@ -10,8 +10,10 @@ import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { completions, parseCommand } from "./command/parse.ts";
 import { compact, KINDS } from "./core/compact.ts";
 import { type Config, DEFAULT_CONFIG, optionsOf, readConfig, saveConfig } from "./core/config.ts";
-import { rewrite } from "./core/rtk.ts";
-import { appendSaving } from "./core/savings.ts";
+import { commandHead } from "./core/command.ts";
+import { isContent } from "./core/generic.ts";
+import { rewrite, unwrapRtk } from "./core/rtk.ts";
+import { appendSaving, missedLogPath, readLog, report, savingsLogPath } from "./core/savings.ts";
 import { fileIn, readFullOutput } from "./core/files.ts";
 import { saveFull } from "./core/save.ts";
 import { emptyStats, record, saved, summary, tokens } from "./core/stats.ts";
@@ -40,9 +42,16 @@ export default function (pi: ExtensionAPI) {
 	});
 
 	pi.on("tool_call", async (event) => {
-		if (!config.enabled || !config.rtk || event.toolName !== "bash") return;
+		if (!config.enabled || event.toolName !== "bash") return;
 		const input = event.input as { command?: unknown };
 		if (typeof input.command !== "string") return;
+		// `rtk rg …` for a command a native compactor handles: run it plain, the compactor does better.
+		const plain = unwrapRtk(input.command);
+		if (plain) {
+			input.command = plain;
+			return;
+		}
+		if (!config.rtk) return;
 		const rewritten = rewrite(input.command);
 		if (rewritten) input.command = rewritten;
 	});
@@ -66,19 +75,18 @@ export default function (pi: ExtensionAPI) {
 		}
 
 		const r = compact(command, original, { ...optionsOf(config), failed: event.isError, isFile: fileIn(ctx.cwd) });
+		const base = { ts: new Date(Date.now()).toISOString(), session: ctx.sessionManager?.getSessionId?.() ?? "", cwd: ctx.cwd ?? "" };
 		// Never more than pi would have shown.
-		if (!r || r.text.length >= shown.length) return;
+		if (!r || r.text.length >= shown.length) {
+			// A large report no compactor took: worth a compactor next. Content (cat, jq…) is meant to pass whole.
+			if (config.logMissed && shown.length >= config.missedChars && !isContent(command))
+				void appendSaving({ ...base, cmd: commandHead(command), chars: shown.length }, missedLogPath());
+			return;
+		}
 		record(stats, { ...r, before: shown.length });
 		if (config.logSavings) {
 			const chars = shown.length - r.after;
-			void appendSaving({
-				ts: new Date(Date.now()).toISOString(),
-				session: ctx.sessionManager?.getSessionId?.() ?? "",
-				cwd: ctx.cwd ?? "",
-				tokens: tokens(chars),
-				chars,
-				kind: r.kind,
-			});
+			void appendSaving({ ...base, tokens: tokens(chars), chars, kind: r.kind, cmd: commandHead(command) });
 		}
 		showStatus(ctx);
 		const where = fullPath ?? (r.truncated ? saveFull(original) : undefined);
@@ -102,7 +110,7 @@ export default function (pi: ExtensionAPI) {
 			};
 			switch (cmd.kind) {
 				case "status":
-					ctx.ui.notify(`squeeze ${settingsText(config)}\n${summary(stats)}`, "info");
+					ctx.ui.notify(`squeeze ${settingsText(config)}\n${summary(stats)}\n${report(await readLog(savingsLogPath()), await readLog(missedLogPath()))}`, "info");
 					return;
 				case "on":
 				case "off":

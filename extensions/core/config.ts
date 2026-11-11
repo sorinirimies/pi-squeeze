@@ -16,6 +16,12 @@ export interface Config {
 	showStatus: boolean;
 	/** Append each saving to <agent dir>/squeeze-savings.jsonl for usage trackers. */
 	logSavings: boolean;
+	/** Append large outputs no compactor took to <agent dir>/squeeze-missed.jsonl (program name and size only). */
+	logMissed: boolean;
+	/** Outputs at least this long that pass through unchanged count as missed. */
+	missedChars: number;
+	/** A compacted result is used only when it is at most this share of the original (0.5 to 1). */
+	maxRatio: number;
 	/** Which compactors run. */
 	kinds: Record<Kind, boolean>;
 	/** Rewrite commands to their `rtk` form (git, cargo, docker, …) when the rtk binary is installed. */
@@ -34,6 +40,9 @@ export const DEFAULT_CONFIG: Config = {
 	enabled: true,
 	showStatus: true,
 	logSavings: true,
+	logMissed: true,
+	missedChars: 2000,
+	maxRatio: 0.9,
 	rtk: true,
 	kinds: Object.fromEntries(KINDS.map((k) => [k, true])) as Record<Kind, boolean>,
 	minChars: 400,
@@ -55,6 +64,9 @@ export function sanitizeConfig(raw: unknown): Config {
 		enabled: bool(r.enabled, d.enabled),
 		showStatus: bool(r.showStatus, d.showStatus),
 		logSavings: bool(r.logSavings, d.logSavings),
+		logMissed: bool(r.logMissed, d.logMissed),
+		missedChars: clampInt(r.missedChars, 400, 10_000_000, d.missedChars),
+		maxRatio: typeof r.maxRatio === "number" && Number.isFinite(r.maxRatio) ? Math.min(1, Math.max(0.5, r.maxRatio)) : d.maxRatio,
 		rtk: bool(r.rtk, d.rtk),
 		kinds: Object.fromEntries(KINDS.map((kind) => [kind, bool(k[kind], d.kinds[kind])])) as Record<Kind, boolean>,
 		minChars: clampInt(r.minChars, 100, 1_000_000, d.minChars),
@@ -109,5 +121,5 @@ export async function saveConfig(config: Config, path = configPath()): Promise<v
 
 /** The compaction options this config stands for. */
 export function optionsOf(c: Config) {
-	return { limits: { lineChars: c.lineChars, perGroup: c.perGroup, total: c.total }, minChars: c.minChars, kinds: c.kinds };
+	return { limits: { lineChars: c.lineChars, perGroup: c.perGroup, total: c.total }, minChars: c.minChars, maxRatio: c.maxRatio, kinds: c.kinds };
 }
