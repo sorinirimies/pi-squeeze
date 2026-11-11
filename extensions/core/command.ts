@@ -57,9 +57,32 @@ export function hasOperator(text: string): boolean {
 	return false;
 }
 
-/** Drop a leading `cd <dir> &&`, which only sets the working directory. */
+/** Drop a leading `cd <dir> &&` or `cd <dir>;`, which only sets the working directory. */
 export function stripCd(command: string): string {
-	return command.replace(/^\s*cd\s+(?:"[^"]*"|'[^']*'|[^\s;&|]+)\s*&&\s*/, "");
+	return command.replace(/^\s*cd\s+(?:"[^"]*"|'[^']*'|[^\s;&|]+)\s*(?:&&|;)\s*/, "");
+}
+
+/** Programs whose first argument names what they do (`git diff`, `npm run`), so it belongs in the command head. */
+const SUBCOMMANDS = new Set([
+	"git", "cargo", "npm", "pnpm", "yarn", "bun", "bunx", "npx", "uv", "pip", "pip3", "go", "docker", "podman", "kubectl",
+	"helm", "gradle", "gradlew", "mvn", "just", "make", "swift", "xcodebuild", "adb", "gh", "tea", "brew", "apt", "systemctl",
+	"journalctl", "flutter", "dart", "deno", "poetry", "rtk", "nu", "python", "python3",
+]);
+
+/**
+ * A short name for what a command line ran, for the savings log: the program and, for tools with
+ * subcommands, the subcommand (`git diff`, `cargo test`). Arguments, paths and patterns are never
+ * included. A chain or pipe adds ` …`.
+ */
+export function commandHead(command: string): string {
+	const segments = stripCd(command).split(/\s*(?:&&|\|\||;|\|)\s*/).filter((s) => s.trim() !== "");
+	const first = segments.find((s) => !/^\s*cd(?:\s|$)/.test(s)) ?? segments[0] ?? "";
+	const words = tokenize(first.trim()) ?? first.trim().split(/\s+/);
+	while (words.length && /^[A-Za-z_][A-Za-z0-9_]*=/.test(words[0]!)) words.shift();
+	const program = (words[0] ?? "").split("/").pop()!;
+	const sub = words[1];
+	const head = SUBCOMMANDS.has(program) && sub && /^[a-z][\w:.-]*$/i.test(sub) ? `${program} ${sub}` : program;
+	return segments.length > 1 ? `${head} …` : head;
 }
 
 /** The single simple command a line runs, or undefined when it is anything more. */

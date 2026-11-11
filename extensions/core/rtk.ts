@@ -48,3 +48,15 @@ export function resetRtk(): void {
 	cache.clear();
 	missing = false;
 }
+
+/**
+ * `rtk rg -n foo` (typed by the model, or rewritten by another extension) back to `rg -n foo` when a
+ * native compactor handles it: the native compactor keeps every fact and saves the full output, and
+ * rtk's own format would otherwise pass through unparsed. Undefined when there is nothing to undo.
+ */
+export function unwrapRtk(command: string): string | undefined {
+	const m = /^(\s*cd\s+(?:"[^"]*"|'[^']*'|[^\s;&|]+)\s*(?:&&|;)\s*)?rtk\s+(?=[^\s-])/.exec(command);
+	if (!m) return undefined;
+	const inner = (m[1] ?? "") + command.slice(m[0].length);
+	return handles(inner) ? inner : undefined;
+}

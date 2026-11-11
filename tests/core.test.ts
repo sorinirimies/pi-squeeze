@@ -350,3 +350,33 @@ describe("reading pi's full output back", () => {
 		rmSync(dir, { recursive: true, force: true });
 	});
 });
+
+describe("command head and rtk unwrap", () => {
+	test("commandHead names the program and its subcommand, never the arguments", async () => {
+		const { commandHead } = await import("../extensions/core/command.ts");
+		expect(commandHead("git diff --stat src")).toBe("git diff");
+		expect(commandHead("cd /x && FOO=1 /usr/bin/cargo test -p a")).toBe("cargo test");
+		expect(commandHead("cd /x; rg -n secret src")).toBe("rg");
+		expect(commandHead("cd x && npm run build && echo ok")).toBe("npm run …");
+		expect(commandHead("git --no-pager log")).toBe("git");
+		expect(commandHead("cd x")).toBe("cd");
+		expect(commandHead("")).toBe("");
+		expect(commandHead("echo 'unterminated")).toBe("echo");
+	});
+
+	test("stripCd also takes `cd dir;`", async () => {
+		const { stripCd } = await import("../extensions/core/command.ts");
+		expect(stripCd("cd /x; rg a")).toBe("rg a");
+	});
+
+	test("unwrapRtk only undoes rtk where a native compactor takes over", async () => {
+		const { unwrapRtk } = await import("../extensions/core/rtk.ts");
+		expect(unwrapRtk("rtk rg -n a")).toBe("rg -n a");
+		expect(unwrapRtk("cd /x; rtk git status")).toBe("cd /x; git status");
+		expect(unwrapRtk("rtk read a.ts")).toBeUndefined();
+		expect(unwrapRtk("rtk docker ps")).toBeUndefined();
+		expect(unwrapRtk("rtk -v rg a")).toBeUndefined();
+		expect(unwrapRtk("rg a")).toBeUndefined();
+		expect(unwrapRtk("rtk:toml ps")).toBeUndefined();
+	});
+});

@@ -204,6 +204,27 @@ describe("extension", () => {
 			useRunner();
 		});
 
+		test("unwraps rtk for a command a native compactor handles, even with rtk off", async () => {
+			const seen = fake(0, "rtk whatever");
+			const { hooks, commands } = load();
+			const a = call("rtk rg -n x src");
+			await hooks.tool_call!(a, fakeCtx());
+			expect(a.input.command).toBe("rg -n x src");
+			const b = call("cd /w && rtk git diff");
+			await hooks.tool_call!(b, fakeCtx());
+			expect(b.input.command).toBe("cd /w && git diff");
+			await commands.squeeze!.handler("rtk off", fakeCtx());
+			const c = call("rtk git status");
+			await hooks.tool_call!(c, fakeCtx());
+			expect(c.input.command).toBe("git status");
+			const d = call("rtk docker ps");
+			await hooks.tool_call!(d, fakeCtx());
+			expect(d.input.command).toBe("rtk docker ps");
+			await commands.squeeze!.handler("rtk on", fakeCtx());
+			expect(seen).toEqual([]);
+			useRunner();
+		});
+
 		test("a missing rtk binary is noticed once and then ignored", async () => {
 			let calls = 0;
 			useRunner(() => (calls++, { status: null, stdout: "", missing: true }));
