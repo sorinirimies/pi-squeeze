@@ -106,7 +106,7 @@ over time; the model never sees it:
 read it as the "pi squeeze" saving. When rtk ran the command, rtk logs its own part; this log holds only what
 pi-squeeze cut after it. `"logSavings": false` in `squeeze.json` turns it off.
 
-Outputs of at least `missedChars` characters (default 2000) that no compactor shortened go to
+Outputs of at least `missedChars` characters (default 2000) from commands no compactor handles go to
 `<pi agent dir>/squeeze-missed.jsonl` as `{"ts","session","cwd","cmd","chars"}`: the commands worth a compactor next.
 Content commands (`cat`, `jq`, `head`…) are never logged. `"logMissed": false` turns it off.
 

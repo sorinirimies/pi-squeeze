@@ -8,7 +8,7 @@
  */
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { completions, parseCommand } from "./command/parse.ts";
-import { compact, KINDS } from "./core/compact.ts";
+import { compact, handles, KINDS } from "./core/compact.ts";
 import { type Config, DEFAULT_CONFIG, optionsOf, readConfig, saveConfig } from "./core/config.ts";
 import { commandHead } from "./core/command.ts";
 import { isContent } from "./core/generic.ts";
@@ -78,8 +78,8 @@ export default function (pi: ExtensionAPI) {
 		const base = { ts: new Date(Date.now()).toISOString(), session: ctx.sessionManager?.getSessionId?.() ?? "", cwd: ctx.cwd ?? "" };
 		// Never more than pi would have shown.
 		if (!r || r.text.length >= shown.length) {
-			// A large report no compactor took: worth a compactor next. Content (cat, jq…) is meant to pass whole.
-			if (config.logMissed && shown.length >= config.missedChars && !isContent(command))
+			// A large report no compactor exists for: worth one next (a handled command with little to cut is not a miss). Content (cat, jq…) is meant to pass whole.
+			if (config.logMissed && shown.length >= config.missedChars && !isContent(command) && !handles(command))
 				void appendSaving({ ...base, cmd: commandHead(command), chars: shown.length }, missedLogPath());
 			return;
 		}

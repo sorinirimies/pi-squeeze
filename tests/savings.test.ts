@@ -88,6 +88,7 @@ describe("savings log", () => {
 		await hooks.tool_result!(res("cd /w && make all", big), fakeCtx());
 		await hooks.tool_result!(res("cat big.txt", big), fakeCtx());
 		await hooks.tool_result!(res("make all", "x".repeat(500)), fakeCtx());
+		await hooks.tool_result!(res("rg -n foo src", big), fakeCtx());
 		const path = missedLogPath();
 		await settle(path, 1);
 		await new Promise((r) => setTimeout(r, 20));
