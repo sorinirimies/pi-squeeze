@@ -3,6 +3,26 @@
 Generated from [Conventional Commits](https://www.conventionalcommits.org) by
 [git-cliff](https://git-cliff.org). Do not edit by hand.
 
+## [0.4.0](https://github.com/sorinirimies/pi-squeeze/releases/tag/v0.4.0) — 2026-11-11
+
+
+### ✨ Features
+
+- Run rtk-wrapped commands plain when a native compactor handles them; strip a leading cd dir; ([`fe404cc`](https://github.com/sorinirimies/pi-squeeze/commit/fe404cca863734727019a9a6725149c74cc70258))
+- Log command heads and missed outputs, all-time report in /squeeze status, configurable maxRatio ([`4ea6ab4`](https://github.com/sorinirimies/pi-squeeze/commit/4ea6ab4987d58b3909308524511c0c1a5e644e22))
+
+### 🐛 Fixes
+
+- **ci:** Quality gate reads npm 12 pack --json output ([`bdde367`](https://github.com/sorinirimies/pi-squeeze/commit/bdde36780e1d53784fdae348971902c085825a2d))
+
+### 🔧 Build & CI
+
+- **deps:** Bump Gitea workflow actions ([`6698a07`](https://github.com/sorinirimies/pi-squeeze/commit/6698a07c9e875b9b5317556aafc912ae4f9f13db))
+
+### 🧹 Chores
+
+- Nightly dev-tooling lockfile update 2026-11-10 (not released) ([`619bff6`](https://github.com/sorinirimies/pi-squeeze/commit/619bff6cbf936e6cb27d3dba57e4744d8340863f))
+- Nightly dev-tooling lockfile update 2026-11-11 (not released) ([`18b875c`](https://github.com/sorinirimies/pi-squeeze/commit/18b875c852267d38230ded63d442d28ac5d8b12c))
 ## [0.3.1](https://github.com/sorinirimies/pi-squeeze/releases/tag/v0.3.1) — 2026-11-09
 
 
