@@ -3,6 +3,12 @@
 Generated from [Conventional Commits](https://www.conventionalcommits.org) by
 [git-cliff](https://git-cliff.org). Do not edit by hand.
 
+## [0.4.1](https://github.com/sorinirimies/pi-squeeze/releases/tag/v0.4.1) — 2026-11-11
+
+
+### 🐛 Fixes
+
+- Missed log lists only commands no compactor handles ([`f015879`](https://github.com/sorinirimies/pi-squeeze/commit/f015879a9a4c45b858090b1833a327eb9f5f6086))
 ## [0.4.0](https://github.com/sorinirimies/pi-squeeze/releases/tag/v0.4.0) — 2026-11-11
 
 
